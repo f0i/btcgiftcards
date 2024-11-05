@@ -5,22 +5,39 @@
       "type": "motoko"
     },
     "btcgiftcards_frontend": {
-      "dependencies": [
-        "btcgiftcards_backend"
-      ],
-      "source": [
-        "src/btcgiftcards_frontend/dist"
-      ],
+      "dependencies": ["btcgiftcards_backend"],
+      "source": ["src/btcgiftcards_frontend/dist"],
       "type": "assets",
       "workspace": "btcgiftcards_frontend"
+    },
+    "ckbtc_ledger": {
+      "type": "custom",
+      "candid": "./external/icrc1_ledger.did",
+      "wasm": "./external/icrc1_ledger.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "mxzaz-hqaaa-aaaar-qaada-cai"
+        }
+      }
+    },
+    "ckbtc_index": {
+      "type": "custom",
+      "candid": "./external/icrc1_index.did",
+      "wasm": "./external/icrc1_index.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "n5wcd-faaaa-aaaar-qaaea-cai"
+        }
+      }
     }
   },
   "defaults": {
     "build": {
       "args": "",
-      "packtool": ""
+      "packtool": "mops sources"
     }
   },
   "output_env_file": ".env",
   "version": 1
 }
+
