@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "btcgiftcards_backend": {
+      "main": "src/btcgiftcards_backend/main.mo",
+      "type": "motoko"
+    },
+    "btcgiftcards_frontend": {
+      "dependencies": [
+        "btcgiftcards_backend"
+      ],
+      "source": [
+        "src/btcgiftcards_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "btcgiftcards_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
