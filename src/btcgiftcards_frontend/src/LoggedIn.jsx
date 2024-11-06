@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useAuth } from "./use-auth-client";
+import { encodeIcrcAccount } from "@dfinity/ledger-icrc";
+import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
 
 function LoggedIn() {
   const [result, setResult] = useState("");
-  const [giftcards, setGiftcards] = useState({
-    created: [],
-    email: [],
-    received: [],
-  });
+  const [giftcards, setGiftcards] = useState(null);
+  const [balance, setBalance] = useState(0n);
 
   const { backendActor, logout } = useAuth();
 
@@ -15,6 +14,19 @@ function LoggedIn() {
     const res = await backendActor.listGiftcards();
     console.log(res);
     setGiftcards(res);
+    const b = await ckbtc_ledger.icrc1_balance_of({
+      owner: res.account.owner,
+      subaccount: res.account.subaccount,
+    });
+    console.log("balance", b);
+    setBalance(b);
+  };
+
+  const encode = (account) => {
+    return encodeIcrcAccount({
+      owner: account.owner,
+      subaccount: account.subaccount[0],
+    });
   };
 
   const handleClick = async () => {
@@ -22,7 +34,9 @@ function LoggedIn() {
     const res = await backendActor.verifyEmail(email);
     console.log(res);
     setResult(JSON.stringify(res));
-    if ("ok" in res) await listGiftcards();
+    if ("ok" in res) {
+      await listGiftcards();
+    }
   };
 
   function handleSubmit(event) {
@@ -66,7 +80,21 @@ function LoggedIn() {
         <button type="submit">Create Giftcard!</button>
       </form>
       <section id="giftcard">{result}</section>
-      <section id="giftcards">{JSON.stringify(giftcards)}</section>
+      <section id="giftcards">
+        {giftcards ? encode(giftcards.account) : ""}
+        <br />
+        <br />
+        {JSON.stringify(giftcards?.created)}
+        <br />
+        {JSON.stringify(giftcards?.received)}
+        <br />
+        {giftcards?.email[0]}
+        <br />
+        {giftcards?.caller?.toString()}
+        <br />
+        <br />
+        Balance: {balance.toString()} ckSat
+      </section>
     </div>
   );
 }

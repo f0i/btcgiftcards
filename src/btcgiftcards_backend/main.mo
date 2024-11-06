@@ -116,6 +116,7 @@ actor class Main() = this {
     received : [Gift];
     email : ?Text;
     account : Account;
+    caller : Principal;
   } {
     let send = Option.get<Vec<Gift>>(Map.get(created, phash, caller), Vec.new());
     let email = Map.get(verified, phash, caller);
@@ -129,6 +130,7 @@ actor class Main() = this {
       received = Vec.toArray<Gift>(own);
       email;
       account;
+      caller;
     };
   };
 
