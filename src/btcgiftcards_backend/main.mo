@@ -32,7 +32,8 @@ actor class Main() = this {
   public shared ({ caller }) func createGiftCard(email : Text, amount : Nat, sender : Text, message : Text) : async Result<Mail> {
     // validate email
     if (not Email.isGmail(email)) return #err("Invalid or unsupported email address");
-    let normalized = Email.normalize(email);
+    let #ok(normalized) = Email.normalize(email) else return #err("Failed to normalize email address");
+
     let self = Principal.fromActor(this);
 
     // transfer funds to subaccount for email
@@ -61,7 +62,7 @@ actor class Main() = this {
 
     // generate gift card
     let link = "https://giftcard.f0i.de/redeem"; // TODO!
-    let mail = {
+    let mail : Mail = {
       to = normalized;
       subject = "You've Received a Gift from " # sender;
       body = message # "/n/n"
@@ -72,25 +73,31 @@ actor class Main() = this {
       link;
     };
 
-    Map.update(
+    ignore Map.update(
       created,
       phash,
       caller,
-      func(x) {
+      func(_ : Principal, x : ?Vec<Mail>) : ?Vec<Mail> {
         switch (x) {
-          case (null) Vec.init(1, mail);
-          case (?mails) Vec.add(mails, mail);
+          case (null) ?Vec.init(1, mail);
+          case (?mails) {
+            Vec.add(mails, mail);
+            null;
+          };
         };
       },
     );
-    Map.update(
+    ignore Map.update(
       received,
       thash,
       normalized,
-      func(x) {
+      func(_ : Text, x : ?Vec<Mail>) : ?Vec<Mail> {
         switch (x) {
-          case (null) Vec.init(1, mail);
-          case (?mails) Vec.add(mails, mail);
+          case (null) ?Vec.init(1, mail);
+          case (?mails) {
+            Vec.add(mails, mail);
+            null;
+          };
         };
       },
     );
@@ -103,22 +110,22 @@ actor class Main() = this {
     received : [Mail];
     email : ?Text;
   } {
-    let send = Option.withDefault(Map.get(created, phash, caller), Vec.new());
-    let email = Map.get(verified, phash, principal);
-    let own = switch (email) {
-      case (null) Vec.new();
-      case (?gmail) Option.get(Map.get(received, thash, gmail), Vec.new());
+    let send = Option.get<Vec<Mail>>(Map.get(created, phash, caller), Vec.new());
+    let email = Map.get(verified, phash, caller);
+    let own : Vec<Mail> = switch (email) {
+      case (null) Vec.new<Mail>();
+      case (?gmail) Option.get<Vec<Mail>>(Map.get(received, thash, gmail), Vec.new());
     };
 
     return {
-      created = Vec.toArray(send);
-      received = Vec.toArray(own);
+      created = Vec.toArray<Mail>(send);
+      received = Vec.toArray<Mail>(own);
       email;
     };
   };
 
-  public shared ({ caller }) func verifyEmail(email : Text) {
-
+  public shared ({ caller }) func verifyEmail(email : Text) : async Result<Text> {
+    return #err("not implemented");
   };
 
   private func getSubaccountEmail(email : Text) : Blob {

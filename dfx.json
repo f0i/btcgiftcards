@@ -29,6 +29,16 @@
           "ic": "n5wcd-faaaa-aaaar-qaaea-cai"
         }
       }
+    },
+    "iclogin": {
+      "type": "custom",
+      "candid": "./external/iclogin.did",
+      "wasm": "./external/iclogin.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "fhzgg-waaaa-aaaah-aqzvq-cai"
+        }
+      }
     }
   },
   "defaults": {
@@ -40,4 +50,3 @@
   "output_env_file": ".env",
   "version": 1
 }
-
