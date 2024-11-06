@@ -131,9 +131,14 @@ actor class Main() = this {
   };
 
   public shared ({ caller }) func verifyEmail(email : Text) : async Result<Text> {
+    if (not Email.isGmail(email)) return #err("Invalid or unsupported email address");
+    let #ok(normalized) = Email.normalize(email) else return #err("Failed to normalize email address");
     try {
       let res = await ICLogin.checkEmail(caller, email);
-      if (res) return #ok(email);
+      if (res) {
+        Map.set(verified, phash, caller, email);
+        return #ok(email);
+      };
       return #err("Email address could not be verified");
     } catch (err) {
       return #err("Failed to verify email address " # email # " " # Error.message(err));
