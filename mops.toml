@@ -1,5 +1,7 @@
 [dependencies]
 base = "0.12.1"
+map = "9.0.1"
+vector = "0.4.1"
 
 [toolchain]
 moc = "0.13.2"

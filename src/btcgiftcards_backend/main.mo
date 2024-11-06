@@ -6,21 +6,28 @@ import Array "mo:base/Array";
 import Text "mo:base/Text";
 import Error "mo:base/Error";
 import Nat "mo:base/Nat";
+import Option "mo:base/Option";
 import Email "Email";
 import Ledger "canister:ckbtc_ledger";
+import Map "mo:map/Map";
+import Set "mo:map/Set";
+import { phash; thash } "mo:map/Map";
+import Vec "mo:vector";
 
 actor class Main() = this {
   type Result<T> = Result.Result<T, Text>;
-
-  public query func greet(name : Text) : async Text {
-    return "Hello, " # name # "!";
-  };
+  type Map<K, V> = Map.Map<K, V>;
+  type Vec<V> = Vec.Vector<V>;
 
   type Mail = {
     subject : Text;
     body : Text;
     link : Text;
   };
+
+  stable var created : Map<Principal, Vec<Mail>> = Map.new();
+  stable var received : Map<Text, Vec<Mail>> = Map.new();
+  stable var verified : Map<Principal, Text> = Map.new();
 
   public shared ({ caller }) func createGiftCard(email : Text, amount : Nat, sender : Text, message : Text) : async Result<Mail> {
     // validate email
@@ -65,7 +72,53 @@ actor class Main() = this {
       link;
     };
 
+    Map.update(
+      created,
+      phash,
+      caller,
+      func(x) {
+        switch (x) {
+          case (null) Vec.init(1, mail);
+          case (?mails) Vec.add(mails, mail);
+        };
+      },
+    );
+    Map.update(
+      received,
+      thash,
+      normalized,
+      func(x) {
+        switch (x) {
+          case (null) Vec.init(1, mail);
+          case (?mails) Vec.add(mails, mail);
+        };
+      },
+    );
+
     return #ok(mail);
+  };
+
+  public shared query ({ caller }) func listGiftcards() : async {
+    created : [Mail];
+    received : [Mail];
+    email : ?Text;
+  } {
+    let send = Option.withDefault(Map.get(created, phash, caller), Vec.new());
+    let email = Map.get(verified, phash, principal);
+    let own = switch (email) {
+      case (null) Vec.new();
+      case (?gmail) Option.get(Map.get(received, thash, gmail), Vec.new());
+    };
+
+    return {
+      created = Vec.toArray(send);
+      received = Vec.toArray(own);
+      email;
+    };
+  };
+
+  public shared ({ caller }) func verifyEmail(email : Text) {
+
   };
 
   private func getSubaccountEmail(email : Text) : Blob {

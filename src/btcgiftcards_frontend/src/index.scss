@@ -10,28 +10,38 @@ img {
   margin: auto;
 }
 
+h1 {
+  width: 100%;
+  text-align: center;
+  font-size: larger;
+}
+
 form {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 0.5em;
-  flex-flow: row wrap;
-  max-width: 40vw;
+  width: 20em;
   margin: auto;
   align-items: baseline;
+}
+
+label {
+  text-align: right;
 }
 
 button[type="submit"] {
   padding: 5px 20px;
   margin: 10px auto;
-  float: right;
+  grid-column: span 2;
 }
 
-#greeting {
+#giftcard {
   margin: 10px auto;
   padding: 10px 60px;
   border: 1px solid #222;
+  max-width: 20em;
 }
 
-#greeting:empty {
+#giftcard:empty {
   display: none;
 }
