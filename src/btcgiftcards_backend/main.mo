@@ -7,29 +7,34 @@ import Text "mo:base/Text";
 import Error "mo:base/Error";
 import Nat "mo:base/Nat";
 import Option "mo:base/Option";
+import Time "mo:base/Time";
 import Email "Email";
 import Ledger "canister:ckbtc_ledger";
 import Map "mo:map/Map";
 import Set "mo:map/Set";
 import { phash; thash } "mo:map/Map";
 import Vec "mo:vector";
+import ICLogin "canister:iclogin";
 
 actor class Main() = this {
   type Result<T> = Result.Result<T, Text>;
   type Map<K, V> = Map.Map<K, V>;
   type Vec<V> = Vec.Vector<V>;
+  type Time = Time.Time;
 
-  type Mail = {
+  type Gift = {
+    to : Text;
     subject : Text;
     body : Text;
     link : Text;
+    created : Time;
   };
 
-  stable var created : Map<Principal, Vec<Mail>> = Map.new();
-  stable var received : Map<Text, Vec<Mail>> = Map.new();
+  stable var created : Map<Principal, Vec<Gift>> = Map.new();
+  stable var received : Map<Text, Vec<Gift>> = Map.new();
   stable var verified : Map<Principal, Text> = Map.new();
 
-  public shared ({ caller }) func createGiftCard(email : Text, amount : Nat, sender : Text, message : Text) : async Result<Mail> {
+  public shared ({ caller }) func createGiftCard(email : Text, amount : Nat, sender : Text, message : Text) : async Result<Gift> {
     // validate email
     if (not Email.isGmail(email)) return #err("Invalid or unsupported email address");
     let #ok(normalized) = Email.normalize(email) else return #err("Failed to normalize email address");
@@ -62,7 +67,7 @@ actor class Main() = this {
 
     // generate gift card
     let link = "https://giftcard.f0i.de/redeem"; // TODO!
-    let mail : Mail = {
+    let gift : Gift = {
       to = normalized;
       subject = "You've Received a Gift from " # sender;
       body = message # "/n/n"
@@ -71,17 +76,18 @@ actor class Main() = this {
       # "Follow the instruction and ideas how to use them./n/n"
       # "Enjoy!";
       link;
+      created = Time.now();
     };
 
     ignore Map.update(
       created,
       phash,
       caller,
-      func(_ : Principal, x : ?Vec<Mail>) : ?Vec<Mail> {
+      func(_ : Principal, x : ?Vec<Gift>) : ?Vec<Gift> {
         switch (x) {
-          case (null) ?Vec.init(1, mail);
+          case (null) ?Vec.init(1, gift);
           case (?mails) {
-            Vec.add(mails, mail);
+            Vec.add(mails, gift);
             null;
           };
         };
@@ -91,41 +97,47 @@ actor class Main() = this {
       received,
       thash,
       normalized,
-      func(_ : Text, x : ?Vec<Mail>) : ?Vec<Mail> {
+      func(_ : Text, x : ?Vec<Gift>) : ?Vec<Gift> {
         switch (x) {
-          case (null) ?Vec.init(1, mail);
+          case (null) ?Vec.init(1, gift);
           case (?mails) {
-            Vec.add(mails, mail);
+            Vec.add(mails, gift);
             null;
           };
         };
       },
     );
 
-    return #ok(mail);
+    return #ok(gift);
   };
 
   public shared query ({ caller }) func listGiftcards() : async {
-    created : [Mail];
-    received : [Mail];
+    created : [Gift];
+    received : [Gift];
     email : ?Text;
   } {
-    let send = Option.get<Vec<Mail>>(Map.get(created, phash, caller), Vec.new());
+    let send = Option.get<Vec<Gift>>(Map.get(created, phash, caller), Vec.new());
     let email = Map.get(verified, phash, caller);
-    let own : Vec<Mail> = switch (email) {
-      case (null) Vec.new<Mail>();
-      case (?gmail) Option.get<Vec<Mail>>(Map.get(received, thash, gmail), Vec.new());
+    let own : Vec<Gift> = switch (email) {
+      case (null) Vec.new<Gift>();
+      case (?gmail) Option.get<Vec<Gift>>(Map.get(received, thash, gmail), Vec.new());
     };
 
     return {
-      created = Vec.toArray<Mail>(send);
-      received = Vec.toArray<Mail>(own);
+      created = Vec.toArray<Gift>(send);
+      received = Vec.toArray<Gift>(own);
       email;
     };
   };
 
   public shared ({ caller }) func verifyEmail(email : Text) : async Result<Text> {
-    return #err("not implemented");
+    try {
+      let res = await ICLogin.checkEmail(caller, email);
+      if (res) return #ok(email);
+      return #err("Email address could not be verified");
+    } catch (err) {
+      return #err("Failed to verify email address " # email # " " # Error.message(err));
+    };
   };
 
   private func getSubaccountEmail(email : Text) : Blob {
@@ -136,7 +148,7 @@ actor class Main() = this {
   };
 
   private func getSubaccountPrincipal(principal : Principal) : Blob {
-    if (Principal.isAnonymous(principal)) Debug.trap("Must not be anonymous");
+    if (Principal.isAnonymous(principal)) Debug.trap("Not logged in");
 
     let p = Blob.toArray(Principal.toBlob(principal));
     assert (p.size() < 32);
