@@ -21,6 +21,8 @@ actor class Main() = this {
   type Map<K, V> = Map.Map<K, V>;
   type Vec<V> = Vec.Vector<V>;
   type Time = Time.Time;
+  type Account = { owner : Principal; subaccount : ?Blob };
+  let self = Principal.fromActor(this);
 
   type Gift = {
     to : Text;
@@ -38,8 +40,6 @@ actor class Main() = this {
     // validate email
     if (not Email.isGmail(email)) return #err("Invalid or unsupported email address");
     let #ok(normalized) = Email.normalize(email) else return #err("Failed to normalize email address");
-
-    let self = Principal.fromActor(this);
 
     // transfer funds to subaccount for email
     let fromAccount = getSubaccountPrincipal(caller);
@@ -115,6 +115,7 @@ actor class Main() = this {
     created : [Gift];
     received : [Gift];
     email : ?Text;
+    account : Account;
   } {
     let send = Option.get<Vec<Gift>>(Map.get(created, phash, caller), Vec.new());
     let email = Map.get(verified, phash, caller);
@@ -122,11 +123,12 @@ actor class Main() = this {
       case (null) Vec.new<Gift>();
       case (?gmail) Option.get<Vec<Gift>>(Map.get(received, thash, gmail), Vec.new());
     };
-
+    let account = { owner = self; subaccount = ?getSubaccountPrincipal(caller) };
     return {
       created = Vec.toArray<Gift>(send);
       received = Vec.toArray<Gift>(own);
       email;
+      account;
     };
   };
 
@@ -136,7 +138,7 @@ actor class Main() = this {
     try {
       let res = await ICLogin.checkEmail(caller, email);
       if (res) {
-        Map.set(verified, phash, caller, email);
+        Map.set(verified, phash, caller, normalized);
         return #ok(email);
       };
       return #err("Email address could not be verified");

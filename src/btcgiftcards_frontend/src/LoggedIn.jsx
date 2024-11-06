@@ -3,12 +3,26 @@ import { useAuth } from "./use-auth-client";
 
 function LoggedIn() {
   const [result, setResult] = useState("");
+  const [giftcards, setGiftcards] = useState({
+    created: [],
+    email: [],
+    received: [],
+  });
 
   const { backendActor, logout } = useAuth();
 
+  const listGiftcards = async () => {
+    const res = await backendActor.listGiftcards();
+    console.log(res);
+    setGiftcards(res);
+  };
+
   const handleClick = async () => {
-    const res = await backendActor.listCards();
-    setResult(res);
+    const email = "icidentify@gmail.com";
+    const res = await backendActor.verifyEmail(email);
+    console.log(res);
+    setResult(JSON.stringify(res));
+    if ("ok" in res) await listGiftcards();
   };
 
   function handleSubmit(event) {
@@ -36,6 +50,12 @@ function LoggedIn() {
       <button id="logout" onClick={logout}>
         log out
       </button>
+      <button id="list" onClick={listGiftcards}>
+        list
+      </button>
+      <button id="list" onClick={handleClick}>
+        verify
+      </button>
       <form action="#" onSubmit={handleSubmit}>
         <label htmlFor="name">Enter your name: &nbsp;</label>
         <input id="name" alt="Name" type="text" />
@@ -46,6 +66,7 @@ function LoggedIn() {
         <button type="submit">Create Giftcard!</button>
       </form>
       <section id="giftcard">{result}</section>
+      <section id="giftcards">{JSON.stringify(giftcards)}</section>
     </div>
   );
 }
