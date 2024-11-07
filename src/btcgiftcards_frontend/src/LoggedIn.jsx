@@ -39,6 +39,13 @@ function LoggedIn() {
     }
   };
 
+  function replacer(key, value) {
+    if (typeof value === "bigint") {
+      return `${value}n`; // Append 'n' to indicate a BigInt
+    }
+    return value;
+  }
+
   function handleSubmit(event) {
     event.preventDefault();
     const email = event.target.elements.email.value;
@@ -49,7 +56,7 @@ function LoggedIn() {
       .createGiftCard(email, amount, name, message)
       .then((greeting) => {
         console.log(greeting);
-        if ("ok" in greeting) setResult(JSON.stringify(greeting.ok));
+        if ("ok" in greeting) setResult(JSON.stringify(greeting.ok, replacer));
         else setResult("" + greeting.err);
       })
       .catch((err) => {
@@ -84,9 +91,9 @@ function LoggedIn() {
         {giftcards ? encode(giftcards.account) : ""}
         <br />
         <br />
-        {JSON.stringify(giftcards?.created)}
+        {JSON.stringify(giftcards?.created, replacer)}
         <br />
-        {JSON.stringify(giftcards?.received)}
+        {JSON.stringify(giftcards?.received, replacer)}
         <br />
         {giftcards?.email[0]}
         <br />
