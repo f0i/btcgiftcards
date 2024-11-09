@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "./use-auth-client";
 import { encodeIcrcAccount } from "@dfinity/ledger-icrc";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
-import { Account } from "../../declarations/btcgiftcards_backend/btcgiftcards_backend.did";
+import { Account } from "../../declarations/backend/backend.did";
 import { Principal } from "@dfinity/principal";
 
 function LoggedIn() {

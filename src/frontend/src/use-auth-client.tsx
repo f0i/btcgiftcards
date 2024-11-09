@@ -1,10 +1,6 @@
 import { AuthClient } from "@dfinity/auth-client";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import {
-  canisterId,
-  createActor,
-  btcgiftcards_backend,
-} from "../../declarations/btcgiftcards_backend";
+import { canisterId, createActor, backend } from "../../declarations/backend";
 import { Identity } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 import {
@@ -13,7 +9,7 @@ import {
   canisterId as canisterIdMinter,
 } from "../../declarations/ckbtc_minter";
 
-type BackendActor = typeof btcgiftcards_backend;
+type BackendActor = typeof backend;
 type MinterActor = typeof ckbtc_minter;
 const AuthContext = createContext({} as AuthProps);
 
