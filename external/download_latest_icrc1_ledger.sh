@@ -31,6 +31,9 @@ for COMMIT in $COMMITS; do
         continue
     fi
 
+    wget https://raw.githubusercontent.com/dfinity/ic/refs/heads/master/rs/bitcoin/ckbtc/minter/ckbtc_minter.did -O ckbtc_minter.did
+    wget https://download.dfinity.systems/ic/ac04d772c23ff771eaf526bee9ca9e9b411e129d/canisters/ic-ckbtc-minter.wasm.gz -O ckbtc_minter.wasm.gz
+
     echo "Found artifacts for commit $COMMIT."
     echo "Downloading .did and .wasm.gz for icrc1 ledger, icrc1 index, and internet identity."
 

@@ -3,9 +3,19 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   canisterId,
   createActor,
+  btcgiftcards_backend,
 } from "../../declarations/btcgiftcards_backend";
+import { Identity } from "@dfinity/agent";
+import { Principal } from "@dfinity/principal";
+import {
+  ckbtc_minter,
+  createActor as createMinterActor,
+  canisterId as canisterIdMinter,
+} from "../../declarations/ckbtc_minter";
 
-const AuthContext = createContext();
+type BackendActor = typeof btcgiftcards_backend;
+type MinterActor = typeof ckbtc_minter;
+const AuthContext = createContext({} as AuthProps);
 
 export const getIdentityProvider = () => {
   return "https://login.f0i.de";
@@ -29,6 +39,16 @@ export const defaultOptions = {
   },
 };
 
+type AuthProps = {
+  isAuthenticated: boolean;
+  login: () => void;
+  logout: () => void;
+  authClient?: AuthClient;
+  identity?: Identity;
+  principal?: Principal;
+  backendActor?: BackendActor;
+  minterActor?: MinterActor;
+};
 /**
  *
  * @param options - Options for the AuthClient
@@ -36,12 +56,19 @@ export const defaultOptions = {
  * @param {AuthClientLoginOptions} options.loginOptions - Options for the AuthClient.login() method
  * @returns
  */
-export const useAuthClient = (options = defaultOptions) => {
+export const useAuthClient = (options = defaultOptions): AuthProps => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authClient, setAuthClient] = useState(null);
-  const [identity, setIdentity] = useState(null);
-  const [principal, setPrincipal] = useState(null);
-  const [backendActor, setBackendActor] = useState(null);
+  const [authClient, setAuthClient] = useState<AuthClient | undefined>(
+    undefined,
+  );
+  const [identity, setIdentity] = useState<Identity | undefined>(undefined);
+  const [principal, setPrincipal] = useState<Principal | undefined>(undefined);
+  const [backendActor, setBackendActor] = useState<BackendActor | undefined>(
+    undefined,
+  );
+  const [minterActor, setMinterActor] = useState<MinterActor | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     // Initialize AuthClient
@@ -51,6 +78,10 @@ export const useAuthClient = (options = defaultOptions) => {
   }, []);
 
   const login = () => {
+    if (!authClient) {
+      console.error("authClient not set");
+      return;
+    }
     authClient.login({
       ...options.loginOptions,
       onSuccess: () => {
@@ -59,16 +90,14 @@ export const useAuthClient = (options = defaultOptions) => {
     });
   };
 
-  async function updateClient(client) {
+  async function updateClient(client: AuthClient) {
     const isAuthenticated = await client.isAuthenticated();
     setIsAuthenticated(isAuthenticated);
 
     const identity = client.getIdentity();
     setIdentity(identity);
-
     const principal = identity.getPrincipal();
     setPrincipal(principal);
-
     setAuthClient(client);
 
     const actor = createActor(canisterId, {
@@ -76,12 +105,22 @@ export const useAuthClient = (options = defaultOptions) => {
         identity,
       },
     });
-
     setBackendActor(actor);
+
+    const minterActor = createMinterActor(canisterIdMinter, {
+      agentOptions: {
+        identity,
+      },
+    });
+    setMinterActor(minterActor);
   }
 
   async function logout() {
-    await authClient?.logout();
+    if (!authClient) {
+      console.error("authClient not set");
+      return;
+    }
+    await authClient.logout();
     await updateClient(authClient);
   }
 
@@ -93,18 +132,16 @@ export const useAuthClient = (options = defaultOptions) => {
     identity,
     principal,
     backendActor,
+    minterActor,
   };
 };
 
-/**
- * @type {React.FC}
- */
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }: { children: any }) => {
   const auth = useAuthClient();
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
-  return useContext(AuthContext);
+  return useContext<AuthProps>(AuthContext);
 };

@@ -11,7 +11,6 @@ import Time "mo:base/Time";
 import Email "Email";
 import Ledger "canister:ckbtc_ledger";
 import Map "mo:map/Map";
-import Set "mo:map/Set";
 import { phash; thash } "mo:map/Map";
 import Vec "mo:vector";
 import ICLogin "canister:iclogin";

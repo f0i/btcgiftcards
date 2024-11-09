@@ -3,7 +3,7 @@ import LoggedOut from "./LoggedOut";
 import LoggedIn from "./LoggedIn";
 
 function App() {
-  const { isAuthenticated, identity } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <main>

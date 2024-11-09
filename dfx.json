@@ -30,6 +30,16 @@
         }
       }
     },
+    "ckbtc_minter": {
+      "type": "custom",
+      "candid": "./external/ckbtc_minter.did",
+      "wasm": "./external/ckbtc_minter.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "mqygn-kiaaa-aaaar-qaadq-cai"
+        }
+      }
+    },
     "iclogin": {
       "type": "custom",
       "candid": "./external/iclogin.did",
