@@ -1,9 +1,13 @@
 import { useState } from "react";
-import { useAuth } from "./use-auth-client";
+import { LedgerActor, useAuth } from "./use-auth-client";
 import { encodeIcrcAccount } from "@dfinity/ledger-icrc";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
-import { Account } from "../../declarations/backend/backend.did";
-import { Principal } from "@dfinity/principal";
+import {
+  Account,
+  Gift,
+  GiftInfo,
+} from "../../declarations/backend/backend.did";
+import { useQuery } from "@tanstack/react-query";
 
 function LoggedIn() {
   const [result, setResult] = useState("");
@@ -12,30 +16,22 @@ function LoggedIn() {
 
   const { backendActor, logout, minterActor } = useAuth();
 
+  const giftcardsQuery = useQuery({
+    queryKey: ["giftcards", backendActor],
+    queryFn: () => backendActor?.listGiftcards(),
+  });
+
   const listGiftcards = async () => {
     const res = await backendActor!.listGiftcards();
     console.log(res);
     setGiftcards(res);
-    const btcMintPromise = minterActor!.get_btc_address({
-      owner: [res.account.owner],
-      subaccount: res.account.subaccount,
-    });
-    const b = await ckbtc_ledger.icrc1_balance_of({
-      owner: res.account.owner,
-      subaccount: res.account.subaccount,
-    });
-    console.log("balance", b);
-    const btcMint = await btcMintPromise;
-    console.log("btc mint", btcMint);
+    //const btcMintPromise = minterActor!.get_btc_address({
+    //  owner: [res.account.owner],
+    //  subaccount: res.account.subaccount,
+    //});
 
-    setBalance(b);
-  };
-
-  const encode = (account: Account) => {
-    return encodeIcrcAccount({
-      owner: account.owner,
-      subaccount: account.subaccount[0],
-    });
+    //const btcMint = await btcMintPromise;
+    //console.log("btc mint", btcMint);
   };
 
   const handleClick = async () => {
@@ -97,11 +93,19 @@ function LoggedIn() {
       </form>
       <section id="giftcard">{result}</section>
       <section id="giftcards">
-        {giftcards ? encode(giftcards.account) : ""}
+        Status {JSON.stringify(giftcardsQuery.error ?? "ok", replacer)}
         <br />
         <br />
-        {JSON.stringify(giftcards?.created, replacer)}
         <br />
+        {giftcardsQuery.data && (
+          <UserInfo info={giftcardsQuery.data} ledger={ckbtc_ledger} />
+        )}
+        <br />
+        {giftcardsQuery.data?.created.map((gift) => GiftCard(gift)) ??
+          "No gift cards created"}
+        <br />
+        {giftcardsQuery.data?.received.map((gift) => GiftCard(gift)) ??
+          "No gift cards received"}
         {JSON.stringify(giftcards?.received, replacer)}
         <br />
         {giftcards?.email[0]}
@@ -111,6 +115,51 @@ function LoggedIn() {
         <br />
         Balance: {balance.toString()} ckSat
       </section>
+    </div>
+  );
+}
+
+function formatDateFromNano(time: bigint): string {
+  const date = new Date(Number(time / 1_000_000n));
+  return date.toISOString().substring(0, 10);
+}
+
+function UserInfo(props: { info: GiftInfo; ledger: LedgerActor }) {
+  const balanceQuery = useQuery({
+    queryKey: ["userinfo", props.info?.account.owner.toString()],
+    queryFn: () => {
+      return props.ledger.icrc1_balance_of({
+        owner: props.info.account.owner,
+        subaccount: props.info.account.subaccount,
+      });
+    },
+  });
+
+  const encode = (account: Account) => {
+    return encodeIcrcAccount({
+      owner: account.owner,
+      subaccount: account.subaccount[0],
+    });
+  };
+
+  return (
+    <div>
+      {balanceQuery.data?.toString()} ckSat
+      <br />
+      {props.info && encode(props.info.account)}
+    </div>
+  );
+}
+
+function GiftCard(gift: Gift) {
+  return (
+    <div className="card">
+      <div>To: {gift.to}</div>
+      <div>Created on {formatDateFromNano(gift.created)}</div>
+      <div>{gift.subject}</div>
+      <a href={gift.link} target="_blank" className="card-body">
+        <div>{gift.body}</div>
+      </a>
     </div>
   );
 }

@@ -45,3 +45,13 @@ button[type="submit"] {
 #giftcard:empty {
   display: none;
 }
+
+.card {
+  border: solid 1px gray;
+  padding: 1em 1em;
+}
+
+.card-body {
+  text-decoration: none;
+  color: black;
+}

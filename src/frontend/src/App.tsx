@@ -1,6 +1,7 @@
 import { useAuth, AuthProvider } from "./use-auth-client";
 import LoggedOut from "./LoggedOut";
 import LoggedIn from "./LoggedIn";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function App() {
   const { isAuthenticated } = useAuth();
@@ -15,8 +16,13 @@ function App() {
   );
 }
 
-export default () => (
-  <AuthProvider>
-    <App />
-  </AuthProvider>
-);
+export default () => {
+  const queryClient = new QueryClient();
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};

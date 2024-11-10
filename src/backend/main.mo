@@ -69,10 +69,10 @@ actor class Main() = this {
     let gift : Gift = {
       to = normalized;
       subject = "You've Received a Gift from " # sender;
-      body = message # "/n/n"
-      # "To redeem your " # formatCkBtc(amount) # ", simply click, the link below:/n/n"
-      # link # "/n/n"
-      # "Follow the instruction and ideas how to use them./n/n"
+      body = message # "\n\n"
+      # "To redeem your " # formatCkBtc(amount) # ", simply click, the link below:\n\n"
+      # link # "\n\n"
+      # "Follow the instruction and ideas how to use them.\n\n"
       # "Enjoy!";
       link;
       created = Time.now();
@@ -110,13 +110,15 @@ actor class Main() = this {
     return #ok(gift);
   };
 
-  public shared query ({ caller }) func listGiftcards() : async {
+  type GiftInfo = {
     created : [Gift];
     received : [Gift];
     email : ?Text;
     account : Account;
     caller : Principal;
-  } {
+  };
+
+  public shared query ({ caller }) func listGiftcards() : async GiftInfo {
     let send = Option.get<Vec<Gift>>(Map.get(created, phash, caller), Vec.new());
     let email = Map.get(verified, phash, caller);
     let own : Vec<Gift> = switch (email) {

@@ -8,9 +8,15 @@ import {
   createActor as createMinterActor,
   canisterId as canisterIdMinter,
 } from "../../declarations/ckbtc_minter";
+import {
+  ckbtc_ledger,
+  createActor as createLedgerActor,
+  canisterId as canisterIdLedger,
+} from "../../declarations/ckbtc_ledger";
 
-type BackendActor = typeof backend;
-type MinterActor = typeof ckbtc_minter;
+export type BackendActor = typeof backend;
+export type MinterActor = typeof ckbtc_minter;
+export type LedgerActor = typeof ckbtc_ledger;
 const AuthContext = createContext({} as AuthProps);
 
 export const getIdentityProvider = () => {
