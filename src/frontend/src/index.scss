@@ -46,12 +46,29 @@ button[type="submit"] {
   display: none;
 }
 
-.card {
+.card, .box {
   border: solid 1px gray;
   padding: 1em 1em;
+  margin: .5em auto;
+  max-width: 30em;
 }
 
 .card-body {
   text-decoration: none;
+  white-space: break-spaces;
   color: black;
+}
+
+.card-date {
+  float: right
+}
+
+.info-address {
+  font-size: .9em;
+  font-family: mono;
+  word-break: break-all;
+  color: #248;
+  border: 1px solid;
+  padding: .5em;
+  margin: .5em;
 }

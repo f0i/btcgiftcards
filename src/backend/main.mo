@@ -34,6 +34,7 @@ actor class Main() = this {
   stable var created : Map<Principal, Vec<Gift>> = Map.new();
   stable var received : Map<Text, Vec<Gift>> = Map.new();
   stable var verified : Map<Principal, Text> = Map.new();
+  stable var lookup : Map<Text, Gift> = Map.new();
 
   public shared ({ caller }) func createGiftCard(email : Text, amount : Nat, sender : Text, message : Text) : async Result<Gift> {
     // validate email
@@ -70,7 +71,7 @@ actor class Main() = this {
       to = normalized;
       subject = "You've Received a Gift from " # sender;
       body = message # "\n\n"
-      # "To redeem your " # formatCkBtc(amount) # ", simply click, the link below:\n\n"
+      # "To redeem your " # formatCkBtc(amount) # ", simply click the link below:\n\n"
       # link # "\n\n"
       # "Follow the instruction and ideas how to use them.\n\n"
       # "Enjoy!";
@@ -115,7 +116,12 @@ actor class Main() = this {
     received : [Gift];
     email : ?Text;
     account : Account;
+    accountEmail : ?Account;
     caller : Principal;
+  };
+
+  public shared query func showGiftcard(id : Text) : async ?Gift {
+    return Map.get(lookup, thash, id);
   };
 
   public shared query ({ caller }) func listGiftcards() : async GiftInfo {
@@ -126,11 +132,17 @@ actor class Main() = this {
       case (?gmail) Option.get<Vec<Gift>>(Map.get(received, thash, gmail), Vec.new());
     };
     let account = { owner = self; subaccount = ?getSubaccountPrincipal(caller) };
+    let accountEmail = Option.map<Text, Account>(
+      email,
+      func(gmail) = { owner = self; subaccount = ?getSubaccountEmail(gmail) },
+    );
+
     return {
       created = Vec.toArray<Gift>(send);
       received = Vec.toArray<Gift>(own);
       email;
       account;
+      accountEmail;
       caller;
     };
   };

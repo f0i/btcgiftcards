@@ -7,40 +7,32 @@ import {
   Gift,
   GiftInfo,
 } from "../../declarations/backend/backend.did";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 function LoggedIn() {
   const [result, setResult] = useState("");
-  const [giftcards, setGiftcards] = useState<any>(null);
-  const [balance, setBalance] = useState(0n);
+  const queryClient = useQueryClient();
 
-  const { backendActor, logout, minterActor } = useAuth();
+  const { backendActor, logout, minterActor, isAuthenticated, identity } =
+    useAuth();
 
-  const giftcardsQuery = useQuery({
-    queryKey: ["giftcards", backendActor],
-    queryFn: () => backendActor?.listGiftcards(),
+  const { isLoading, isError, data, refetch, error } = useQuery({
+    queryKey: ["giftcards", backendActor, isAuthenticated],
+    queryFn: () => {
+      if (identity && !identity.getPrincipal().isAnonymous()) {
+        return backendActor?.listGiftcards();
+      }
+      return null;
+    },
   });
 
-  const listGiftcards = async () => {
-    const res = await backendActor!.listGiftcards();
-    console.log(res);
-    setGiftcards(res);
-    //const btcMintPromise = minterActor!.get_btc_address({
-    //  owner: [res.account.owner],
-    //  subaccount: res.account.subaccount,
-    //});
-
-    //const btcMint = await btcMintPromise;
-    //console.log("btc mint", btcMint);
-  };
-
   const handleClick = async () => {
-    const email = "icidentify@gmail.com";
+    const email = "icidentify@gmail.com"; //TODO! set email address
     const res = await backendActor!.verifyEmail(email);
     console.log(res);
     setResult(JSON.stringify(res));
     if ("ok" in res) {
-      await listGiftcards();
+      queryClient.invalidateQueries();
     }
   };
 
@@ -76,13 +68,7 @@ function LoggedIn() {
       <button id="logout" onClick={logout}>
         log out
       </button>
-      <button id="list" onClick={listGiftcards}>
-        list
-      </button>
-      <button id="list" onClick={handleClick}>
-        verify
-      </button>
-      <form action="#" onSubmit={handleSubmit}>
+      <form action="#" onSubmit={handleSubmit} className="box">
         <label htmlFor="name">Enter your name: &nbsp;</label>
         <input id="name" alt="Name" type="text" />
         <label htmlFor="email">Recipient Email: &nbsp;</label>
@@ -93,27 +79,30 @@ function LoggedIn() {
       </form>
       <section id="giftcard">{result}</section>
       <section id="giftcards">
-        Status {JSON.stringify(giftcardsQuery.error ?? "ok", replacer)}
-        <br />
-        <br />
-        <br />
-        {giftcardsQuery.data && (
-          <UserInfo info={giftcardsQuery.data} ledger={ckbtc_ledger} />
-        )}
-        <br />
-        {giftcardsQuery.data?.created.map((gift) => GiftCard(gift)) ??
-          "No gift cards created"}
-        <br />
-        {giftcardsQuery.data?.received.map((gift) => GiftCard(gift)) ??
-          "No gift cards received"}
-        {JSON.stringify(giftcards?.received, replacer)}
-        <br />
-        {giftcards?.email[0]}
-        <br />
-        {giftcards?.caller?.toString()}
-        <br />
-        <br />
-        Balance: {balance.toString()} ckSat
+        <div className="box">
+          User info status{" "}
+          {isLoading ? "loading..." : isError ? "error " + error : "ok"}
+          {data?.email.length === 1 ? (
+            "Own email address " + data.email[0]
+          ) : (
+            <div>
+              <form>
+                <label htmlFor="gmail">Enter a message: &nbsp;</label>
+                <input id="gmail" type="text" />
+                <button type="submit">Verify Gmail Address</button>
+              </form>
+            </div>
+          )}
+          {data && <UserInfo info={data} ledger={ckbtc_ledger} />}
+        </div>
+        <div className="box">
+          <h3>Created Gift Cards</h3>
+          <GiftcardList gifts={data?.created ?? []} />
+        </div>
+        <div className="box">
+          <h3>Received Gift Cards</h3>
+          <GiftcardList gifts={data?.received ?? []} />
+        </div>
       </section>
     </div>
   );
@@ -124,13 +113,36 @@ function formatDateFromNano(time: bigint): string {
   return date.toISOString().substring(0, 10);
 }
 
+function GiftcardList({ gifts }: { gifts: Gift[] }) {
+  if (gifts.length === 0) return "No gift cards";
+
+  return (
+    <div>
+      {gifts.map((gift) => (
+        <GiftCard gift={gift} />
+      ))}
+    </div>
+  );
+}
+
 function UserInfo(props: { info: GiftInfo; ledger: LedgerActor }) {
-  const balanceQuery = useQuery({
-    queryKey: ["userinfo", props.info?.account.owner.toString()],
+  const { isLoading, isError, data, error, refetch } = useQuery({
+    queryKey: ["userinfo", props.info.account.owner.toString()],
     queryFn: () => {
       return props.ledger.icrc1_balance_of({
         owner: props.info.account.owner,
         subaccount: props.info.account.subaccount,
+      });
+    },
+  });
+
+  const giftCardBalance = useQuery({
+    queryKey: ["userinfo", props.info?.accountEmail?.[0]?.owner.toString()],
+    queryFn: () => {
+      if (!props.info.accountEmail?.[0]) return null;
+      return props.ledger.icrc1_balance_of({
+        owner: props.info.accountEmail[0].owner,
+        subaccount: props.info.accountEmail[0].subaccount,
       });
     },
   });
@@ -144,19 +156,33 @@ function UserInfo(props: { info: GiftInfo; ledger: LedgerActor }) {
 
   return (
     <div>
-      {balanceQuery.data?.toString()} ckSat
       <br />
-      {props.info && encode(props.info.account)}
+      ckBTC deposit account: <button>Copy Deposit Account</button>
+      <div className="info-address">{encode(props.info.account)}</div>
+      <br />
+      Account balance:{" "}
+      {!isError ? data?.toString() + " ckSat" : "Error " + error}
+      <br />
+      email: {props.info.email[0] ?? "Not verified"}
+      <br />
+      Gift card balance:{" "}
+      {!giftCardBalance.isError
+        ? giftCardBalance.data?.toString() + " ckSat"
+        : "Error " + error}
+      <br />
     </div>
   );
 }
 
-function GiftCard(gift: Gift) {
+function GiftCard({ gift }: { gift: Gift }) {
   return (
     <div className="card">
+      <div className="card-date">{formatDateFromNano(gift.created)}</div>
       <div>To: {gift.to}</div>
-      <div>Created on {formatDateFromNano(gift.created)}</div>
+      <br />
       <div>{gift.subject}</div>
+      <br />
+      <br />
       <a href={gift.link} target="_blank" className="card-body">
         <div>{gift.body}</div>
       </a>
