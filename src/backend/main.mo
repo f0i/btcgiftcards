@@ -171,7 +171,7 @@ actor class Main() = this {
     let hash = Blob.toArray(Sha256.fromBlob(#sha224, Text.encodeUtf8(email)));
     assert (hash.size() < 32);
 
-    Blob.fromArray(Array.tabulate(32, func(i : Nat) : Nat8 = if (i < hash.size()) hash[i] else 0x00));
+    Blob.fromArray(Array.tabulate(32, func(i : Nat) : Nat8 = if (i < hash.size()) hash[i] else 0xee));
   };
 
   private func getSubaccountPrincipal(principal : Principal) : Blob {
@@ -180,7 +180,7 @@ actor class Main() = this {
     let p = Blob.toArray(Principal.toBlob(principal));
     assert (p.size() < 32);
 
-    Blob.fromArray(Array.tabulate(32, func(i : Nat) : Nat8 = if (i < p.size()) p[i] else 0x01));
+    Blob.fromArray(Array.tabulate(32, func(i : Nat) : Nat8 = if (i < p.size()) p[i] else 0xbb));
   };
 
   private func formatCkBtc(amount : Nat) : Text {
