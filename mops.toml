@@ -2,6 +2,7 @@
 base = "0.13.2"
 map = "9.0.1"
 vector = "0.4.1"
+sha2 = "0.1.0"
 
 [toolchain]
 moc = "0.13.2"

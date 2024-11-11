@@ -16,6 +16,7 @@ import Map "mo:map/Map";
 import { phash; thash } "mo:map/Map";
 import Vec "mo:vector";
 import ICLogin "canister:iclogin";
+import Sha256 "mo:sha2/Sha256";
 
 actor class Main() = this {
   type Result<T> = Result.Result<T, Text>;
@@ -167,10 +168,10 @@ actor class Main() = this {
   };
 
   private func getSubaccountEmail(email : Text) : Blob {
-    let p = Blob.toArray(Text.encodeUtf8(email));
-    if (p.size() >= 32) Debug.trap("Email address too long");
+    let hash = Blob.toArray(Sha256.fromBlob(#sha224, Text.encodeUtf8(email)));
+    assert (hash.size() < 32);
 
-    Blob.fromArray(Array.tabulate(32, func(i : Nat) : Nat8 = if (i < p.size()) p[i] else 0x00));
+    Blob.fromArray(Array.tabulate(32, func(i : Nat) : Nat8 = if (i < hash.size()) hash[i] else 0x00));
   };
 
   private func getSubaccountPrincipal(principal : Principal) : Blob {
