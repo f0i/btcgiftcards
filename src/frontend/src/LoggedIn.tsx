@@ -180,11 +180,11 @@ function GiftCard({ gift }: { gift: Gift }) {
       <div className="card-date">{formatDateFromNano(gift.created)}</div>
       <div>To: {gift.to}</div>
       <br />
-      <div>{gift.subject}</div>
+      <div>You received a gift from {gift.sender}</div>
       <br />
       <br />
-      <a href={gift.link} target="_blank" className="card-body">
-        <div>{gift.body}</div>
+      <a href={"/redeem#" + gift.id} target="_blank" className="card-body">
+        <div>{gift.message}</div>
       </a>
     </div>
   );

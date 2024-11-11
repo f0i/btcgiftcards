@@ -8,6 +8,8 @@ import Error "mo:base/Error";
 import Nat "mo:base/Nat";
 import Option "mo:base/Option";
 import Time "mo:base/Time";
+import Int "mo:base/Int";
+import Nat32 "mo:base/Nat32";
 import Email "Email";
 import Ledger "canister:ckbtc_ledger";
 import Map "mo:map/Map";
@@ -25,9 +27,9 @@ actor class Main() = this {
 
   type Gift = {
     to : Text;
-    subject : Text;
-    body : Text;
-    link : Text;
+    sender : Text;
+    message : Text;
+    id : Text;
     created : Time;
   };
 
@@ -66,16 +68,17 @@ actor class Main() = this {
     // At this point the ckBTC token is inside the subaccoutn for this email address
 
     // generate gift card
-    let link = "https://giftcard.f0i.de/redeem"; // TODO!
     let gift : Gift = {
+      id = giftHash({
+        id = "";
+        to = normalized;
+        sender;
+        message;
+        created = Time.now();
+      });
       to = normalized;
-      subject = "You've Received a Gift from " # sender;
-      body = message # "\n\n"
-      # "To redeem your " # formatCkBtc(amount) # ", simply click the link below:\n\n"
-      # link # "\n\n"
-      # "Follow the instruction and ideas how to use them.\n\n"
-      # "Enjoy!";
-      link;
+      sender;
+      message;
       created = Time.now();
     };
 
@@ -107,6 +110,7 @@ actor class Main() = this {
         };
       },
     );
+    Map.set(lookup, thash, gift.id, gift);
 
     return #ok(gift);
   };
@@ -180,6 +184,12 @@ actor class Main() = this {
 
   private func formatCkBtc(amount : Nat) : Text {
     Nat.toText(amount) # " ckSat";
+  };
+
+  private func giftHash(gift : Gift) : Text {
+    let time = Int.toText(gift.created);
+    let hash = Nat32.toText(Text.hash(gift.to # gift.message));
+    gift.to # " " # hash # time;
   };
 
 };
