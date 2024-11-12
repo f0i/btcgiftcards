@@ -8,6 +8,7 @@ import {
   GiftInfo,
 } from "../../declarations/backend/backend.did";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import CopyButton from "./CopyButton";
 
 function LoggedIn() {
   const [result, setResult] = useState("");
@@ -26,13 +27,16 @@ function LoggedIn() {
     },
   });
 
-  const handleClick = async () => {
+  const formVerifyEmail = async (event: any) => {
+    event.preventDefault();
     const email = "icidentify@gmail.com"; //TODO! set email address
     const res = await backendActor!.verifyEmail(email);
     console.log(res);
-    setResult(JSON.stringify(res));
     if ("ok" in res) {
+      setResult("Verified " + res.ok);
       queryClient.invalidateQueries();
+    } else {
+      setResult("Error: " + res.err);
     }
   };
 
@@ -86,7 +90,7 @@ function LoggedIn() {
             "Own email address " + data.email[0]
           ) : (
             <div>
-              <form>
+              <form action="#" onSubmit={formVerifyEmail}>
                 <label htmlFor="gmail">Enter a message: &nbsp;</label>
                 <input id="gmail" type="text" />
                 <button type="submit">Verify Gmail Address</button>
@@ -154,21 +158,29 @@ function UserInfo(props: { info: GiftInfo; ledger: LedgerActor }) {
     });
   };
 
+  const email = props.info.email[0];
+
   return (
     <div>
       <br />
-      ckBTC deposit account: <button>Copy Deposit Account</button>
+      ckBTC deposit account:{" "}
+      <CopyButton
+        label="Copy Deposit Account"
+        textToCopy={encode(props.info.account)}
+      />
       <div className="info-address">{encode(props.info.account)}</div>
       <br />
       Account balance:{" "}
       {!isError ? data?.toString() + " ckSat" : "Error " + error}
       <br />
-      email: {props.info.email[0] ?? "Not verified"}
+      email: {email ?? "Not verified"}
       <br />
       Gift card balance:{" "}
-      {!giftCardBalance.isError
-        ? giftCardBalance.data?.toString() + " ckSat"
-        : "Error " + error}
+      {email
+        ? !giftCardBalance.isError
+          ? giftCardBalance.data?.toString() + " ckSat"
+          : "Error " + error
+        : "-"}
       <br />
     </div>
   );

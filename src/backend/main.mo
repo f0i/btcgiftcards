@@ -167,6 +167,37 @@ actor class Main() = this {
     };
   };
 
+  public shared ({ caller }) func withdraw(to : Account, amount : Nat, main : Bool) : async Result<Text> {
+
+    // transfer funds to subaccount for email
+    let fromAccount = if (main) {
+      getSubaccountPrincipal(caller);
+    } else {
+      let ?email = Map.get(verified, phash, caller) else return #err("Email not verified.");
+      getSubaccountEmail(email);
+    };
+    let transferArgs : Ledger.TransferArg = {
+      memo = null;
+      amount;
+      from_subaccount = ?fromAccount;
+      fee = null;
+      to;
+      created_at_time = null;
+    };
+    var blockIndex = 0;
+    try {
+      let result = await Ledger.icrc1_transfer(transferArgs);
+      blockIndex := switch (result) {
+        case (#Err err) return #err("Transfer failed: " # debug_show (err));
+        case (#Ok blockIndex) blockIndex;
+      };
+    } catch (error) {
+      return #err("Transfer call failed: " # Error.message(error));
+    };
+
+    return #err("Not implemented");
+  };
+
   private func getSubaccountEmail(email : Text) : Blob {
     let hash = Blob.toArray(Sha256.fromBlob(#sha224, Text.encodeUtf8(email)));
     assert (hash.size() < 32);
