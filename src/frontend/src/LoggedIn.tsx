@@ -263,7 +263,7 @@ function UserInfo(props: {
     const res = await props.backend.withdraw(toAccount, amount, main);
     console.log(res);
     if ("ok" in res) {
-      alert("Withdrawal was successful!" + res.ok);
+      alert("Withdrawal was successful!\nTransaction ID " + res.ok);
       queryClient.invalidateQueries();
     } else {
       alert("Error: " + res.err);
