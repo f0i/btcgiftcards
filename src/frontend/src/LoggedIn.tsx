@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { BackendActor, LedgerActor, useAuth } from "./use-auth-client";
+import {
+  BackendActor,
+  LedgerActor,
+  MinterActor,
+  useAuth,
+} from "./use-auth-client";
 import { decodeIcrcAccount, encodeIcrcAccount } from "@dfinity/ledger-icrc";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
 import {
@@ -9,6 +14,8 @@ import {
 } from "../../declarations/backend/backend.did";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import CopyButton from "./CopyButton";
+import { backend } from "../../declarations/backend";
+import { QRCodeSVG } from "qrcode.react";
 
 function LoggedIn() {
   const [result, setResult] = useState("");
@@ -40,13 +47,6 @@ function LoggedIn() {
     }
   };
 
-  function replacer(key: any, value: any) {
-    if (typeof value === "bigint") {
-      return `${value}n`; // Append 'n' to indicate a BigInt
-    }
-    return value;
-  }
-
   function handleSubmit(event: any) {
     event.preventDefault();
     const email = event.target.elements.email.value;
@@ -57,6 +57,7 @@ function LoggedIn() {
       .createGiftCard(email, amount, name, message)
       .then((greeting) => {
         console.log(greeting);
+        queryClient.invalidateQueries();
         if ("ok" in greeting) setResult(JSON.stringify(greeting.ok, replacer));
         else setResult("" + greeting.err);
       })
@@ -73,10 +74,11 @@ function LoggedIn() {
         log out
       </button>
       <form action="#" onSubmit={handleSubmit} className="box">
+        <h3>New Gift Card</h3>
         <label htmlFor="name">Enter your name: &nbsp;</label>
         <input id="name" alt="Name" type="text" />
         <label htmlFor="email">Recipient Email: &nbsp;</label>
-        <input id="email" alt="Name" type="text" />
+        <input id="email" alt="Name" type="email" />
         <label htmlFor="message">Enter a message: &nbsp;</label>
         <textarea id="message" rows={5} />
         <button type="submit">Create Giftcard!</button>
@@ -84,7 +86,7 @@ function LoggedIn() {
       <section id="giftcard">{result}</section>
       <section id="giftcards">
         <div className="box">
-          <h3>User info</h3>
+          <h3>User Info</h3>
           {isLoading ? "loading..." : isError ? "Error " + error : ""}
           {data?.email.length === 1 ? (
             ""
@@ -97,7 +99,14 @@ function LoggedIn() {
               </form>
             </div>
           )}
-          {data && <UserInfo info={data} ledger={ckbtc_ledger} />}
+          {data && backendActor && minterActor && (
+            <UserInfo
+              info={data}
+              ledger={ckbtc_ledger}
+              backend={backendActor}
+              minter={minterActor}
+            />
+          )}
         </div>
         <div className="box">
           <h3>Created Gift Cards</h3>
@@ -129,10 +138,64 @@ function GiftcardList({ gifts }: { gifts: Gift[] }) {
   );
 }
 
+function DepositAddressBTC(props: { info: GiftInfo; minter: MinterActor }) {
+  const queryClient = useQueryClient();
+  const account = props.info.account;
+  const { isLoading, isError, data, error, refetch } = useQuery({
+    queryKey: ["deposit-address-btc", props.info.account.subaccount.toString()],
+    queryFn: () => {
+      return props.minter.get_btc_address({
+        owner: [account.owner],
+        subaccount: account.subaccount,
+      });
+    },
+  });
+
+  // TODO: remove dummy address
+  //return <BTCQRCode btcAddress="bc1qyawapemf4nsv6lc4z9tcltgfymsl2wklnecqlw" />;
+  if (isLoading) return <div>Loading BTC depossit address...</div>;
+  // TODO: log error
+  if (isError) return <div>Error getting BTC depossit address.</div>;
+  if (!data) return <div>No Data received</div>;
+  // TODO: render qr code
+  return (
+    <div>
+      BTC deposit address:
+      <BTCQRCode btcAddress={data} />
+    </div>
+  );
+}
+
+const BTCQRCode = ({ btcAddress }: { btcAddress: string }) => {
+  const btcUri = `bitcoin:${btcAddress}`;
+
+  return (
+    <div className="min-height-">
+      BTC deposit account:{" "}
+      <CopyButton label="Copy BTC Deposit Address" textToCopy={btcAddress} />
+      <br />
+      <div className="info-address min-height-200">
+        <span className="max-w-600">{btcAddress}</span>
+        <QRCodeSVG
+          width={150}
+          className="float-right w-300"
+          value={btcUri}
+          size={150} // in pixels
+          fgColor="#000000"
+          bgColor="transparent"
+          level="H" // Error correction: L, M, Q, H
+          marginSize={1}
+        />
+      </div>
+    </div>
+  );
+};
+
 function UserInfo(props: {
   info: GiftInfo;
   ledger: LedgerActor;
   backend: BackendActor;
+  minter: MinterActor;
 }) {
   const queryClient = useQueryClient();
 
@@ -147,7 +210,10 @@ function UserInfo(props: {
   });
 
   const giftCardBalance = useQuery({
-    queryKey: ["userinfo", props.info?.accountEmail?.[0]?.owner.toString()],
+    queryKey: [
+      "userinfo",
+      props.info?.accountEmail?.[0]?.subaccount.toString(),
+    ],
     queryFn: () => {
       if (!props.info.accountEmail?.[0]) return null;
       return props.ledger.icrc1_balance_of({
@@ -185,8 +251,8 @@ function UserInfo(props: {
           amount +
           " ckSat from " +
           (main ? "Main account" : "Gift Cards") +
-          " to " +
-          encode(account) +
+          " to \n" +
+          encode(toAccount) +
           "?",
       )
     ) {
@@ -197,7 +263,7 @@ function UserInfo(props: {
     const res = await props.backend.withdraw(toAccount, amount, main);
     console.log(res);
     if ("ok" in res) {
-      alert("Verified " + res.ok);
+      alert("Withdrawal was successful!" + res.ok);
       queryClient.invalidateQueries();
     } else {
       alert("Error: " + res.err);
@@ -207,9 +273,10 @@ function UserInfo(props: {
   return (
     <div>
       <br />
+      <DepositAddressBTC minter={props.minter} info={props.info} />
       ckBTC deposit account:{" "}
       <CopyButton
-        label="Copy Deposit Account"
+        label="Copy ckBTC Deposit Account"
         textToCopy={encode(props.info.account)}
       />
       <div className="info-address">{encode(props.info.account)}</div>
@@ -217,7 +284,7 @@ function UserInfo(props: {
       Account balance:{" "}
       {!isError ? data?.toString() + " ckSat" : "Error " + error}
       <br />
-      email: {email ?? "Not verified"}
+      Your email address: {email ?? "Not verified"}
       <br />
       Gift card balance:{" "}
       {email
@@ -260,6 +327,13 @@ function GiftCard({ gift }: { gift: Gift }) {
       </a>
     </div>
   );
+}
+
+function replacer(key: any, value: any) {
+  if (typeof value === "bigint") {
+    return `${value}n`; // Append 'n' to indicate a BigInt
+  }
+  return value;
 }
 
 export default LoggedIn;

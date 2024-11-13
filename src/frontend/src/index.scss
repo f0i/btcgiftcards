@@ -23,17 +23,23 @@ form {
   width: 20em;
   margin: auto;
   align-items: baseline;
+
+  h1, h2, h3, h4, h5, h6 {
+    grid-column: span 2;
+  }
+
+  label {
+    text-align: right;
+  }
+
+  button[type="submit"] {
+    padding: 5px 20px;
+    margin: 10px auto;
+    grid-column: span 2;
+  }
 }
 
-label {
-  text-align: right;
-}
 
-button[type="submit"] {
-  padding: 5px 20px;
-  margin: 10px auto;
-  grid-column: span 2;
-}
 
 #giftcard {
   margin: 10px auto;
@@ -59,8 +65,12 @@ button[type="submit"] {
   color: black;
 }
 
-.card-date {
+.float-right, .card-date {
   float: right
+}
+
+.min-height-200 {
+  min-height: 150px;
 }
 
 .info-address {
@@ -71,6 +81,8 @@ button[type="submit"] {
   border: 1px solid;
   padding: .5em;
   margin: .5em;
+  display: flex;
+  align-items: center;
 }
 
 #logout {
