@@ -16,6 +16,8 @@
     "src/frontend"
   ],
   "dependencies": {
-    "qrcode.react": "^4.1.0"
+    "@types/react-router-dom": "^5.3.3",
+    "qrcode.react": "^4.1.0",
+    "react-router-dom": "^6.28.0"
   }
 }

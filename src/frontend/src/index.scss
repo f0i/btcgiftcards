@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+//@tailwind base;
+//@tailwind components;
+//@tailwind utilities;
 
 body {
   font-family: sans-serif;
@@ -40,6 +40,7 @@ form {
     padding: 5px 20px;
     margin: 10px auto;
     grid-column: span 2;
+    border: 1px solid #234;
   }
 }
 
