@@ -157,12 +157,7 @@ function DepositAddressBTC(props: { info: GiftInfo; minter: MinterActor }) {
   // TODO: log error
   if (isError) return <div>Error getting BTC depossit address.</div>;
   if (!data) return <div>No Data received</div>;
-  return (
-    <div>
-      BTC deposit address:
-      <BTCQRCode btcAddress={data} />
-    </div>
-  );
+  return <BTCQRCode btcAddress={data} />;
 }
 
 const BTCQRCode = ({ btcAddress }: { btcAddress: string }) => {

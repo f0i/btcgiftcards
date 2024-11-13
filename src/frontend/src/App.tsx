@@ -15,12 +15,11 @@ function App() {
           element={
             <main>
               <h1>BTC Gift Cards</h1>
-              <br />
-              <br />
               {isAuthenticated ? <LoggedIn /> : <LoggedOut />}
             </main>
           }
         />
+        <Route path="/show/:id" element={<div>TODO</div>} />
       </Routes>
     </Router>
   );
