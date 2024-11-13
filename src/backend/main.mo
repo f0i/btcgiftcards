@@ -26,11 +26,14 @@ actor class Main() = this {
   type Account = { owner : Principal; subaccount : ?Blob };
   let self = Principal.fromActor(this);
 
+  let CARD_FEE = 180;
+
   type Gift = {
     to : Text;
     sender : Text;
     message : Text;
     id : Text;
+    amount : Nat;
     created : Time;
   };
 
@@ -46,21 +49,20 @@ actor class Main() = this {
 
     // transfer funds to subaccount for email
     let fromAccount = getSubaccountPrincipal(caller);
+
+    let feeAccount = { owner = self; subaccount = ?getSubaccountFor(#fees) };
+
     let toAccount = getSubaccountEmail(email);
-    let transferArgs : Ledger.TransferArg = {
-      memo = null;
-      amount;
-      from_subaccount = ?fromAccount;
-      fee = null;
-      to = { owner = self; subaccount = ?toAccount };
-      created_at_time = null;
-    };
+
+    let to = { owner = self; subaccount = ?toAccount };
     var blockIndex = 0;
     try {
-      let result = await Ledger.icrc1_transfer(transferArgs);
+      ignore await transfer(fromAccount, feeAccount, CARD_FEE);
+      let result = await transfer(fromAccount, to, amount);
+
       blockIndex := switch (result) {
-        case (#Err err) return #err("Transfer failed: " # debug_show (err));
-        case (#Ok blockIndex) blockIndex;
+        case (#err err) return #err(err);
+        case (#ok blockIndex) blockIndex;
       };
     } catch (error) {
       return #err("Transfer call failed: " # Error.message(error));
@@ -73,11 +75,13 @@ actor class Main() = this {
       id = giftHash({
         id = "";
         to = normalized;
+        amount;
         sender;
         message;
         created = Time.now();
       });
       to = normalized;
+      amount;
       sender;
       message;
       created = Time.now();
@@ -167,7 +171,7 @@ actor class Main() = this {
     };
   };
 
-  public shared ({ caller }) func withdraw(to : Account, amount : Nat, main : Bool) : async Result<Text> {
+  public shared ({ caller }) func withdraw(to : Account, amount : Nat, main : Bool) : async Result<Nat> {
 
     // transfer funds to subaccount for email
     let fromAccount = if (main) {
@@ -176,26 +180,28 @@ actor class Main() = this {
       let ?email = Map.get(verified, phash, caller) else return #err("Email not verified.");
       getSubaccountEmail(email);
     };
+
+    return await transfer(fromAccount, to, amount);
+  };
+
+  private func transfer(from : Blob, to : Account, amount : Nat) : async Result<Nat> {
     let transferArgs : Ledger.TransferArg = {
       memo = null;
       amount;
-      from_subaccount = ?fromAccount;
+      from_subaccount = ?from;
       fee = null;
       to;
       created_at_time = null;
     };
-    var blockIndex = 0;
     try {
       let result = await Ledger.icrc1_transfer(transferArgs);
-      blockIndex := switch (result) {
+      switch (result) {
         case (#Err err) return #err("Transfer failed: " # debug_show (err));
-        case (#Ok blockIndex) blockIndex;
+        case (#Ok blockIndex) return #ok(blockIndex);
       };
     } catch (error) {
       return #err("Transfer call failed: " # Error.message(error));
     };
-
-    return #err("Not implemented");
   };
 
   private func getSubaccountEmail(email : Text) : Blob {
@@ -203,6 +209,13 @@ actor class Main() = this {
     assert (hash.size() < 32);
 
     Blob.fromArray(Array.tabulate(32, func(i : Nat) : Nat8 = if (i < hash.size()) hash[i] else 0xee));
+  };
+
+  private func getSubaccountFor(category : { #fees; #donate }) : Blob {
+    switch (category) {
+      case (#fees) Blob.fromArray(Array.tabulate(32, func(i : Nat) : Nat8 = if (i == 0) 0xff else 0x00));
+      case (#donate) Blob.fromArray(Array.tabulate(32, func(i : Nat) : Nat8 = if (i == 0) 0xdd else 0x00));
+    };
   };
 
   private func getSubaccountPrincipal(principal : Principal) : Blob {

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { LedgerActor, useAuth } from "./use-auth-client";
-import { encodeIcrcAccount } from "@dfinity/ledger-icrc";
+import { BackendActor, LedgerActor, useAuth } from "./use-auth-client";
+import { decodeIcrcAccount, encodeIcrcAccount } from "@dfinity/ledger-icrc";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
 import {
   Account,
@@ -84,14 +84,14 @@ function LoggedIn() {
       <section id="giftcard">{result}</section>
       <section id="giftcards">
         <div className="box">
-          User info status{" "}
-          {isLoading ? "loading..." : isError ? "error " + error : "ok"}
+          <h3>User info</h3>
+          {isLoading ? "loading..." : isError ? "Error " + error : ""}
           {data?.email.length === 1 ? (
-            "Own email address " + data.email[0]
+            ""
           ) : (
             <div>
               <form action="#" onSubmit={formVerifyEmail}>
-                <label htmlFor="gmail">Enter a message: &nbsp;</label>
+                <label htmlFor="gmail">Your gmail address: &nbsp;</label>
                 <input id="gmail" type="text" />
                 <button type="submit">Verify Gmail Address</button>
               </form>
@@ -129,7 +129,13 @@ function GiftcardList({ gifts }: { gifts: Gift[] }) {
   );
 }
 
-function UserInfo(props: { info: GiftInfo; ledger: LedgerActor }) {
+function UserInfo(props: {
+  info: GiftInfo;
+  ledger: LedgerActor;
+  backend: BackendActor;
+}) {
+  const queryClient = useQueryClient();
+
   const { isLoading, isError, data, error, refetch } = useQuery({
     queryKey: ["userinfo", props.info.account.owner.toString()],
     queryFn: () => {
@@ -151,14 +157,52 @@ function UserInfo(props: { info: GiftInfo; ledger: LedgerActor }) {
     },
   });
 
-  const encode = (account: Account) => {
+  const encode = (account: Account): string => {
     return encodeIcrcAccount({
       owner: account.owner,
-      subaccount: account.subaccount[0],
+      subaccount: account.subaccount?.[0],
     });
+  };
+  const decode = (account: string): Account => {
+    let icrcAccount = decodeIcrcAccount(account);
+    return {
+      owner: icrcAccount.owner,
+      subaccount: icrcAccount.subaccount ? [icrcAccount.subaccount] : [],
+    };
   };
 
   const email = props.info.email[0];
+
+  const formWithdraw = async (event: any) => {
+    event.preventDefault();
+    const account = event.target.elements.account.value;
+    const main = event.target.elements.main.value === "main";
+    const amount = BigInt(event.target.elements.amount.value);
+    const toAccount = decode(account);
+    if (
+      !confirm(
+        "Withdraw " +
+          amount +
+          " ckSat from " +
+          (main ? "Main account" : "Gift Cards") +
+          " to " +
+          encode(account) +
+          "?",
+      )
+    ) {
+      alert("Withdrawl canceled.");
+      return;
+    }
+
+    const res = await props.backend.withdraw(toAccount, amount, main);
+    console.log(res);
+    if ("ok" in res) {
+      alert("Verified " + res.ok);
+      queryClient.invalidateQueries();
+    } else {
+      alert("Error: " + res.err);
+    }
+  };
 
   return (
     <div>
@@ -182,6 +226,22 @@ function UserInfo(props: { info: GiftInfo; ledger: LedgerActor }) {
           : "Error " + error
         : "-"}
       <br />
+      <form action="#" onSubmit={formWithdraw} className="box">
+        <label htmlFor="account">To Account: &nbsp;</label>
+        <input id="account" alt="Name" type="text" />
+        <label htmlFor="amount">Amount: &nbsp;</label>
+        <input id="amount" alt="Amount" type="number" min={90} />
+        <label htmlFor="main">From: &nbsp;</label>
+        <select id="main">
+          <option value="card">
+            Gift Cards ({giftCardBalance.data?.toString() ?? "-"} ckSat)
+          </option>
+          <option value="main">
+            Main Account ({data?.toString() ?? "-"} ckSat)
+          </option>
+        </select>
+        <button type="submit">Withdraw</button>
+      </form>
     </div>
   );
 }
