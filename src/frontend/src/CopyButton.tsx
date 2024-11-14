@@ -11,7 +11,7 @@ const CopyButton: React.FC<CopyButtonProps> = ({
 }) => {
   const [isCopied, setIsCopied] = useState(false);
 
-  const handleCopy = async () => {
+  const oldHandleCopy = async () => {
     try {
       await navigator.clipboard.writeText(textToCopy);
       setIsCopied(true);
@@ -21,7 +21,30 @@ const CopyButton: React.FC<CopyButtonProps> = ({
     }
   };
 
-  return <button onClick={handleCopy}>{isCopied ? "Copied!" : label}</button>;
+  const handleCopy = async () => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(textToCopy);
+        console.log("Copied to clipboard:", textToCopy);
+      } catch (error) {
+        console.error("Failed to copy:", error);
+      }
+    } else {
+      // Fallback method
+      const textArea = document.createElement("textarea");
+      textArea.value = textToCopy;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+    }
+  };
+
+  return (
+    <button onClick={handleCopy} className="button-sm">
+      {isCopied ? "Copied!" : label}
+    </button>
+  );
 };
 
 export default CopyButton;

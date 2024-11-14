@@ -5,17 +5,14 @@ import {
   MinterActor,
   useAuth,
 } from "./use-auth-client";
-import { decodeIcrcAccount, encodeIcrcAccount } from "@dfinity/ledger-icrc";
-import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
 import {
   Account,
   Gift,
   GiftInfo,
 } from "../../declarations/backend/backend.did";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import CopyButton from "./CopyButton";
-import { backend } from "../../declarations/backend";
-import { QRCodeSVG } from "qrcode.react";
+import InfoHeader from "./InfoHeader";
+import { decodeAccount, encodeAccount } from "./utils";
 
 function LoggedIn() {
   const [result, setResult] = useState("");
@@ -34,25 +31,32 @@ function LoggedIn() {
     },
   });
 
-  const formVerifyEmail = async (event: any) => {
-    event.preventDefault();
-    const email = "icidentify@gmail.com"; //TODO! set email address
-    const res = await backendActor!.verifyEmail(email);
-    console.log(res);
-    if ("ok" in res) {
-      setResult("Verified " + res.ok);
-      queryClient.invalidateQueries();
-    } else {
-      setResult("Error: " + res.err);
-    }
-  };
-
   function handleSubmit(event: any) {
     event.preventDefault();
     const email = event.target.elements.email.value;
-    const amount = 10000n;
+    const confirm = event.target.elements.email.value;
+    const amount = BigInt(event.target.elements.amount.value);
     const name = event.target.elements.name.value;
     const message = event.target.elements.message.value;
+    if (email !== confirm) {
+      alert("Error: Eamil addresses do not match.");
+      return;
+    }
+    if (
+      !confirm(
+        "Create a giftcard with " +
+          amount +
+          " ckSat for " +
+          " to " +
+          email +
+          "?\n\n A total of " +
+          (amount + 200n) +
+          " ckSat will be deducted from your main account.",
+      )
+    ) {
+      alert("Gift card creation canceled.");
+      return;
+    }
     backendActor!
       .createGiftCard(email, amount, name, message)
       .then((greeting) => {
@@ -69,54 +73,55 @@ function LoggedIn() {
   }
 
   return (
-    <div className="container">
-      <button id="logout" onClick={logout}>
-        log out
+    <div className="main">
+      <button id="logout" onClick={logout} className="group">
+        🚶‍➡️🚪
+        <div className="hidden group-hover:block">Sign out</div>
       </button>
-      <form action="#" onSubmit={handleSubmit} className="box">
-        <h3>New Gift Card</h3>
-        <label htmlFor="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <label htmlFor="email">Recipient Email: &nbsp;</label>
-        <input id="email" alt="Name" type="email" />
-        <label htmlFor="message">Enter a message: &nbsp;</label>
-        <textarea id="message" rows={5} />
-        <button type="submit">Create Giftcard!</button>
-      </form>
-      <section id="giftcard">{result}</section>
-      <section id="giftcards">
-        <div className="box">
-          <h3>User Info</h3>
-          {isLoading ? "loading..." : isError ? "Error " + error : ""}
-          {data?.email.length === 1 ? (
-            ""
-          ) : (
-            <div>
-              <form action="#" onSubmit={formVerifyEmail}>
-                <label htmlFor="gmail">Your gmail address: &nbsp;</label>
-                <input id="gmail" type="text" />
-                <button type="submit">Verify Gmail Address</button>
-              </form>
-            </div>
-          )}
-          {data && backendActor && minterActor && (
-            <UserInfo
-              info={data}
-              ledger={ckbtc_ledger}
-              backend={backendActor}
-              minter={minterActor}
-            />
-          )}
-        </div>
-        <div className="box">
+      <div className="content max-w-4xl mb-4">
+        <InfoHeader notify={setResult} />
+      </div>
+      <div className="content max-w-4xl mb-4">
+        <form action="#" onSubmit={handleSubmit}>
+          <h3 className="w-full">New Gift Card</h3>
+          <label htmlFor="name">Enter your name: &nbsp;</label>
+          <input id="name" alt="Name" type="text" />
+          <label htmlFor="email">Recipient Email: &nbsp;</label>
+          <input id="email" alt="Email" type="email" />
+          <label htmlFor="confirm">Confirm Email: &nbsp;</label>
+          <input id="confirm" alt="Email confirm" type="email" />
+          <label htmlFor="amount">Amount: &nbsp;</label>
+          <select id="amount">
+            {/* TODO: get current exchange rate */}
+            <option value="1000">1000 ckSat (~1$)</option>
+            <option value="1000">5000 ckSat (~5$)</option>
+            <option value="10000">10000 ckSat (~10$)</option>
+            <option value="10000">20000 ckSat (~20$)</option>
+            <option value="100000">50000 ckSat (~50$)</option>
+          </select>
+          <label htmlFor="message">Enter a message: &nbsp;</label>
+          <textarea id="message" rows={5} />
+          <div className="w-full bg-blue-100 border border-blue-300 text-blue-800 text-sm rounded-lg p-4 mb-6 inline-block">
+            ⚠️ <strong>Warning:</strong> The project is still under active
+            development. Please avoid loading large amounts onto the gift cards
+            at this stage, as there is a risk of funds being lost.
+          </div>
+          <button type="submit">Create Giftcard!</button>
+        </form>
+        <section id="giftcard">{result}</section>
+      </div>
+      <div className="content max-w-4xl mb-4">
+        <section id="giftcards">
           <h3>Created Gift Cards</h3>
           <GiftcardList gifts={data?.created ?? []} />
-        </div>
-        <div className="box">
+        </section>
+      </div>
+      <div className="content max-w-4xl mb-4">
+        <section id="giftcards">
           <h3>Received Gift Cards</h3>
           <GiftcardList gifts={data?.received ?? []} />
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }
@@ -132,60 +137,13 @@ function GiftcardList({ gifts }: { gifts: Gift[] }) {
   return (
     <div>
       {gifts.map((gift) => (
-        <GiftCard gift={gift} />
+        <GiftCard gift={gift} key={gift.id} />
       ))}
     </div>
   );
 }
 
-function DepositAddressBTC(props: { info: GiftInfo; minter: MinterActor }) {
-  const queryClient = useQueryClient();
-  const account = props.info.account;
-  const { isLoading, isError, data, error, refetch } = useQuery({
-    queryKey: ["deposit-address-btc", props.info.account.subaccount.toString()],
-    queryFn: () => {
-      return props.minter.get_btc_address({
-        owner: [account.owner],
-        subaccount: account.subaccount,
-      });
-    },
-  });
-
-  // TODO: remove dummy address
-  //return <BTCQRCode btcAddress="bc1qyawapemf4nsv6lc4z9tcltgfymsl2wklnecqlw" />;
-  if (isLoading) return <div>Loading BTC depossit address...</div>;
-  // TODO: log error
-  if (isError) return <div>Error getting BTC depossit address.</div>;
-  if (!data) return <div>No Data received</div>;
-  return <BTCQRCode btcAddress={data} />;
-}
-
-const BTCQRCode = ({ btcAddress }: { btcAddress: string }) => {
-  const btcUri = `bitcoin:${btcAddress}`;
-
-  return (
-    <div className="min-height-">
-      BTC deposit account:{" "}
-      <CopyButton label="Copy BTC Deposit Address" textToCopy={btcAddress} />
-      <br />
-      <div className="info-address min-height-200">
-        <span className="max-w-600">{btcAddress}</span>
-        <QRCodeSVG
-          width={150}
-          className="float-right w-300"
-          value={btcUri}
-          size={150} // in pixels
-          fgColor="#000000"
-          bgColor="transparent"
-          level="H" // Error correction: L, M, Q, H
-          marginSize={1}
-        />
-      </div>
-    </div>
-  );
-};
-
-function UserInfo(props: {
+function Withdraw(props: {
   info: GiftInfo;
   ledger: LedgerActor;
   backend: BackendActor;
@@ -193,6 +151,7 @@ function UserInfo(props: {
 }) {
   const queryClient = useQueryClient();
 
+  // TODO: deduplicate this query to avoid errors when updating the query
   const { isLoading, isError, data, error, refetch } = useQuery({
     queryKey: ["userinfo", props.info.account.owner.toString()],
     queryFn: () => {
@@ -203,6 +162,7 @@ function UserInfo(props: {
     },
   });
 
+  // TODO: deduplicate this query to avoid errors when updating the query
   const giftCardBalance = useQuery({
     queryKey: [
       "userinfo",
@@ -217,28 +177,12 @@ function UserInfo(props: {
     },
   });
 
-  const encode = (account: Account): string => {
-    return encodeIcrcAccount({
-      owner: account.owner,
-      subaccount: account.subaccount?.[0],
-    });
-  };
-  const decode = (account: string): Account => {
-    let icrcAccount = decodeIcrcAccount(account);
-    return {
-      owner: icrcAccount.owner,
-      subaccount: icrcAccount.subaccount ? [icrcAccount.subaccount] : [],
-    };
-  };
-
-  const email = props.info.email[0];
-
   const formWithdraw = async (event: any) => {
     event.preventDefault();
     const account = event.target.elements.account.value;
     const main = event.target.elements.main.value === "main";
     const amount = BigInt(event.target.elements.amount.value);
-    const toAccount = decode(account);
+    const toAccount = decodeAccount(account);
     if (
       !confirm(
         "Withdraw " +
@@ -246,7 +190,7 @@ function UserInfo(props: {
           " ckSat from " +
           (main ? "Main account" : "Gift Cards") +
           " to \n" +
-          encode(toAccount) +
+          encodeAccount(toAccount) +
           "?",
       )
     ) {
@@ -265,45 +209,22 @@ function UserInfo(props: {
   };
 
   return (
-    <div>
-      <br />
-      <DepositAddressBTC minter={props.minter} info={props.info} />
-      ckBTC deposit account:{" "}
-      <CopyButton
-        label="Copy ckBTC Deposit Account"
-        textToCopy={encode(props.info.account)}
-      />
-      <div className="info-address">{encode(props.info.account)}</div>
-      <br />
-      Account balance:{" "}
-      {!isError ? data?.toString() + " ckSat" : "Error " + error}
-      <br />
-      Your email address: {email ?? "Not verified"}
-      <br />
-      Gift card balance:{" "}
-      {email
-        ? !giftCardBalance.isError
-          ? giftCardBalance.data?.toString() + " ckSat"
-          : "Error " + error
-        : "-"}
-      <br />
-      <form action="#" onSubmit={formWithdraw} className="box">
-        <label htmlFor="account">To Account: &nbsp;</label>
-        <input id="account" alt="Name" type="text" />
-        <label htmlFor="amount">Amount: &nbsp;</label>
-        <input id="amount" alt="Amount" type="number" min={90} />
-        <label htmlFor="main">From: &nbsp;</label>
-        <select id="main">
-          <option value="card">
-            Gift Cards ({giftCardBalance.data?.toString() ?? "-"} ckSat)
-          </option>
-          <option value="main">
-            Main Account ({data?.toString() ?? "-"} ckSat)
-          </option>
-        </select>
-        <button type="submit">Withdraw</button>
-      </form>
-    </div>
+    <form action="#" onSubmit={formWithdraw} className="box">
+      <label htmlFor="account">To Account: &nbsp;</label>
+      <input id="account" alt="Name" type="text" />
+      <label htmlFor="amount">Amount: &nbsp;</label>
+      <input id="amount" alt="Amount" type="number" min={90} />
+      <label htmlFor="main">From: &nbsp;</label>
+      <select id="main">
+        <option value="card">
+          Gift Cards ({giftCardBalance.data?.toString() ?? "-"} ckSat)
+        </option>
+        <option value="main">
+          Main Account ({data?.toString() ?? "-"} ckSat)
+        </option>
+      </select>
+      <button type="submit">Withdraw</button>
+    </form>
   );
 }
 
