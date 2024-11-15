@@ -21,6 +21,10 @@ h1 {
   font-size: larger;
 }
 
+h3 {
+  @apply text-3xl font-bold mb-8;
+}
+
 form {
   label {
      @apply lg:w-1/3 w-full block float-left;
@@ -52,6 +56,18 @@ form {
 
 .button-sm {
   @apply px-2 py-1 border border-gray-300 text-sm rounded-md text-gray-700 hover:bg-gray-100 hover:text-black focus:outline-none focus:ring-2 focus:ring-gray-300 ml-4;
+}
+
+.button-tab {
+  @apply px-4 py-2  border-gray-300 text-xl font-bold text-gray-700 bg-white  hover:text-black focus:outline-none focus:ring-2 focus:ring-gray-300 flex-1 text-center;
+}
+.button-tab-active {
+  @apply button-tab border-t border-l border-r rounded-md;
+  margin-bottom: -10px;
+
+}
+.button-tab-inactive {
+  @apply button-tab border rounded-md mb-1 hover:bg-gray-100;
 }
 
 
@@ -101,5 +117,5 @@ form {
 }
 
 #logout {
-  @apply absolute top-4 right-4 text-gray-500 hover:text-gray-700 hover:bg-gray-200 p-4 text-sm font-medium transition;
+  @apply absolute top-4 right-4 text-gray-500 hover:text-gray-700 hover:bg-gray-200 p-4 text-sm font-medium transition rounded-xl;
 }

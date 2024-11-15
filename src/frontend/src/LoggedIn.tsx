@@ -11,10 +11,13 @@ import {
   GiftInfo,
 } from "../../declarations/backend/backend.did";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import InfoHeader from "./InfoHeader";
+import AccountInfo from "./AccountInfo";
 import { decodeAccount, encodeAccount } from "./utils";
+import { Link } from "react-router-dom";
 
-function LoggedIn() {
+type Tab = "created" | "new" | "received" | "account";
+
+function LoggedIn({ tab }: { tab: Tab }) {
   const [result, setResult] = useState("");
   const queryClient = useQueryClient();
 
@@ -39,11 +42,11 @@ function LoggedIn() {
     const name = event.target.elements.name.value;
     const message = event.target.elements.message.value;
     if (email !== confirm) {
-      alert("Error: Eamil addresses do not match.");
+      window.alert("Error: Eamil addresses do not match.");
       return;
     }
     if (
-      !confirm(
+      !window.confirm(
         "Create a giftcard with " +
           amount +
           " ckSat for " +
@@ -54,7 +57,7 @@ function LoggedIn() {
           " ckSat will be deducted from your main account.",
       )
     ) {
-      alert("Gift card creation canceled.");
+      window.alert("Gift card creation canceled.");
       return;
     }
     backendActor!
@@ -79,49 +82,97 @@ function LoggedIn() {
         <div className="hidden group-hover:block">Sign out</div>
       </button>
       <div className="content max-w-4xl mb-4">
-        <InfoHeader notify={setResult} />
+        <h1>ckBTC Gift Cards</h1>
       </div>
-      <div className="content max-w-4xl mb-4">
-        <form action="#" onSubmit={handleSubmit}>
-          <h3 className="w-full">New Gift Card</h3>
-          <label htmlFor="name">Enter your name: &nbsp;</label>
-          <input id="name" alt="Name" type="text" />
-          <label htmlFor="email">Recipient Email: &nbsp;</label>
-          <input id="email" alt="Email" type="email" />
-          <label htmlFor="confirm">Confirm Email: &nbsp;</label>
-          <input id="confirm" alt="Email confirm" type="email" />
-          <label htmlFor="amount">Amount: &nbsp;</label>
-          <select id="amount">
-            {/* TODO: get current exchange rate */}
-            <option value="1000">1000 ckSat (~1$)</option>
-            <option value="1000">5000 ckSat (~5$)</option>
-            <option value="10000">10000 ckSat (~10$)</option>
-            <option value="10000">20000 ckSat (~20$)</option>
-            <option value="100000">50000 ckSat (~50$)</option>
-          </select>
-          <label htmlFor="message">Enter a message: &nbsp;</label>
-          <textarea id="message" rows={5} />
-          <div className="w-full bg-blue-100 border border-blue-300 text-blue-800 text-sm rounded-lg p-4 mb-6 inline-block">
-            ⚠️ <strong>Warning:</strong> The project is still under active
-            development. Please avoid loading large amounts onto the gift cards
-            at this stage, as there is a risk of funds being lost.
-          </div>
-          <button type="submit">Create Giftcard!</button>
-        </form>
-        <section id="giftcard">{result}</section>
+      <div className="flex w-full max-w-4xl space-x-4">
+        <Link
+          to="/create"
+          className={
+            tab === "new" ? "button-tab-active" : "button-tab-inactive"
+          }
+        >
+          Create
+        </Link>
+        <Link
+          to="/received"
+          className={
+            tab === "received" ? "button-tab-active" : "button-tab-inactive"
+          }
+        >
+          Received
+        </Link>
+        <Link
+          to="/created"
+          className={
+            tab === "created" ? "button-tab-active" : "button-tab-inactive"
+          }
+        >
+          created
+        </Link>
+        <Link
+          to="/account"
+          className={
+            tab === "account" ? "button-tab-active" : "button-tab-inactive"
+          }
+        >
+          Account
+        </Link>
       </div>
-      <div className="content max-w-4xl mb-4">
-        <section id="giftcards">
-          <h3>Created Gift Cards</h3>
-          <GiftcardList gifts={data?.created ?? []} />
-        </section>
-      </div>
-      <div className="content max-w-4xl mb-4">
-        <section id="giftcards">
-          <h3>Received Gift Cards</h3>
-          <GiftcardList gifts={data?.received ?? []} />
-        </section>
-      </div>
+      {tab !== "new" ? null : (
+        <div className="content max-w-4xl mb-4">
+          <form action="#" onSubmit={handleSubmit}>
+            <h3 className="w-full">New Gift Card</h3>
+            <label htmlFor="name">Enter your name: &nbsp;</label>
+            <input id="name" alt="Name" type="text" />
+            <label htmlFor="email">Recipient Email: &nbsp;</label>
+            <input id="email" alt="Email" type="email" />
+            <label htmlFor="confirm">Confirm Email: &nbsp;</label>
+            <input id="confirm" alt="Email confirm" type="email" />
+            <label htmlFor="amount">Amount: &nbsp;</label>
+            <select id="amount">
+              {/* TODO: get current exchange rate */}
+              <option value="1000">1000 ckSat (~1$)</option>
+              <option value="1000">5000 ckSat (~5$)</option>
+              <option value="10000">10000 ckSat (~10$)</option>
+              <option value="10000">20000 ckSat (~20$)</option>
+              <option value="100000">50000 ckSat (~50$)</option>
+            </select>
+            <label htmlFor="message">Enter a message: &nbsp;</label>
+            <textarea id="message" rows={5} />
+            <div className="w-full bg-blue-100 border border-blue-300 text-blue-800 text-sm rounded-lg p-4 mb-6 inline-block">
+              ⚠️ <strong>Warning:</strong> The project is still under active
+              development. Please avoid loading large amounts onto the gift
+              cards at this stage, as there is a risk of funds being lost.
+            </div>
+            <button type="submit">Create Giftcard!</button>
+          </form>
+          <section id="giftcard">{result}</section>
+        </div>
+      )}
+      {tab !== "created" ? null : (
+        <div className="content max-w-4xl mb-4">
+          <section id="giftcards">
+            <h3>Created Gift Cards</h3>
+            <GiftcardList gifts={data?.created ?? []} />
+          </section>
+        </div>
+      )}
+      {tab !== "received" ? null : (
+        <div className="content max-w-4xl mb-4">
+          <section id="giftcards">
+            <h3>Received Gift Cards</h3>
+            <GiftcardList gifts={data?.received ?? []} />
+          </section>
+        </div>
+      )}
+      {tab !== "account" ? null : (
+        <div className="content max-w-4xl mb-4">
+          <section id="giftcards">
+            <h3>Account</h3>
+            <AccountInfo notify={(_: unknown) => {}} />
+          </section>
+        </div>
+      )}
     </div>
   );
 }
@@ -184,7 +235,7 @@ function Withdraw(props: {
     const amount = BigInt(event.target.elements.amount.value);
     const toAccount = decodeAccount(account);
     if (
-      !confirm(
+      !window.confirm(
         "Withdraw " +
           amount +
           " ckSat from " +
@@ -194,17 +245,17 @@ function Withdraw(props: {
           "?",
       )
     ) {
-      alert("Withdrawl canceled.");
+      window.alert("Withdrawl canceled.");
       return;
     }
 
     const res = await props.backend.withdraw(toAccount, amount, main);
     console.log(res);
     if ("ok" in res) {
-      alert("Withdrawal was successful!\nTransaction ID " + res.ok);
+      window.alert("Withdrawal was successful!\nTransaction ID " + res.ok);
       queryClient.invalidateQueries();
     } else {
-      alert("Error: " + res.err);
+      window.alert("Error: " + res.err);
     }
   };
 

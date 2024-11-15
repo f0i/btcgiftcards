@@ -12,7 +12,27 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={isAuthenticated ? <LoggedIn /> : <LoggedOut />}
+          element={
+            isAuthenticated ? <LoggedIn tab="received" /> : <LoggedOut />
+          }
+        />
+        <Route
+          path="/create"
+          element={isAuthenticated ? <LoggedIn tab="new" /> : <LoggedOut />}
+        />
+        <Route
+          path="/created"
+          element={isAuthenticated ? <LoggedIn tab="created" /> : <LoggedOut />}
+        />
+        <Route
+          path="/received"
+          element={
+            isAuthenticated ? <LoggedIn tab="received" /> : <LoggedOut />
+          }
+        />
+        <Route
+          path="/account"
+          element={isAuthenticated ? <LoggedIn tab="account" /> : <LoggedOut />}
         />
         <Route path="/show/:id" element={<div>TODO</div>} />
         <Route path="/colors" element={<ColorTest />} />

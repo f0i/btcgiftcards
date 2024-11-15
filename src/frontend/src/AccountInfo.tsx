@@ -12,7 +12,7 @@ import CopyButton from "./CopyButton";
 import { QRCodeSVG } from "qrcode.react";
 import { encodeAccount } from "./utils";
 
-function InfoHeader(props: { notify: any }) {
+function AccountInfo(props: { notify: any }) {
   const { backendActor, minterActor, isAuthenticated, identity } = useAuth();
   const queryClient = useQueryClient();
 
@@ -68,7 +68,7 @@ function InfoHeader(props: { notify: any }) {
   );
 }
 
-export default InfoHeader;
+export default AccountInfo;
 
 function UserInfo(props: {
   info: GiftInfo;
