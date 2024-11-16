@@ -108,7 +108,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
             tab === "created" ? "button-tab-active" : "button-tab-inactive"
           }
         >
-          created
+          Created
         </Link>
         <Link
           to="/account"
@@ -296,6 +296,8 @@ function GiftCard({ gift }: { gift: Gift }) {
       <div>To: {gift.to}</div>
       <br />
       <div>You received a gift from {gift.sender}</div>
+      <br />
+      <div>Value: {gift.amount.toString()} ckBTC</div>
       <br />
       <br />
       <a href={"/redeem#" + gift.id} target="_blank" className="card-body">
