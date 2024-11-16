@@ -14,6 +14,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import AccountInfo from "./AccountInfo";
 import { decodeAccount, encodeAccount } from "./utils";
 import { Link } from "react-router-dom";
+import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
 
 type Tab = "created" | "new" | "received" | "account";
 
@@ -84,7 +85,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
       <div className="content max-w-4xl mb-4">
         <h1>ckBTC Gift Cards</h1>
       </div>
-      <div className="flex w-full max-w-4xl space-x-4">
+      <div className="flex w-full max-w-4xl space-x-4 overflow-x-auto overflow-y-hidden">
         <Link
           to="/create"
           className={
@@ -139,7 +140,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
             </select>
             <label htmlFor="message">Enter a message: &nbsp;</label>
             <textarea id="message" rows={5} />
-            <div className="w-full bg-blue-100 border border-blue-300 text-blue-800 text-sm rounded-lg p-4 mb-6 inline-block">
+            <div className="w-full bg-blue-100 border border-blue-300 text-blue-800 text-sm rounded-lg p-4 my-2 inline-block">
               ⚠️ <strong>Warning:</strong> The project is still under active
               development. Please avoid loading large amounts onto the gift
               cards at this stage, as there is a risk of funds being lost.
@@ -170,6 +171,15 @@ function LoggedIn({ tab }: { tab: Tab }) {
           <section id="giftcards">
             <h3>Account</h3>
             <AccountInfo notify={(_: unknown) => {}} />
+            <h3 className="mt-12">Withdraw</h3>
+            {!data || !backendActor || !minterActor ? null : (
+              <Withdraw
+                info={data}
+                ledger={ckbtc_ledger}
+                backend={backendActor}
+                minter={minterActor}
+              />
+            )}
           </section>
         </div>
       )}
@@ -260,7 +270,7 @@ function Withdraw(props: {
   };
 
   return (
-    <form action="#" onSubmit={formWithdraw} className="box">
+    <form action="#" onSubmit={formWithdraw}>
       <label htmlFor="account">To Account: &nbsp;</label>
       <input id="account" alt="Name" type="text" />
       <label htmlFor="amount">Amount: &nbsp;</label>
