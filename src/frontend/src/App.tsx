@@ -3,6 +3,7 @@ import LoggedOut from "./LoggedOut";
 import LoggedIn from "./LoggedIn";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ShowGiftCard from "./ShowGiftCard";
 
 function App() {
   const { isAuthenticated } = useAuth();
@@ -34,7 +35,8 @@ function App() {
           path="/account"
           element={isAuthenticated ? <LoggedIn tab="account" /> : <LoggedOut />}
         />
-        <Route path="/show/:id" element={<div>TODO</div>} />
+        <Route path="/show/:giftId" element={<ShowGiftCard />} />
+        <Route path="/send/:giftId" element={<ShowGiftCard />} />
         <Route path="/colors" element={<ColorTest />} />
         <Route path="/signin" element={<LoggedOut />} />
       </Routes>

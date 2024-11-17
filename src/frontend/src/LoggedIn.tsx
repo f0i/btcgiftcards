@@ -1,31 +1,27 @@
-import { useState } from "react";
 import {
   BackendActor,
   LedgerActor,
   MinterActor,
   useAuth,
 } from "./use-auth-client";
-import {
-  Account,
-  Gift,
-  GiftInfo,
-} from "../../declarations/backend/backend.did";
+import { Gift, GiftInfo } from "../../declarations/backend/backend.did";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import AccountInfo from "./AccountInfo";
 import { decodeAccount, encodeAccount } from "./utils";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
+import { GiftCard } from "./GiftCard";
 
 type Tab = "created" | "new" | "received" | "account";
 
 function LoggedIn({ tab }: { tab: Tab }) {
-  const [result, setResult] = useState("");
   const queryClient = useQueryClient();
 
   const { backendActor, logout, minterActor, isAuthenticated, identity } =
     useAuth();
+  const navigate = useNavigate();
 
-  const { isLoading, isError, data, refetch, error } = useQuery({
+  const { data } = useQuery({
     queryKey: ["giftcards", backendActor, isAuthenticated],
     queryFn: () => {
       if (identity && !identity.getPrincipal().isAnonymous()) {
@@ -35,7 +31,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
     },
   });
 
-  function handleSubmit(event: any) {
+  const handleSubmit = (event: any) => {
     event.preventDefault();
     const email = event.target.elements.email.value;
     const confirm = event.target.elements.email.value;
@@ -48,7 +44,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
     }
     if (
       !window.confirm(
-        "Create a giftcard with " +
+        "Create a gift card with " +
           amount +
           " ckSat for " +
           " to " +
@@ -62,19 +58,22 @@ function LoggedIn({ tab }: { tab: Tab }) {
       return;
     }
     backendActor!
-      .createGiftCard(email, amount, name, message)
-      .then((greeting) => {
-        console.log(greeting);
+      .createGiftCard(email, amount, name, message, "xmas")
+      .then((gift) => {
+        console.log(gift);
         queryClient.invalidateQueries();
-        if ("ok" in greeting) setResult(JSON.stringify(greeting.ok, replacer));
-        else setResult("" + greeting.err);
+        if ("ok" in gift) {
+          window.alert("Gift card created successfuly.");
+          navigate("/send/" + gift.ok.id);
+        } else {
+          throw gift.err;
+        }
       })
       .catch((err) => {
-        console.log(err);
-        setResult("" + err);
+        window.alert("Failed to create gift card.\n\n" + err);
       });
     return false;
-  }
+  };
 
   return (
     <div className="main">
@@ -137,7 +136,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
               <option value="1000">5000 ckSat (~5$)</option>
               <option value="10000">10000 ckSat (~10$)</option>
               <option value="21000">21000 ckSat (~20$)</option>
-              <option value="100000">50000 ckSat (~50$)</option>
+              <option value="50000">50000 ckSat (~50$)</option>
             </select>
             <label htmlFor="message">Enter a message: &nbsp;</label>
             <textarea id="message" rows={5} />
@@ -146,16 +145,15 @@ function LoggedIn({ tab }: { tab: Tab }) {
               development. Please avoid loading large amounts onto the gift
               cards at this stage, as there is a risk of funds being lost.
             </div>
-            <button type="submit">Create Giftcard!</button>
+            <button type="submit">Create Gift Card!</button>
           </form>
-          <section id="giftcard">{result}</section>
         </div>
       )}
       {tab !== "created" ? null : (
         <div className="content max-w-4xl mb-4">
           <section id="giftcards">
             <h3>Created Gift Cards</h3>
-            <GiftcardList gifts={data?.created ?? []} />
+            <GiftcardList gifts={data?.created ?? []} showRefund={true} />
           </section>
         </div>
       )}
@@ -163,7 +161,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
         <div className="content max-w-4xl mb-4">
           <section id="giftcards">
             <h3>Received Gift Cards</h3>
-            <GiftcardList gifts={data?.received ?? []} />
+            <GiftcardList gifts={data?.received ?? []} showRefund={false} />
           </section>
         </div>
       )}
@@ -188,18 +186,19 @@ function LoggedIn({ tab }: { tab: Tab }) {
   );
 }
 
-function formatDateFromNano(time: bigint): string {
-  const date = new Date(Number(time / 1_000_000n));
-  return date.toISOString().substring(0, 10);
-}
-
-function GiftcardList({ gifts }: { gifts: Gift[] }) {
+function GiftcardList({
+  gifts,
+  showRefund,
+}: {
+  gifts: Gift[];
+  showRefund: boolean;
+}) {
   if (gifts.length === 0) return "No gift cards";
 
   return (
     <div>
       {gifts.map((gift) => (
-        <GiftCard gift={gift} key={gift.id} />
+        <GiftCard gift={gift} key={gift.id} showRefund={showRefund} />
       ))}
     </div>
   );
@@ -292,24 +291,6 @@ function Withdraw(props: {
       </select>
       <button type="submit">Withdraw</button>
     </form>
-  );
-}
-
-function GiftCard({ gift }: { gift: Gift }) {
-  return (
-    <div className="card">
-      <div className="card-date">{formatDateFromNano(gift.created)}</div>
-      <div>To: {gift.to}</div>
-      <br />
-      <div>You received a gift from {gift.sender}</div>
-      <br />
-      <div>Value: {gift.amount.toString()} ckBTC</div>
-      <br />
-      <br />
-      <a href={"/redeem#" + gift.id} target="_blank" className="card-body">
-        <div>{gift.message}</div>
-      </a>
-    </div>
   );
 }
 

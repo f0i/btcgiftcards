@@ -18,3 +18,8 @@ export const decodeAccount = (account: string): Account => {
     subaccount: icrcAccount.subaccount ? [icrcAccount.subaccount] : [],
   };
 };
+
+export const formatDateFromNano = (time: bigint): string => {
+  const date = new Date(Number(time / 1_000_000n));
+  return date.toISOString().substring(0, 10);
+};

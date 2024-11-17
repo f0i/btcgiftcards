@@ -43,8 +43,8 @@ export const defaultOptions = {
 
 type AuthProps = {
   isAuthenticated: boolean;
-  login: () => void;
-  logout: () => void;
+  login: () => Promise<void>;
+  logout: () => Promise<void>;
   authClient?: AuthClient;
   identity?: Identity;
   principal?: Principal;

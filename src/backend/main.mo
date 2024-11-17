@@ -178,7 +178,7 @@ actor class Main() = this {
         Map.set(locked, thash, normalized, Time.now());
         return #ok(email);
       };
-      return #err("Email address could not be verified");
+      return #err("Email address does not match this identity.");
     } catch (err) {
       return #err("Failed to verify email address " # email # " " # Error.message(err));
     };

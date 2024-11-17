@@ -6,6 +6,11 @@ export const queryKeys = {
   giftcards: (principal?: Principal) => ["giftcards", principal],
   userinfo: (info: GiftInfo) => ["userinfo", encodeAccountOrNull(info.account)],
   balance: (account?: Account) => ["balance", encodeAccountOrNull(account)],
+  show: (id: string, account?: Account) => [
+    "show",
+    id,
+    encodeAccountOrNull(account),
+  ],
 };
 
 const encodeAccountOrNull = (account?: Account) => {
