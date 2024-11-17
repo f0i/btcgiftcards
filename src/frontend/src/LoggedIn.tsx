@@ -85,7 +85,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
       <div className="content max-w-4xl mb-4">
         <h1>ckBTC Gift Cards</h1>
       </div>
-      <div className="flex w-full max-w-4xl space-x-4 overflow-x-auto overflow-y-hidden">
+      <div className="flex w-full max-w-4xl space-x-4 overflow-x-auto overflow-y-hidden mb-[-10px] pb-[10px]">
         <Link
           to="/create"
           className={
@@ -133,9 +133,10 @@ function LoggedIn({ tab }: { tab: Tab }) {
             <select id="amount">
               {/* TODO: get current exchange rate */}
               <option value="1000">1000 ckSat (~1$)</option>
+              <option value="2222">2222 ckSat (🦆🦆🦆🦆)</option>
               <option value="1000">5000 ckSat (~5$)</option>
               <option value="10000">10000 ckSat (~10$)</option>
-              <option value="10000">20000 ckSat (~20$)</option>
+              <option value="21000">21000 ckSat (~20$)</option>
               <option value="100000">50000 ckSat (~50$)</option>
             </select>
             <label htmlFor="message">Enter a message: &nbsp;</label>
@@ -240,32 +241,37 @@ function Withdraw(props: {
 
   const formWithdraw = async (event: any) => {
     event.preventDefault();
-    const account = event.target.elements.account.value;
-    const main = event.target.elements.main.value === "main";
-    const amount = BigInt(event.target.elements.amount.value);
-    const toAccount = decodeAccount(account);
-    if (
-      !window.confirm(
-        "Withdraw " +
-          amount +
-          " ckSat from " +
-          (main ? "Main account" : "Gift Cards") +
-          " to \n" +
-          encodeAccount(toAccount) +
-          "?",
-      )
-    ) {
-      window.alert("Withdrawl canceled.");
-      return;
-    }
+    try {
+      const account = event.target.elements.account.value;
+      const main = event.target.elements.main.value === "main";
+      const amount = BigInt(event.target.elements.amount.value);
+      const toAccount = decodeAccount(account);
+      if (
+        !window.confirm(
+          "Withdraw " +
+            amount +
+            " ckSat from " +
+            (main ? "Main account" : "Gift Cards") +
+            " to \n" +
+            encodeAccount(toAccount) +
+            "?",
+        )
+      ) {
+        window.alert("Withdrawl canceled.");
+        return;
+      }
 
-    const res = await props.backend.withdraw(toAccount, amount, main);
-    console.log(res);
-    if ("ok" in res) {
-      window.alert("Withdrawal was successful!\nTransaction ID " + res.ok);
-      queryClient.invalidateQueries();
-    } else {
-      window.alert("Error: " + res.err);
+      const res = await props.backend.withdraw(toAccount, amount, main);
+      console.log(res);
+      if ("ok" in res) {
+        window.alert("Withdrawal was successful!\nTransaction ID " + res.ok);
+        queryClient.invalidateQueries();
+      } else {
+        window.alert("Error: " + res.err);
+      }
+    } catch (e) {
+      window.alert("Could not withdraw: " + e);
+      return;
     }
   };
 

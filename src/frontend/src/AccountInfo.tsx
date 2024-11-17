@@ -11,9 +11,10 @@ import { Account } from "../../declarations/backend/backend.did";
 import CopyButton from "./CopyButton";
 import { QRCodeSVG } from "qrcode.react";
 import { encodeAccount } from "./utils";
+import { queryKeys } from "./queryKeys";
 
 function AccountInfo(props: { notify: any }) {
-  const { backendActor, minterActor, isAuthenticated, identity } = useAuth();
+  const { backendActor, minterActor, identity, principal } = useAuth();
   const queryClient = useQueryClient();
 
   const formVerifyEmail = async (event: any) => {
@@ -33,8 +34,8 @@ function AccountInfo(props: { notify: any }) {
     }
   };
 
-  const { isLoading, isError, data, refetch, error } = useQuery({
-    queryKey: ["giftcards", backendActor, isAuthenticated],
+  const { isLoading, isError, data, error } = useQuery({
+    queryKey: queryKeys.giftcards(principal),
     queryFn: () => {
       if (identity && !identity.getPrincipal().isAnonymous()) {
         return backendActor?.listGiftcards();
@@ -57,12 +58,7 @@ function AccountInfo(props: { notify: any }) {
         </div>
       )}
       {data && backendActor && minterActor && (
-        <UserInfo
-          info={data}
-          ledger={ckbtc_ledger}
-          backend={backendActor}
-          minter={minterActor}
-        />
+        <UserInfo info={data} ledger={ckbtc_ledger} minter={minterActor} />
       )}
     </div>
   );
@@ -70,60 +66,66 @@ function AccountInfo(props: { notify: any }) {
 
 export default AccountInfo;
 
-function UserInfo(props: {
+function UserInfo({
+  info,
+  ledger,
+  minter,
+}: {
   info: GiftInfo;
   ledger: LedgerActor;
-  backend: BackendActor;
   minter: MinterActor;
 }) {
-  const { isLoading, isError, data, error, refetch } = useQuery({
-    queryKey: ["userinfo", props.info.account.owner.toString()],
+  const { isLoading, isError, data, error } = useQuery({
+    queryKey: queryKeys.balance(info.account),
     queryFn: () => {
-      return props.ledger.icrc1_balance_of({
-        owner: props.info.account.owner,
-        subaccount: props.info.account.subaccount,
+      return ledger.icrc1_balance_of({
+        owner: info.account.owner,
+        subaccount: info.account.subaccount,
       });
     },
   });
 
   const giftCardBalance = useQuery({
-    queryKey: [
-      "userinfo",
-      props.info?.accountEmail?.[0]?.subaccount.toString(),
-    ],
+    queryKey: queryKeys.balance(info.accountEmail?.[0]),
     queryFn: () => {
-      if (!props.info.accountEmail?.[0]) return null;
-      return props.ledger.icrc1_balance_of({
-        owner: props.info.accountEmail[0].owner,
-        subaccount: props.info.accountEmail[0].subaccount,
+      if (!info.accountEmail?.[0]) return null;
+      return ledger.icrc1_balance_of({
+        owner: info.accountEmail[0].owner,
+        subaccount: info.accountEmail[0].subaccount,
       });
     },
   });
 
-  const email = props.info.email[0];
+  const email = info.email[0];
 
   return (
     <div>
+      Your email address: {email ?? "Not verified"}
       <br />
-      <DepositAddressBTC minter={props.minter} info={props.info} />
+      <br />
+      <DepositAddressBTC minter={minter} info={info} />
       ckBTC deposit account:{" "}
       <CopyButton
         label="Copy ckBTC Deposit Account"
-        textToCopy={encodeAccount(props.info.account)}
+        textToCopy={encodeAccount(info.account)}
       />
-      <div className="info-address">{encodeAccount(props.info.account)}</div>
+      <div className="info-address">{encodeAccount(info.account)}</div>
       <br />
       Account balance:{" "}
-      {!isError ? data?.toString() + " ckSat" : "Error " + error}
-      <br />
-      Your email address: {email ?? "Not verified"}
+      {isLoading
+        ? "loading..."
+        : isError
+          ? "Error: " + error
+          : data?.toString() + " ckSat"}
       <br />
       Gift card balance:{" "}
-      {email
-        ? !giftCardBalance.isError
-          ? giftCardBalance.data?.toString() + " ckSat"
-          : "Error " + error
-        : "-"}
+      {!email
+        ? "-"
+        : giftCardBalance.isLoading
+          ? "loading..."
+          : giftCardBalance.isError
+            ? "Error: " + error
+            : giftCardBalance.data?.toString() + " ckSat"}
       <br />
     </div>
   );
