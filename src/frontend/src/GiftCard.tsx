@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Gift } from "../../declarations/backend/backend.did";
 import { useAuth } from "./use-auth-client";
 import { formatDateFromNano } from "./utils";
-import { useNavigate } from "react-router-dom";
+import { getTheme } from "./cardThemes";
 
 export const GiftCard = ({
   gift,
@@ -13,7 +13,6 @@ export const GiftCard = ({
 }) => {
   let { backendActor } = useAuth();
   let queryClient = useQueryClient();
-  let navigate = useNavigate();
 
   const refund = async () => {
     try {
@@ -36,10 +35,18 @@ export const GiftCard = ({
     }
   };
 
+  const theme = getTheme(gift?.design + "");
+
   return (
-    <div className="card relative">
-      <div className="card-date">{formatDateFromNano(gift.created)}</div>
-      <div>To: {gift.to}</div>
+    <div className="card relative break-all">
+      <div className="relative text-gray-500 text-lg">
+        <div className="card-date">{formatDateFromNano(gift.created)}</div>
+        <div>To: {gift.to}</div>
+      </div>
+      <img
+        className="w-full max-w-full object-cover rounded-lg max-h-[25em]"
+        src={theme.cover}
+      />
       <br />
       <div>You received a gift from {gift.sender}</div>
       <br />
@@ -47,7 +54,8 @@ export const GiftCard = ({
         Value: <strong>{gift.amount.toString()} ckSat</strong> (={" "}
         {Number(gift.amount) / 100000000.0} Bitcoin)
       </div>
-      Visit this link to redeem it:
+      <br />
+      Visit the follwing link to redeem it:
       <br />
       <a
         href={"/show/" + gift.id}

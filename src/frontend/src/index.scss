@@ -84,9 +84,9 @@ form {
 
 .card, .box {
   border: solid 1px #248;
-  padding: 1em 1em;
+  padding: 0 1em 1em 1em;
   margin: .5em auto;
-  max-width: 30em;
+  //max-width: 30em;
   @apply bg-white rounded shadow
 }
 

@@ -71,7 +71,7 @@ const ShowGiftCard = () => {
         ) : (
           <GiftCard gift={data!} showRefund={false} />
         )}
-
+        <br />
         <div>
           {isAuthenticated ? (
             isEmailVerified ? (
@@ -80,6 +80,8 @@ const ShowGiftCard = () => {
               ) : (
                 <div>
                   The gift card is assigned to another email address.
+                  <br />
+                  <br />
                   <button
                     onClick={changeAccount}
                     className="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition duration-200 mb-4"
@@ -91,6 +93,8 @@ const ShowGiftCard = () => {
             ) : (
               <div>
                 Your eamil address has not been verified
+                <br />
+                <br />
                 <form action="#" onSubmit={formVerifyEmail}>
                   <label htmlFor="gmail">Your gmail address: &nbsp;</label>
                   <input
@@ -114,6 +118,8 @@ const ShowGiftCard = () => {
           ) : (
             <div>
               Sign in to redeem.
+              <br />
+              <br />
               <button
                 onClick={login}
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition duration-200 mb-4"

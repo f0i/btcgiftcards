@@ -11,6 +11,9 @@ import { decodeAccount, encodeAccount } from "./utils";
 import { Link, useNavigate } from "react-router-dom";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
 import { GiftCard } from "./GiftCard";
+import { getTheme } from "./cardThemes";
+import { useRef } from "react";
+import { ThemeSelect } from "./ThemeSelect";
 
 type Tab = "created" | "new" | "received" | "account";
 
@@ -38,6 +41,9 @@ function LoggedIn({ tab }: { tab: Tab }) {
     const amount = BigInt(event.target.elements.amount.value);
     const name = event.target.elements.name.value;
     const message = event.target.elements.message.value;
+    const design = event.target.elements.design.value;
+    console.log("gift card params:", email, amount, name, message, design);
+
     if (email !== confirm) {
       window.alert("Error: Eamil addresses do not match.");
       return;
@@ -58,7 +64,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
       return;
     }
     backendActor!
-      .createGiftCard(email, amount, name, message, "xmas")
+      .createGiftCard(email, amount, name, message, design)
       .then((gift) => {
         console.log(gift);
         queryClient.invalidateQueries();
@@ -74,6 +80,8 @@ function LoggedIn({ tab }: { tab: Tab }) {
       });
     return false;
   };
+
+  const refDesign = useRef<HTMLInputElement>(null);
 
   return (
     <div className="main">
@@ -122,6 +130,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
         <div className="content max-w-4xl mb-4">
           <form action="#" onSubmit={handleSubmit}>
             <h3 className="w-full">New Gift Card</h3>
+            <ThemeSelect id="desing" />
             <label htmlFor="name">Enter your name: &nbsp;</label>
             <input id="name" alt="Name" type="text" />
             <label htmlFor="email">Recipient Email: &nbsp;</label>
