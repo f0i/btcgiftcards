@@ -35,6 +35,14 @@ module {
     return #ok(trimmed);
   };
 
+  public func isEmail(email : Text) : Bool {
+    let normalized = normalize(email);
+    switch (normalized) {
+      case (#ok _) return true;
+      case (#err _) return false;
+    };
+  };
+
   public func isGmail(email : Text) : Bool {
     let lower = Text.toLowercase(email);
     let trimmed = Text.trim(lower, #predicate(Char.isWhitespace));

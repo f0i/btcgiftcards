@@ -11,9 +11,9 @@ import { decodeAccount, encodeAccount } from "./utils";
 import { Link, useNavigate } from "react-router-dom";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
 import { GiftCard } from "./GiftCard";
-import { getTheme } from "./cardThemes";
-import { useRef } from "react";
+import { getTheme, ThemeKey } from "./cardThemes";
 import { ThemeSelect } from "./ThemeSelect";
+import { useState } from "react";
 
 type Tab = "created" | "new" | "received" | "account";
 
@@ -36,18 +36,13 @@ function LoggedIn({ tab }: { tab: Tab }) {
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
-    const email = event.target.elements.email.value;
-    const confirm = event.target.elements.email.value;
-    const amount = BigInt(event.target.elements.amount.value);
-    const name = event.target.elements.name.value;
-    const message = event.target.elements.message.value;
-    const design = event.target.elements.design.value;
+    const email: string = event.target.elements.email.value;
+    const amount: bigint = BigInt(event.target.elements.amount.value);
+    const name: string = event.target.elements.name.value;
+    const message: string = event.target.elements.message.value;
+    const design: string = event.target.elements.cardTheme.value;
     console.log("gift card params:", email, amount, name, message, design);
 
-    if (email !== confirm) {
-      window.alert("Error: Eamil addresses do not match.");
-      return;
-    }
     if (
       !window.confirm(
         "Create a gift card with " +
@@ -81,7 +76,16 @@ function LoggedIn({ tab }: { tab: Tab }) {
     return false;
   };
 
-  const refDesign = useRef<HTMLInputElement>(null);
+  const [email, setEmail] = useState("");
+
+  const isGmail = (email: string) => {
+    if (email.indexOf("@") < 0) return true;
+    return email.toLowerCase().trim().endsWith("@gmail.com");
+  };
+
+  const emailBlurHandler = (e: any) => {
+    console.log("blur", e);
+  };
 
   return (
     <div className="main">
@@ -130,13 +134,29 @@ function LoggedIn({ tab }: { tab: Tab }) {
         <div className="content max-w-4xl mb-4">
           <form action="#" onSubmit={handleSubmit}>
             <h3 className="w-full">New Gift Card</h3>
-            <ThemeSelect id="desing" />
+            <ThemeSelect id="cardTheme" />
             <label htmlFor="name">Enter your name: &nbsp;</label>
             <input id="name" alt="Name" type="text" />
+            <label
+              hidden={isGmail(email)}
+              className="w-full bg-yellow-100 border border-yellow-500 text-yellow-700 p-4 rounded text-base"
+            >
+              ⚠️ <strong>Warning:</strong> <i>{email}</i> is not a gmail
+              address.
+              <br />
+              You can still use it if the recipient can sign in with google
+              using this address.
+            </label>
             <label htmlFor="email">Recipient Email: &nbsp;</label>
-            <input id="email" alt="Email" type="email" />
-            <label htmlFor="confirm">Confirm Email: &nbsp;</label>
-            <input id="confirm" alt="Email confirm" type="email" />
+            <input
+              id="email"
+              alt="Email"
+              type="email"
+              onBlur={(e: any) => {
+                setEmail(e.target.value);
+              }}
+              onChange={(e: any) => setEmail("")}
+            />
             <label htmlFor="amount">Amount: &nbsp;</label>
             <select id="amount">
               {/* TODO: get current exchange rate */}
@@ -149,7 +169,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
             </select>
             <label htmlFor="message">Enter a message: &nbsp;</label>
             <textarea id="message" rows={5} />
-            <div className="w-full bg-blue-100 border border-blue-300 text-blue-800 text-sm rounded-lg p-4 my-2 inline-block">
+            <div className="w-full bg-blue-100 border border-blue-300 text-blue-800 text-base rounded-lg p-4 my-2 inline-block">
               ⚠️ <strong>Warning:</strong> The project is still under active
               development. Please avoid loading large amounts onto the gift
               cards at this stage, as there is a risk of funds being lost.

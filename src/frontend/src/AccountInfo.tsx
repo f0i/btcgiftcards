@@ -7,7 +7,6 @@ import {
 } from "./use-auth-client";
 import { GiftInfo } from "../../declarations/backend/backend.did";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
-import { Account } from "../../declarations/backend/backend.did";
 import CopyButton from "./CopyButton";
 import { QRCodeSVG } from "qrcode.react";
 import { encodeAccount } from "./utils";
@@ -16,23 +15,6 @@ import { queryKeys } from "./queryKeys";
 function AccountInfo(props: { notify: any }) {
   const { backendActor, minterActor, identity, principal } = useAuth();
   const queryClient = useQueryClient();
-
-  const formVerifyEmail = async (event: any) => {
-    event.preventDefault();
-    const email = "icidentify@gmail.com"; //TODO! set email address
-    try {
-      const res = await backendActor!.verifyEmail(email);
-      console.log(res);
-      if ("ok" in res) {
-        props.notify("Verified " + res.ok);
-        queryClient.invalidateQueries();
-      } else {
-        props.notify("Error: " + res.err);
-      }
-    } catch (e) {
-      props.notify("Error: " + e);
-    }
-  };
 
   const { isLoading, isError, data, error } = useQuery({
     queryKey: queryKeys.giftcards(principal),
@@ -46,19 +28,13 @@ function AccountInfo(props: { notify: any }) {
   return (
     <div className="w-full">
       {isLoading ? "loading..." : isError ? "Error " + error : ""}
-      {data?.email.length === 1 ? (
-        ""
-      ) : (
-        <div>
-          <form action="#" onSubmit={formVerifyEmail}>
-            <label htmlFor="gmail">Your gmail address: &nbsp;</label>
-            <input id="gmail" type="text" />
-            <button type="submit">Verify Gmail Address</button>
-          </form>
-        </div>
-      )}
       {data && backendActor && minterActor && (
-        <UserInfo info={data} ledger={ckbtc_ledger} minter={minterActor} />
+        <UserInfo
+          info={data}
+          ledger={ckbtc_ledger}
+          minter={minterActor}
+          backend={backendActor}
+        />
       )}
     </div>
   );
@@ -70,11 +46,15 @@ function UserInfo({
   info,
   ledger,
   minter,
+  backend,
 }: {
   info: GiftInfo;
   ledger: LedgerActor;
   minter: MinterActor;
+  backend: BackendActor;
 }) {
+  const queryClient = useQueryClient();
+
   const { isLoading, isError, data, error } = useQuery({
     queryKey: queryKeys.balance(info.account),
     queryFn: () => {
@@ -96,11 +76,36 @@ function UserInfo({
     },
   });
 
+  const verifyEmail = async (event: any) => {
+    event.preventDefault();
+    try {
+      const res = await backend!.getEmail();
+      console.log(res);
+      if ("ok" in res) {
+        queryClient.invalidateQueries();
+      } else {
+        window.alert("Error: " + res.err);
+      }
+    } catch (e) {
+      window.alert("Error: " + e);
+    }
+  };
+
   const email = info.email[0];
 
   return (
     <div>
-      Your email address: {email ?? "Not verified"}
+      Your email address:{" "}
+      {email ? (
+        email
+      ) : (
+        <>
+          Not verified
+          <button className="button-sm-green" onClick={verifyEmail}>
+            Verify Email Address
+          </button>
+        </>
+      )}
       <br />
       <br />
       <DepositAddressBTC minter={minter} info={info} />
@@ -132,7 +137,6 @@ function UserInfo({
 }
 
 function DepositAddressBTC(props: { info: GiftInfo; minter: MinterActor }) {
-  const queryClient = useQueryClient();
   const account = props.info.account;
   const { isLoading, isError, data, error, refetch } = useQuery({
     queryKey: ["deposit-address-btc", props.info.account.subaccount.toString()],
@@ -157,12 +161,12 @@ const BTCQRCode = ({ btcAddress }: { btcAddress: string }) => {
   const btcUri = `bitcoin:${btcAddress}`;
 
   return (
-    <div className="min-height-">
+    <div className="">
       BTC deposit account:{" "}
       <CopyButton label="Copy BTC Deposit Address" textToCopy={btcAddress} />
       <br />
-      <div className="info-address min-height-200">
-        <span className="max-w-600">{btcAddress}</span>
+      <div className="info-address min-height-200 flex-row">
+        <span className="max-w-600 flex-grow">{btcAddress}</span>
         <QRCodeSVG
           width={150}
           className="float-right w-300"

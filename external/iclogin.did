@@ -86,6 +86,7 @@ service : {
   checkEmail: (principal, text) -> (bool) query;
   fetchGoogleKeys: () -> (Result);
   getDelegations: (text, text, vec nat8, nat) -> (Result_2) query;
+  getEmail: (principal) -> (opt text) query;
   getPrincipal: () -> (text) query;
   getStats: () -> (vec text) query;
   prepareDelegation: (text, text, nat32) -> (PrepRes);

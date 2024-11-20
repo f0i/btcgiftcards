@@ -1,13 +1,13 @@
 export type Theme = { name: ThemeKey; cover: string };
 export type ThemeKey = "xmas" | "xmasThankYou" | "btcFuture" | "btcPlan";
 const themes: { [key: string]: Theme } = {
-  xmas: { name: "xmas", cover: "../public/themes/xmas-gift.jpg" },
+  xmas: { name: "xmas", cover: "/themes/xmas-gift.jpg" },
   xmasThankYou: {
     name: "xmasThankYou",
-    cover: "../public/themes/xmas-thankyou.jpg",
+    cover: "/themes/xmas-thankyou.jpg",
   },
-  btcFuture: { name: "btcFuture", cover: "../public/themes/btc-future.jpeg" },
-  btcPlan: { name: "btcPlan", cover: "../public/themes/btc-plan.jpg" },
+  btcFuture: { name: "btcFuture", cover: "/themes/btc-future.jpeg" },
+  btcPlan: { name: "btcPlan", cover: "/themes/btc-plan.jpg" },
 };
 
 export const getTheme = (name: string): Theme => {

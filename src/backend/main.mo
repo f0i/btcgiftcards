@@ -51,7 +51,7 @@ actor class Main() = this {
 
   public shared ({ caller }) func createGiftCard(email : Text, amount : Nat, sender : Text, message : Text, design : Text) : async Result<Gift> {
     // validate email
-    if (not Email.isGmail(email)) return #err("Invalid or unsupported email address");
+    if (not Email.isEmail(email)) return #err("Invalid or unsupported email address");
     let #ok(normalized) = Email.normalize(email) else return #err("Failed to normalize email address");
 
     // transfer funds to subaccount for email
@@ -168,9 +168,41 @@ actor class Main() = this {
     };
   };
 
+  public shared ({ caller }) func getEmail() : async Result<Text> {
+    switch (Map.get(verified, phash, caller)) {
+      case (?email) return #ok(email);
+      case (null) {};
+    };
+    try {
+      let res = await ICLogin.getEmail(caller);
+      switch (res) {
+        case (?email) {
+          Map.set(verified, phash, caller, email);
+          Map.set(locked, thash, email, Time.now());
+          return #ok(email);
+        };
+        case (null) {
+          return #err("No email address assigned to this identity");
+        };
+      };
+    } catch (err) {
+      return #err("Failed to get email address for " # Principal.toText(caller) # ": " # Error.message(err));
+    };
+  };
+
   public shared ({ caller }) func verifyEmail(email : Text) : async Result<Text> {
-    if (not Email.isGmail(email)) return #err("Invalid or unsupported email address");
+    if (not Email.isEmail(email)) return #err("Invalid or unsupported email address");
     let #ok(normalized) = Email.normalize(email) else return #err("Failed to normalize email address");
+    switch (Map.get(verified, phash, caller)) {
+      case (?email) {
+        if (email == normalized) {
+          return #ok(email);
+        } else {
+          return #err("Account already assigned to " # email);
+        };
+      };
+      case (null) {};
+    };
     try {
       let res = await ICLogin.checkEmail(caller, email);
       if (res) {

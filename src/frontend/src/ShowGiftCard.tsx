@@ -34,9 +34,8 @@ const ShowGiftCard = () => {
 
   const formVerifyEmail = async (event: any) => {
     event.preventDefault();
-    const email = "icidentify@gmail.com"; //TODO! set email address
     try {
-      const res = await backendActor!.verifyEmail(email);
+      const res = await backendActor!.getEmail();
       console.log(res);
       if ("ok" in res) {
         window.alert("Verified " + res.ok);
@@ -50,7 +49,6 @@ const ShowGiftCard = () => {
   };
 
   const isEmailVerified = !!info.data?.accountEmail?.[0];
-  // TODO: auto verify email address
   const isForMe = info.data?.accountEmail?.[0] === data?.to;
 
   const changeAccount = async (e: any) => {
@@ -96,13 +94,6 @@ const ShowGiftCard = () => {
                 <br />
                 <br />
                 <form action="#" onSubmit={formVerifyEmail}>
-                  <label htmlFor="gmail">Your gmail address: &nbsp;</label>
-                  <input
-                    id="gmail"
-                    type="text"
-                    value={data?.to}
-                    disabled={true}
-                  />
                   <button type="submit" className="w-2/3">
                     Verify Gmail Address
                   </button>

@@ -82,9 +82,9 @@ export const useAuthClient = (options = defaultOptions): AuthProps => {
   const login = () => {
     if (!authClient) {
       console.error("authClient not set");
-      return;
+      return Promise.reject("authClient not set");
     }
-    authClient.login({
+    return authClient.login({
       ...options.loginOptions,
       onSuccess: () => {
         updateClient(authClient);
