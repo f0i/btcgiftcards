@@ -15,6 +15,7 @@ import { getTheme, ThemeKey } from "./cardThemes";
 import { ThemeSelect } from "./ThemeSelect";
 import { useState } from "react";
 import { queryKeys } from "./queryKeys";
+import Showcase from "./Showcase";
 
 type Tab = "created" | "new" | "received" | "account";
 
@@ -211,7 +212,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
       )}
       {tab !== "account" ? null : (
         <div className="content max-w-4xl mb-4">
-          <section id="giftcards">
+          <section id="withdraw">
             <h3>Account</h3>
             <AccountInfo notify={(_: unknown) => {}} />
             <h3 className="mt-12">Withdraw</h3>
@@ -223,6 +224,10 @@ function LoggedIn({ tab }: { tab: Tab }) {
                 minter={minterActor}
               />
             )}
+          </section>
+          <section className="mt-16">
+            <h3>What to do with ckBTC?</h3>
+            <Showcase />
           </section>
         </div>
       )}
