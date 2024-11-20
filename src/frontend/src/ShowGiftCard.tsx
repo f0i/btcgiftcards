@@ -50,6 +50,14 @@ const ShowGiftCard = () => {
 
   const isEmailVerified = !!info.data?.accountEmail?.[0];
   const isForMe = info.data?.accountEmail?.[0] === data?.to;
+  const isGmail =
+    !data ||
+    isForMe ||
+    data.to.endsWith("gmail.com") ||
+    data.to.endsWith("google.com") ||
+    data.to.endsWith("googlemail.com") ||
+    data.to.endsWith("googlemail.co.uk") ||
+    data.to.endsWith("googleworkspace.com");
 
   const changeAccount = async (e: any) => {
     try {
@@ -70,6 +78,19 @@ const ShowGiftCard = () => {
           <GiftCard gift={data!} showRefund={false} />
         )}
         <br />
+        {isGmail ? null : (
+          <div className="warning">
+            Looks like this card is for a non Gmail address. To redeem card, you
+            have sign in to google using the same address. See{" "}
+            <a
+              className="link text-blue-900"
+              href="https://support.google.com/accounts/answer/176347"
+            >
+              support.google.com
+            </a>{" "}
+            for instructions
+          </div>
+        )}
         <div>
           {isAuthenticated ? (
             isEmailVerified ? (

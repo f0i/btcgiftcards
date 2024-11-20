@@ -3,11 +3,16 @@
 ## Features
 
 - Deposit or mint ckBTC
+- Show account balances
 - Create gift cards
   - Assign an amount of ckBTC to be send with it
   - Specify recipient
   - Add custom message
   - Select gift card design
+- Verify email ownership
+  - Show instructions how to log in with an email that is not associated with a google account
+- Show tips on what to do with the ckBTC
+- Custom domain
 
 
 ## local setup
@@ -19,15 +24,10 @@
 
 ## Roadmap
 
-- Show account balance
-- Show info box to explain verify gmail address
-- Remove limit to @gmail.com
-  - Add instructions how to log in with an email that is not associated with a google account
+- Auto verify email address
 - Sending emails
 - Progress indicator for ckBTC minter
-- Show tips on what to do with the ckBTC
 - Add redeem by code (without email verification)
-- Custom domain
-- Lock submit buttons if requests are pending
 - Use react query mutations for update calls
-
+- Lock submit buttons if requests are pending
+- Preload images
