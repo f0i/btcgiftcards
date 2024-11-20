@@ -50,6 +50,10 @@ form {
   @apply underline
 }
 
+.warning {
+  @apply bg-blue-100 border border-blue-300 text-blue-800 text-sm rounded-lg p-4 mb-6
+}
+
 .button {
   @apply px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 hover:text-black focus:outline-none focus:ring-2 focus:ring-gray-300;
 }

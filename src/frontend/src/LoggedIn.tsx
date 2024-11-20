@@ -14,18 +14,18 @@ import { GiftCard } from "./GiftCard";
 import { getTheme, ThemeKey } from "./cardThemes";
 import { ThemeSelect } from "./ThemeSelect";
 import { useState } from "react";
+import { queryKeys } from "./queryKeys";
 
 type Tab = "created" | "new" | "received" | "account";
 
 function LoggedIn({ tab }: { tab: Tab }) {
   const queryClient = useQueryClient();
 
-  const { backendActor, logout, minterActor, isAuthenticated, identity } =
-    useAuth();
+  const { backendActor, logout, minterActor, principal, identity } = useAuth();
   const navigate = useNavigate();
 
   const { data } = useQuery({
-    queryKey: ["giftcards", backendActor, isAuthenticated],
+    queryKey: queryKeys.giftcards(principal),
     queryFn: () => {
       if (identity && !identity.getPrincipal().isAnonymous()) {
         return backendActor?.listGiftcards();
@@ -83,9 +83,16 @@ function LoggedIn({ tab }: { tab: Tab }) {
     return email.toLowerCase().trim().endsWith("@gmail.com");
   };
 
-  const emailBlurHandler = (e: any) => {
-    console.log("blur", e);
-  };
+  const balance = useQuery({
+    queryKey: queryKeys.balance(data?.account),
+    queryFn: () => {
+      if (!data) return null;
+      return ckbtc_ledger.icrc1_balance_of({
+        owner: data.account.owner,
+        subaccount: data.account.subaccount,
+      });
+    },
+  });
 
   return (
     <div className="main">
@@ -157,6 +164,14 @@ function LoggedIn({ tab }: { tab: Tab }) {
               }}
               onChange={(e: any) => setEmail("")}
             />
+            <label className="w-full text-base text-right">
+              Current balance:{" "}
+              {balance.isLoading
+                ? "loading..."
+                : balance.isError || !balance.data
+                  ? "-"
+                  : balance.data.toString() + " ckSat"}
+            </label>
             <label htmlFor="amount">Amount: &nbsp;</label>
             <select id="amount">
               {/* TODO: get current exchange rate */}

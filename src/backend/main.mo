@@ -221,8 +221,8 @@ actor class Main() = this {
     if (gift.creator != caller) return #err("Not created by you");
 
     switch (Map.get(revoked, thash, id)) {
-      case (?(_, true, _)) return #err("Gift card already revoked");
-      case (?(_, false, _)) return #err("Refund is pending");
+      case (?(_, true, _)) return #err("Gift card already refunded");
+      case (?(_, false, _)) return #err("Refund already requested");
       case (null) {};
     };
 
