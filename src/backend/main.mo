@@ -174,11 +174,16 @@ actor class Main() = this {
   };
 
   private func isRefundable(gift : Gift) : Bool {
+    switch (Map.get(locked, thash, gift.to)) {
+      case (?_time) return false;
+      case (null) {};
+    };
     switch (Map.get(revoked, thash, gift.id)) {
       case (?(_, true, _)) return false;
       case (?(_, false, _)) return false;
-      case (null) return true;
+      case (null) {};
     };
+    return true;
   };
 
   public shared ({ caller }) func getEmail() : async Result<Text> {
@@ -233,6 +238,10 @@ actor class Main() = this {
     let ?gift = Map.get(lookup, thash, id) else return #err("Gift card not found");
     if (gift.creator != caller) return #err("Not created by you");
 
+    switch (Map.get(locked, thash, gift.to)) {
+      case (?_time) return #err("Recipient account is protected");
+      case (null) {};
+    };
     switch (Map.get(revoked, thash, id)) {
       case (?(_, true, _)) return #err("Gift card already refunded");
       case (?(_, false, _)) return #err("Refund already requested");
