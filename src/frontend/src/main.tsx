@@ -9,7 +9,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <App />
     <Toaster
       toastOptions={{
-        duration: 3000,
+        duration: 1500,
       }}
     />
   </React.StrictMode>,

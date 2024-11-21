@@ -12,7 +12,6 @@ export const ThemeButton = ({
 }) => {
   const theme = getTheme(design);
   const isActive = getTheme(active ?? "").name === theme.name;
-  console.log("active: ", active);
 
   const border = isActive
     ? "border-green-600 hover:border-green-800 "
@@ -52,6 +51,7 @@ export const ThemeSelect = ({ id }: { id: string }) => {
         alt="Design"
         type="text"
         hidden={true}
+        readOnly={true}
         className="w-full"
       />
     </>

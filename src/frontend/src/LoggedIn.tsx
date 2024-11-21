@@ -15,7 +15,7 @@ import { ThemeSelect } from "./ThemeSelect";
 import { useState } from "react";
 import { queries, mutations } from "./queryKeys";
 import Showcase from "./Showcase";
-import toast from "react-hot-toast";
+import toast, { Toast } from "react-hot-toast";
 
 type Tab = "created" | "new" | "received" | "account";
 
@@ -41,7 +41,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
     },
   });
 
-  const handleSubmit = (event: any) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
     const email: string = event.target.elements.email.value;
     const amount: bigint = BigInt(event.target.elements.amount.value);
@@ -54,21 +54,59 @@ function LoggedIn({ tab }: { tab: Tab }) {
     }
     console.log("gift card params:", email, amount, name, message, design);
 
-    if (
-      !window.confirm(
-        "Create a gift card with " +
-          amount +
-          " ckSat for " +
-          " to " +
-          email +
-          "?\n\n A total of " +
-          (amount + 200n) +
-          " ckSat will be deducted from your main account.",
-      )
-    ) {
-      window.alert("Gift card creation canceled.");
+    function isValidEmail(email: string) {
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return regex.test(email);
+    }
+
+    if (!isValidEmail(email)) {
+      toast.error("Invalid email address.");
       return;
     }
+
+    await toast.promise(
+      new Promise((resolve, reject) => {
+        toast(
+          (t: Toast) => (
+            <div>
+              <p>
+                Create a gift card with {amount.toString()} ckSat for {email}?
+              </p>
+              <p>
+                A total of {(amount + 200n).toString()} ckSat will be deducted
+                from your main account.
+              </p>
+              <div className="mt-4 flex justify-end space-x-2">
+                <button
+                  onClick={() => {
+                    reject("Cancel");
+                    toast.dismiss(t.id);
+                  }}
+                  className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    resolve(null);
+                    toast.dismiss(t.id);
+                  }}
+                  className="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700"
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          ),
+          { duration: Infinity },
+        );
+      }),
+      {
+        loading: "Please confirm...",
+        success: "Confirmed",
+        error: "Canceled",
+      },
+    );
 
     createGiftCardMutation.mutate({ email, amount, name, message, design });
     return false;
