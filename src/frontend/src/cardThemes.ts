@@ -1,5 +1,10 @@
 export type Theme = { name: ThemeKey; cover: string };
-export type ThemeKey = "xmas" | "xmasThankYou" | "btcFuture" | "btcPlan";
+export type ThemeKey =
+  | "xmas"
+  | "xmasThankYou"
+  | "btcFuture"
+  | "btcPlan"
+  | "birthday";
 const themes: { [key: string]: Theme } = {
   xmas: { name: "xmas", cover: "/themes/xmas-gift.jpg" },
   xmasThankYou: {
@@ -8,6 +13,7 @@ const themes: { [key: string]: Theme } = {
   },
   btcFuture: { name: "btcFuture", cover: "/themes/btc-future.jpeg" },
   btcPlan: { name: "btcPlan", cover: "/themes/btc-plan.jpg" },
+  birthday: { name: "birthday", cover: "/themes/birthday.jpeg" },
 };
 
 export const getTheme = (name: string): Theme => {
@@ -23,4 +29,11 @@ function djb2(str: string): number {
     hash = (hash * 33) ^ str.charCodeAt(i);
   }
   return hash >>> 0; // Ensure non-negative integer
+}
+
+export function preloadImages() {
+  Object.values(themes).forEach((theme: Theme) => {
+    const img = new Image();
+    img.src = theme.cover;
+  });
 }

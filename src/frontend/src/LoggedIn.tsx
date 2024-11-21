@@ -104,7 +104,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
       <div className="content max-w-4xl mb-4">
         <h1>ckBTC Gift Cards</h1>
       </div>
-      <div className="flex w-full max-w-4xl space-x-4 overflow-x-auto overflow-y-hidden mb-[-10px] pb-[10px]">
+      <div className="flex w-full max-w-4xl space-x-4 overflow-x-auto overflow-y-hidden mb-[-10px] pb-[10px] pt-1">
         <Link
           to="/create"
           className={

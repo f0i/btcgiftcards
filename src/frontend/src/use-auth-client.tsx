@@ -1,5 +1,5 @@
 import { AuthClient } from "@dfinity/auth-client";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { canisterId, createActor, backend } from "../../declarations/backend";
 import { Identity } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";

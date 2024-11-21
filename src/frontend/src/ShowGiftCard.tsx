@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { queryKeys } from "./queryKeys";
 import { useAuth } from "./use-auth-client";
 import { GiftCard } from "./GiftCard";
@@ -95,7 +95,17 @@ const ShowGiftCard = () => {
           {isAuthenticated ? (
             isEmailVerified ? (
               isForMe ? (
-                "The amount has been added to your account. 🎉"
+                <div>
+                  "The amount has been added to your account. 🎉"
+                  <br />
+                  <br />
+                  <Link
+                    to="/account"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition duration-200 mb-4"
+                  >
+                    Go to Your Accout
+                  </Link>
+                </div>
               ) : (
                 <div>
                   The gift card is assigned to another email address.
@@ -105,7 +115,7 @@ const ShowGiftCard = () => {
                     onClick={changeAccount}
                     className="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition duration-200 mb-4"
                   >
-                    Change account
+                    Change Account
                   </button>
                 </div>
               )
@@ -116,13 +126,13 @@ const ShowGiftCard = () => {
                 <br />
                 <form action="#" onSubmit={formVerifyEmail}>
                   <button type="submit" className="w-2/3">
-                    Verify Gmail Address
+                    Verify Email Address
                   </button>
                   <button
                     onClick={changeAccount}
                     className="w-1/3 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition duration-200 mb-4"
                   >
-                    Change account
+                    Change Account
                   </button>
                 </form>
               </div>

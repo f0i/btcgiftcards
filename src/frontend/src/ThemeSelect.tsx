@@ -39,6 +39,7 @@ export const ThemeSelect = ({ id }: { id: string }) => {
         <ThemeButton setActive={setActive} design="xmas" active={active} />
         <ThemeButton setActive={setActive} design="btcFuture" active={active} />
         <ThemeButton setActive={setActive} design="btcPlan" active={active} />
+        <ThemeButton setActive={setActive} design="birthday" active={active} />
         <ThemeButton
           setActive={setActive}
           design="xmasThankYou"

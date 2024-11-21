@@ -5,6 +5,10 @@
 
 set -eu -o pipefail
 
+# deployment identity
+dfx identity use default
+export DEFAULT=$(dfx identity get-principal)
+
 
 # minter identity
 # Uncomment if you want a separate identity for the minter
@@ -17,13 +21,9 @@ export MINTER=$(dfx identity get-principal)
 export TOKEN_NAME="notCkBTC"
 export TOKEN_SYMBOL="notCkBTC"
 
-# deployment identity
-dfx identity use default
-export DEFAULT=$(dfx identity get-principal)
-
 # premint
 export PRE_MINTED_TOKENS=10_000_000_000
-export TRANSFER_FEE=10_000
+export TRANSFER_FEE=10
 
 # Uncomment if you want a separate identity for the minter
 #dfx identity use minter

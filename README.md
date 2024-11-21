@@ -13,6 +13,7 @@
   - Show instructions how to log in with an email that is not associated with a google account
 - Show tips on what to do with the ckBTC
 - Custom domain
+- Preload images
 
 
 ## local setup
@@ -30,4 +31,3 @@
 - Add redeem by code (without email verification)
 - Use react query mutations for update calls
 - Lock submit buttons if requests are pending
-- Preload images
