@@ -1,14 +1,15 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
-import { queryKeys } from "./queryKeys";
+import { queries, queryKeys } from "./queryKeys";
 import { useAuth } from "./use-auth-client";
 import { GiftCard } from "./GiftCard";
+import { CopyFormattedContent } from "./CopyButton";
 
 const ShowGiftCard = () => {
   const { giftId } = useParams();
-  const { backendActor, logout, login, isAuthenticated, identity } = useAuth();
+  const { backendActor, logout, login, isAuthenticated, principal } = useAuth();
 
-  const { isPaused, isLoading, isError, data, error } = useQuery({
+  const { isLoading, isError, data, error } = useQuery({
     queryKey: queryKeys.show(giftId!, undefined),
     queryFn: async () => {
       const res = await backendActor!.showGiftcard(giftId!);
@@ -22,15 +23,9 @@ const ShowGiftCard = () => {
   });
 
   const queryClient = useQueryClient();
-  const info = useQuery({
-    queryKey: ["giftcards", backendActor, isAuthenticated],
-    queryFn: () => {
-      if (identity && !identity.getPrincipal().isAnonymous()) {
-        return backendActor?.listGiftcards();
-      }
-      return null;
-    },
-  });
+  const info = useQuery(
+    queries.giftcards(queryClient, backendActor, principal),
+  );
 
   const formVerifyEmail = async (event: any) => {
     event.preventDefault();
@@ -77,6 +72,7 @@ const ShowGiftCard = () => {
         ) : (
           <GiftCard gift={data!} showRefund={false} />
         )}
+        <CopyFormattedContent gift={data!} />
         <br />
         {isGmail ? null : (
           <div className="warning">

@@ -55,7 +55,7 @@ export const GiftCard = ({
         {Number(gift.amount) / 100000000.0} Bitcoin)
       </div>
       <br />
-      Visit the follwing link to redeem it:
+      Visit the following link to redeem it:
       <br />
       <a
         href={"/show/" + gift.id}

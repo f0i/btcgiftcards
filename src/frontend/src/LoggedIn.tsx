@@ -14,7 +14,7 @@ import { GiftCard } from "./GiftCard";
 import { getTheme, ThemeKey } from "./cardThemes";
 import { ThemeSelect } from "./ThemeSelect";
 import { useState } from "react";
-import { queryKeys } from "./queryKeys";
+import { queries, queryKeys } from "./queryKeys";
 import Showcase from "./Showcase";
 
 type Tab = "created" | "new" | "received" | "account";
@@ -22,18 +22,12 @@ type Tab = "created" | "new" | "received" | "account";
 function LoggedIn({ tab }: { tab: Tab }) {
   const queryClient = useQueryClient();
 
-  const { backendActor, logout, minterActor, principal, identity } = useAuth();
+  const { backendActor, logout, minterActor, principal } = useAuth();
   const navigate = useNavigate();
 
-  const { data } = useQuery({
-    queryKey: queryKeys.giftcards(principal),
-    queryFn: () => {
-      if (identity && !identity.getPrincipal().isAnonymous()) {
-        return backendActor?.listGiftcards();
-      }
-      return null;
-    },
-  });
+  const { data } = useQuery(
+    queries.giftcards(queryClient, backendActor, principal),
+  );
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
@@ -84,16 +78,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
     return email.toLowerCase().trim().endsWith("@gmail.com");
   };
 
-  const balance = useQuery({
-    queryKey: queryKeys.balance(data?.account),
-    queryFn: () => {
-      if (!data) return null;
-      return ckbtc_ledger.icrc1_balance_of({
-        owner: data.account.owner,
-        subaccount: data.account.subaccount,
-      });
-    },
-  });
+  const balance = useQuery(queries.balance(ckbtc_ledger, data?.account));
 
   return (
     <div className="main">
@@ -275,31 +260,13 @@ function Withdraw(props: {
 }) {
   const queryClient = useQueryClient();
 
-  // TODO: deduplicate this query to avoid errors when updating the query
-  const { isLoading, isError, data, error, refetch } = useQuery({
-    queryKey: ["userinfo", props.info.account.owner.toString()],
-    queryFn: () => {
-      return props.ledger.icrc1_balance_of({
-        owner: props.info.account.owner,
-        subaccount: props.info.account.subaccount,
-      });
-    },
-  });
+  const { isLoading, isError, data, error, refetch } = useQuery(
+    queries.balance(props.ledger, props.info.account),
+  );
 
-  // TODO: deduplicate this query to avoid errors when updating the query
-  const giftCardBalance = useQuery({
-    queryKey: [
-      "userinfo",
-      props.info?.accountEmail?.[0]?.subaccount.toString(),
-    ],
-    queryFn: () => {
-      if (!props.info.accountEmail?.[0]) return null;
-      return props.ledger.icrc1_balance_of({
-        owner: props.info.accountEmail[0].owner,
-        subaccount: props.info.accountEmail[0].subaccount,
-      });
-    },
-  });
+  const giftCardBalance = useQuery(
+    queries.balance(props.ledger, props.info.accountEmail?.[0]),
+  );
 
   const formWithdraw = async (event: any) => {
     event.preventDefault();

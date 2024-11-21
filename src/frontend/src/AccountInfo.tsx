@@ -7,24 +7,19 @@ import {
 } from "./use-auth-client";
 import { GiftInfo } from "../../declarations/backend/backend.did";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
-import CopyButton from "./CopyButton";
+import { CopyButton } from "./CopyButton";
 import { QRCodeSVG } from "qrcode.react";
 import { encodeAccount } from "./utils";
-import { queryKeys } from "./queryKeys";
+import { queries, queryKeys } from "./queryKeys";
 
 function AccountInfo(props: { notify: any }) {
   const { backendActor, minterActor, identity, principal } = useAuth();
   const queryClient = useQueryClient();
 
-  const { isLoading, isError, data, error } = useQuery({
-    queryKey: queryKeys.giftcards(principal),
-    queryFn: () => {
-      if (identity && !identity.getPrincipal().isAnonymous()) {
-        return backendActor?.listGiftcards();
-      }
-      return null;
-    },
-  });
+  const { isLoading, isError, data, error } = useQuery(
+    queries.giftcards(queryClient, backendActor, principal),
+  );
+
   return (
     <div className="w-full">
       {isLoading ? "loading..." : isError ? "Error " + error : ""}
@@ -55,26 +50,13 @@ function UserInfo({
 }) {
   const queryClient = useQueryClient();
 
-  const { isLoading, isError, data, error } = useQuery({
-    queryKey: queryKeys.balance(info.account),
-    queryFn: () => {
-      return ledger.icrc1_balance_of({
-        owner: info.account.owner,
-        subaccount: info.account.subaccount,
-      });
-    },
-  });
+  const { isLoading, isError, data, error } = useQuery(
+    queries.balance(ledger, info.account),
+  );
 
-  const giftCardBalance = useQuery({
-    queryKey: queryKeys.balance(info.accountEmail?.[0]),
-    queryFn: () => {
-      if (!info.accountEmail?.[0]) return null;
-      return ledger.icrc1_balance_of({
-        owner: info.accountEmail[0].owner,
-        subaccount: info.accountEmail[0].subaccount,
-      });
-    },
-  });
+  const giftCardBalance = useQuery(
+    queries.balance(ledger, info.accountEmail?.[0]),
+  );
 
   const verifyEmail = async (event: any) => {
     event.preventDefault();
