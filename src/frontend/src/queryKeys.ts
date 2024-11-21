@@ -25,6 +25,30 @@ const encodeAccountOrNull = (account?: Account) => {
   }
 };
 
+export const mutations = {
+  createGiftCard: (backend: BackendActor) => ({
+    mutationFn: async (params: {
+      email: string;
+      amount: bigint;
+      name: string;
+      message: string;
+      design: string;
+    }) => {
+      const result = await backend.createGiftCard(
+        params.email,
+        params.amount,
+        params.name,
+        params.message,
+        params.design
+      );
+      if ("err" in result) {
+        throw result.err;
+      }
+      return result.ok;
+    },
+  }),
+};
+
 export const queries = {
   giftcards: (
     queryClient: QueryClient,

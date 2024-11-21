@@ -5,16 +5,15 @@ import {
   useAuth,
 } from "./use-auth-client";
 import { Gift, GiftInfo } from "../../declarations/backend/backend.did";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import AccountInfo from "./AccountInfo";
 import { decodeAccount, encodeAccount } from "./utils";
 import { Link, useNavigate } from "react-router-dom";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
 import { GiftCard } from "./GiftCard";
-import { getTheme, ThemeKey } from "./cardThemes";
 import { ThemeSelect } from "./ThemeSelect";
 import { useState } from "react";
-import { queries, queryKeys } from "./queryKeys";
+import { queries, mutations } from "./queryKeys";
 import Showcase from "./Showcase";
 
 type Tab = "created" | "new" | "received" | "account";
@@ -29,6 +28,18 @@ function LoggedIn({ tab }: { tab: Tab }) {
     queries.giftcards(queryClient, backendActor, principal),
   );
 
+  const createGiftCardMutation = useMutation({
+    ...mutations.createGiftCard(backendActor!),
+    onSuccess: (gift) => {
+      queryClient.invalidateQueries();
+      window.alert("Gift card created successfully.");
+      navigate("/send/" + gift.id);
+    },
+    onError: (err) => {
+      window.alert("Failed to create gift card.\n\n" + err);
+    },
+  });
+
   const handleSubmit = (event: any) => {
     event.preventDefault();
     const email: string = event.target.elements.email.value;
@@ -36,6 +47,10 @@ function LoggedIn({ tab }: { tab: Tab }) {
     const name: string = event.target.elements.name.value;
     const message: string = event.target.elements.message.value;
     const design: string = event.target.elements.cardTheme.value;
+
+    if (createGiftCardMutation.isPending) {
+      return;
+    }
     console.log("gift card params:", email, amount, name, message, design);
 
     if (
@@ -53,21 +68,8 @@ function LoggedIn({ tab }: { tab: Tab }) {
       window.alert("Gift card creation canceled.");
       return;
     }
-    backendActor!
-      .createGiftCard(email, amount, name, message, design)
-      .then((gift) => {
-        console.log(gift);
-        queryClient.invalidateQueries();
-        if ("ok" in gift) {
-          window.alert("Gift card created successfuly.");
-          navigate("/send/" + gift.ok.id);
-        } else {
-          throw gift.err;
-        }
-      })
-      .catch((err) => {
-        window.alert("Failed to create gift card.\n\n" + err);
-      });
+
+    createGiftCardMutation.mutate({ email, amount, name, message, design });
     return false;
   };
 
@@ -138,11 +140,10 @@ function LoggedIn({ tab }: { tab: Tab }) {
               hidden={isGmail(email)}
               className="w-full bg-yellow-100 border border-yellow-500 text-yellow-700 p-4 rounded text-base"
             >
-              ⚠️ <strong>Warning:</strong> <i>{email}</i> is not a gmail
-              address.
-              <br />
-              You can still use it if the recipient can sign in with google
-              using this address.
+              ⚠️ <strong>Warning:</strong> <i>{email}</i> is not a Gmail
+              address. You can still use it if the recipient can do "sign in
+              with google" using this address. You will be able to refund until
+              the first sucessful sign in with that email address.
             </label>
             <label htmlFor="email">Recipient Email: &nbsp;</label>
             <input
@@ -158,7 +159,9 @@ function LoggedIn({ tab }: { tab: Tab }) {
               Current balance:{" "}
               {balance.isLoading
                 ? "loading..."
-                : balance.isError || !balance.data
+                : balance.isError ||
+                    balance.data === null ||
+                    balance.data === undefined
                   ? "-"
                   : balance.data.toString() + " ckSat"}
             </label>
@@ -179,7 +182,19 @@ function LoggedIn({ tab }: { tab: Tab }) {
               development. Please avoid loading large amounts onto the gift
               cards at this stage, as there is a risk of funds being lost.
             </div>
-            <button type="submit">Create Gift Card!</button>
+            <button
+              type="submit"
+              disabled={createGiftCardMutation.isPending}
+              className={
+                createGiftCardMutation.isPending
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }
+            >
+              {createGiftCardMutation.isPending
+                ? "Creating..."
+                : "Create Gift Card!"}
+            </button>
           </form>
         </div>
       )}
