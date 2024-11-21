@@ -64,6 +64,17 @@ const ShowGiftCard = () => {
 
   return (
     <div className="main">
+      <div className="content max-w-4xl mb-4">
+        <h1>
+          BTC<span className=" text-gray-300">-</span>Gift
+          <span className="text-gray-300">-</span>Cards
+          <span className="text-gray-300 text-base">.com</span>
+        </h1>
+        <br />
+        <Link to="/received" className="button-sm inline-block">
+          {"<"} Show all Received Gift Cards
+        </Link>
+      </div>
       <div className="content max-w-4xl mb-4 min-h-72">
         {isLoading ? (
           "Loading gift card " + giftId + "..."

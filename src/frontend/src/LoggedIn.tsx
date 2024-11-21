@@ -245,9 +245,11 @@ function GiftcardList({
 
   return (
     <div>
-      {gifts.map((gift) => (
-        <GiftCard gift={gift} key={gift.id} refundable={refundable} />
-      ))}
+      {gifts
+        .map((gift) => (
+          <GiftCard gift={gift} key={gift.id} refundable={refundable} />
+        ))
+        .reverse()}
     </div>
   );
 }

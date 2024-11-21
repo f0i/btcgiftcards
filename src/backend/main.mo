@@ -44,9 +44,13 @@ actor class Main() = this {
 
   stable var created : Map<Principal, Vec<Gift>> = Map.new();
   stable var received : Map<Text, Vec<Gift>> = Map.new();
+  // Principal and email address
   stable var verified : Map<Principal, Text> = Map.new();
+  // Lookup table from gift ID to Gift
   stable var lookup : Map<Text, Gift> = Map.new();
+  // List of emails that signed in and can't be refunded with first time of email verification
   stable var locked : Map<Text, Time> = Map.new();
+  // List of gift IDs that have been revoked with time of revocation and completion status
   stable var revoked : Map<Text, (Time, Bool, Gift)> = Map.new();
 
   public shared ({ caller }) func createGiftCard(email : Text, amount : Nat, sender : Text, message : Text, design : Text) : async Result<Gift> {

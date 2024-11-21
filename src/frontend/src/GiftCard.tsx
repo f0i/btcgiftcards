@@ -35,7 +35,7 @@ export const GiftCard = ({
     }
   };
 
-  const theme = getTheme(gift?.design + "");
+  const theme = getTheme(gift.design);
   const showRefund = refundable.indexOf(gift.id) >= 0;
 
   return (
