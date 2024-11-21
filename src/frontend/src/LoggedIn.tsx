@@ -15,6 +15,7 @@ import { ThemeSelect } from "./ThemeSelect";
 import { useState } from "react";
 import { queries, mutations } from "./queryKeys";
 import Showcase from "./Showcase";
+import toast from "react-hot-toast";
 
 type Tab = "created" | "new" | "received" | "account";
 
@@ -32,11 +33,11 @@ function LoggedIn({ tab }: { tab: Tab }) {
     ...mutations.createGiftCard(backendActor!),
     onSuccess: (gift) => {
       queryClient.invalidateQueries();
-      window.alert("Gift card created successfully.");
+      toast.success("Gift card created successfully");
       navigate("/send/" + gift.id);
     },
     onError: (err) => {
-      window.alert("Failed to create gift card.\n\n" + err);
+      toast.error("Failed to create gift card: " + err);
     },
   });
 
