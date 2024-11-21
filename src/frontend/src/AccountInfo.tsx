@@ -110,9 +110,11 @@ function UserInfo({
       <br />
       <DepositAddressBTC minter={minter} info={info} />
       <div className="warning">
-        Minting ckBTC using a Bitcoin transaction will take at least one hour (6
-        confirmations). Minimum amount should be larger than 55000 SAT to be
-        well above the current minimum and cover the KYT fees.
+        Minting ckBTC using a Bitcoin transaction will take{" "}
+        <b>at least one hour</b> (6 confirmations). A{" "}
+        <b>minimum amount of 0.00055 BTC</b> or more should be transfered to be
+        well above the current minimum and cover the KYT fees. Bitcoin
+        transaction fees apply.
       </div>
       ckBTC deposit account:{" "}
       <CopyButton

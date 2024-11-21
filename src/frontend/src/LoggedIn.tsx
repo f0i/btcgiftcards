@@ -102,7 +102,11 @@ function LoggedIn({ tab }: { tab: Tab }) {
         <div className="hidden group-hover:block">Sign out</div>
       </button>
       <div className="content max-w-4xl mb-4">
-        <h1>ckBTC Gift Cards</h1>
+        <h1>
+          BTC<span className=" text-gray-300">-</span>Gift
+          <span className="text-gray-300">-</span>Cards
+          <span className="text-gray-300 text-base">.com</span>
+        </h1>
       </div>
       <div className="flex w-full max-w-4xl space-x-4 overflow-x-auto overflow-y-hidden mb-[-10px] pb-[10px] pt-1">
         <Link
@@ -194,19 +198,27 @@ function LoggedIn({ tab }: { tab: Tab }) {
           </form>
         </div>
       )}
-      {tab !== "created" ? null : (
+      {tab !== "received" ? null : (
         <div className="content max-w-4xl mb-4">
-          <section id="giftcards">
-            <h3>Created Gift Cards</h3>
-            <GiftcardList gifts={data?.created ?? []} showRefund={true} />
+          <section id="received" className="min-h-[16em]">
+            <h3>Received Gift Cards</h3>
+            <GiftcardList
+              gifts={data?.received ?? []}
+              showRefund={false}
+              empty="No gift cards received yet."
+            />
           </section>
         </div>
       )}
-      {tab !== "received" ? null : (
+      {tab !== "created" ? null : (
         <div className="content max-w-4xl mb-4">
-          <section id="giftcards">
-            <h3>Received Gift Cards</h3>
-            <GiftcardList gifts={data?.received ?? []} showRefund={false} />
+          <section id="created" className="min-h-[16em]">
+            <h3>Created Gift Cards</h3>
+            <GiftcardList
+              gifts={data?.created ?? []}
+              showRefund={true}
+              empty="No gift cards created yet."
+            />
           </section>
         </div>
       )}
@@ -238,11 +250,13 @@ function LoggedIn({ tab }: { tab: Tab }) {
 function GiftcardList({
   gifts,
   showRefund,
+  empty,
 }: {
   gifts: Gift[];
   showRefund: boolean;
+  empty: string;
 }) {
-  if (gifts.length === 0) return "No gift cards";
+  if (gifts.length === 0) return <div className="warning mt-2">{empty}</div>;
 
   return (
     <div>
