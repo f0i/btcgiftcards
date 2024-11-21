@@ -70,7 +70,7 @@ const ShowGiftCard = () => {
         ) : isError ? (
           "Error: " + error
         ) : (
-          <GiftCard gift={data!} showRefund={false} />
+          <GiftCard gift={data!} refundable={[]} />
         )}
         <CopyFormattedContent gift={data!} />
         <br />

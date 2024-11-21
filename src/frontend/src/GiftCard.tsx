@@ -6,10 +6,10 @@ import { getTheme } from "./cardThemes";
 
 export const GiftCard = ({
   gift,
-  showRefund,
+  refundable,
 }: {
   gift: Gift;
-  showRefund: boolean;
+  refundable: string[];
 }) => {
   let { backendActor } = useAuth();
   let queryClient = useQueryClient();
@@ -36,6 +36,7 @@ export const GiftCard = ({
   };
 
   const theme = getTheme(gift?.design + "");
+  const showRefund = refundable.indexOf(gift.id) >= 0;
 
   return (
     <div className="card relative break-all">

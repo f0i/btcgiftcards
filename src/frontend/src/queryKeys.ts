@@ -36,7 +36,9 @@ export const queries = {
       queryFn: async () => {
         if (backend && principal && !principal.isAnonymous()) {
           var res = await backend.listGiftcards();
+          console.log(res);
           if (res.email.length === 0) {
+            // don't await! This should not stop user from other interactions
             backend.getEmail().then((emailRes) => {
               if ("ok" in emailRes) {
                 queryClient.invalidateQueries();
@@ -44,7 +46,6 @@ export const queries = {
                 console.log("Error verifying email:", emailRes.err);
               }
             });
-            return await backend.listGiftcards();
           }
           return res;
         }

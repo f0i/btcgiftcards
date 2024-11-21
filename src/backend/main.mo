@@ -134,6 +134,7 @@ actor class Main() = this {
 
   type GiftInfo = {
     created : [Gift];
+    refundable : [Text];
     received : [Gift];
     email : ?Text;
     account : Account;
@@ -158,13 +159,25 @@ actor class Main() = this {
       func(gmail) = { owner = self; subaccount = ?getSubaccountEmail(gmail) },
     );
 
+    let sendArr = Vec.toArray<Gift>(send);
+    let refundable = Array.map(Array.filter(sendArr, isRefundable), func(g : Gift) : Text = g.id);
+
     return {
-      created = Vec.toArray<Gift>(send);
+      created = sendArr;
+      refundable;
       received = Vec.toArray<Gift>(own);
       email;
       account;
       accountEmail;
       caller;
+    };
+  };
+
+  private func isRefundable(gift : Gift) : Bool {
+    switch (Map.get(revoked, thash, gift.id)) {
+      case (?(_, true, _)) return false;
+      case (?(_, false, _)) return false;
+      case (null) return true;
     };
   };
 

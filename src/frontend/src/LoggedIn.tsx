@@ -189,7 +189,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
             <h3>Received Gift Cards</h3>
             <GiftcardList
               gifts={data?.received ?? []}
-              showRefund={false}
+              refundable={data?.refundable ?? []}
               empty="No gift cards received yet."
             />
           </section>
@@ -201,7 +201,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
             <h3>Created Gift Cards</h3>
             <GiftcardList
               gifts={data?.created ?? []}
-              showRefund={true}
+              refundable={data?.refundable ?? []}
               empty="No gift cards created yet."
             />
           </section>
@@ -234,11 +234,11 @@ function LoggedIn({ tab }: { tab: Tab }) {
 
 function GiftcardList({
   gifts,
-  showRefund,
+  refundable,
   empty,
 }: {
   gifts: Gift[];
-  showRefund: boolean;
+  refundable: string[];
   empty: string;
 }) {
   if (gifts.length === 0) return <div className="warning mt-2">{empty}</div>;
@@ -246,7 +246,7 @@ function GiftcardList({
   return (
     <div>
       {gifts.map((gift) => (
-        <GiftCard gift={gift} key={gift.id} showRefund={showRefund} />
+        <GiftCard gift={gift} key={gift.id} refundable={refundable} />
       ))}
     </div>
   );
