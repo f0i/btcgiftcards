@@ -14,6 +14,7 @@
 - Show tips on what to do with the ckBTC
 - Custom domain
 - Preload images
+- Auto verify email address
 
 
 ## local setup
@@ -25,10 +26,10 @@
 
 ## Roadmap
 
-- Auto verify email address
 - Sending emails
 - Progress indicator for ckBTC minter
 - Add redeem by code (without email verification)
 - Use react query mutations for update calls
 - Lock submit buttons if requests are pending
 - Shortcut to transfer gift card balance to main account
+- Replace alert with toast messages
