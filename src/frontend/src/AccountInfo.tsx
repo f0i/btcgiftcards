@@ -141,9 +141,9 @@ function DepositAddressBTC(props: { info: GiftInfo; minter: MinterActor }) {
 
   // TODO: remove dummy address
   //return <BTCQRCode btcAddress="bc1qyawapemf4nsv6lc4z9tcltgfymsl2wklnecqlw" />;
-  if (isLoading) return <div>Loading BTC depossit address...</div>;
+  if (isLoading) return <div>Loading BTC deposit address...</div>;
   // TODO: log error
-  if (isError) return <div>Error getting BTC depossit address.</div>;
+  if (isError) return <div>Error getting BTC deposit address.</div>;
   if (!data) return <div>No Data received</div>;
   return <BTCQRCode btcAddress={data} />;
 }

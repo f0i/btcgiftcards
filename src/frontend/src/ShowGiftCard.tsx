@@ -129,7 +129,7 @@ const ShowGiftCard = () => {
               )
             ) : (
               <div>
-                Your eamil address has not been verified
+                Your email address has not been verified
                 <br />
                 <br />
                 <form action="#" onSubmit={formVerifyEmail}>

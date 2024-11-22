@@ -166,7 +166,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
               ⚠️ <strong>Warning:</strong> <i>{email}</i> is not a Gmail
               address. You can still use it if the recipient can "sign in with
               google" using this address. You will be able to refund until the
-              first sucessful sign in with that email address.
+              first successful sign in with that email address.
             </label>
             <label htmlFor="email">Recipient Email: &nbsp;</label>
             <input
