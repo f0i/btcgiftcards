@@ -52,6 +52,8 @@ actor class Main() = this {
   stable var locked : Map<Text, Time> = Map.new();
   // List of gift IDs that have been revoked with time of revocation and completion status
   stable var revoked : Map<Text, (Time, Bool, Gift)> = Map.new();
+  // List of gift IDs that should be send with current status
+  stable var emailQueue : Map<Text, Text> = Map.new();
 
   public shared ({ caller }) func createGiftCard(email : Text, amount : Nat, sender : Text, message : Text, design : Text) : async Result<Gift> {
     // validate email
@@ -299,6 +301,66 @@ actor class Main() = this {
     "Cards created: " # Nat.toText(Map.size(lookup)) # "\n" #
     "Emails verified: " # Nat.toText(Map.size(verified)) # "\n" #
     gifts;
+  };
+
+  public shared query ({ caller }) func getEmailQueue(status : Text) : async Result<[{ gift : Gift; status : Text }]> {
+    if (not Principal.isController(caller)) {
+      return #err("Permission denied");
+    };
+    return #ok([]);
+  };
+
+  public shared ({ caller }) func addToEmailQueue(id : Text, status : Text) : async Result<Text> {
+    let isSendRequest = status != "sendRequest";
+    let isCancelRequest = status != "sendCancel";
+
+    if ((not isSendRequest) and (not isCancelRequest) and (not Principal.isController(caller))) {
+      return #err("Permission denied");
+    };
+
+    switch (Map.get(lookup, thash, id)) {
+      case (?gift) {
+        if (gift.creator != caller and (not Principal.isController(caller))) {
+          return #err("You did not create this gift card");
+        };
+      };
+      case (null) { return #err("Invalid gift ID") };
+    };
+
+    switch (Map.get(emailQueue, thash, id)) {
+      case (?"sendRequest") {
+        if (isSendRequest) {
+          return #ok("Already in queue");
+        } else if (isCancelRequest) {
+          // allowed to cancel
+        } else {
+          return #err("Gift Card already added to queue");
+        };
+      };
+      case (?"sendCancel") {
+        if (isCancelRequest) {
+          return #ok("Already canceled");
+        } else if (isSendRequest) {
+          // allowed to restart
+        } else {
+          return #err("Gift Card already added to queue");
+        };
+      };
+      case (?status) {
+        return #err("Gift card already added to queue");
+      };
+      case (null) {
+        // no previous request
+      };
+    };
+
+    Map.set(emailQueue, thash, id, status);
+
+    if (isSendRequest) {
+      return #ok("Added to queue");
+    } else {
+      return #ok("Status updated to " # status);
+    };
   };
 
   private func transfer(from : Blob, to : Account, amount : Nat) : async Result<Nat> {
