@@ -307,7 +307,18 @@ actor class Main() = this {
     if (not Principal.isController(caller)) {
       return #err("Permission denied");
     };
-    return #ok([]);
+    let out : Vec<{ gift : Gift; status : Text }> = Vec.new();
+    for ((id, stat) in Map.entries(emailQueue)) {
+      if (stat == status or status == "") {
+        switch (Map.get(lookup, thash, id)) {
+          case (?gift) Vec.add(out, { gift; status });
+          case (null) {
+            return #err("emailQueue contains invalid card ID " # id);
+          };
+        };
+      };
+    };
+    return #ok(Vec.toArray(out));
   };
 
   public shared ({ caller }) func addToEmailQueue(id : Text, status : Text) : async Result<Text> {
