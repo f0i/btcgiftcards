@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { Gift } from "../../declarations/backend/backend.did";
 import { getTheme } from "./cardThemes";
 import toast, { Toast } from "react-hot-toast";
+import { shortenErr } from "./utils";
 
 interface CopyButtonProps {
   textToCopy: string;
@@ -68,10 +69,10 @@ export const CopyFormattedContent = ({ gift }: { gift: Gift }) => {
         }),
       ]);
 
-      alert("Content copied to clipboard!!!");
-    } catch (err) {
+      toast.success("Content copied to clipboard!");
+    } catch (err: any) {
       console.error("Failed to copy content: ", err);
-      alert("Failed to copy content.");
+      toast.error("Failed to copy content: \n" + shortenErr(err));
     }
   };
 

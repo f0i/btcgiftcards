@@ -1,9 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Gift } from "../../declarations/backend/backend.did";
 import { useAuth } from "./use-auth-client";
-import { formatDateFromNano } from "./utils";
+import { formatDateFromNano, shortenErr } from "./utils";
 import { getTheme } from "./cardThemes";
 import { confirmDialog } from "./CopyButton";
+import toast from "react-hot-toast";
 
 export const GiftCard = ({
   gift,
@@ -19,7 +20,7 @@ export const GiftCard = ({
     try {
       await confirmDialog({
         msg: "Do you really want to refund this gift card?",
-        sub: "The balance will be transfered back to your main account. Transaction fees will be deducted."
+        sub: "The balance will be transfered back to your main account. Transaction fees will be deducted.",
       });
 
       let res = await backendActor!.refund(gift.id, gift.amount - 10n);
@@ -29,8 +30,8 @@ export const GiftCard = ({
       } else {
         throw res.err;
       }
-    } catch (e) {
-      toast.error("Refund failed: " + e);
+    } catch (e: any) {
+      toast.error("Refund failed:\n" + shortenErr(e));
     }
   };
 

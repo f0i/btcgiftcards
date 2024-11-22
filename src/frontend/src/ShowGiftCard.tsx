@@ -5,6 +5,7 @@ import { useAuth } from "./use-auth-client";
 import { GiftCard } from "./GiftCard";
 import { CopyFormattedContent } from "./CopyButton";
 import toast from "react-hot-toast";
+import { shortenErr } from "./utils";
 
 const ShowGiftCard = () => {
   const { giftId } = useParams();
@@ -37,10 +38,10 @@ const ShowGiftCard = () => {
         toast.success("Verified " + res.ok);
         queryClient.invalidateQueries();
       } else {
-        toast.error("Error: " + res.err);
+        toast.error("Could not verify email address:\n" + shortenErr(res.err));
       }
-    } catch (e) {
-      toast.error("Error: " + e);
+    } catch (e: any) {
+      toast.error("Could not verify email address:\n" + shortenErr(e));
     }
   };
 

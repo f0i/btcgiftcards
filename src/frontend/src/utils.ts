@@ -20,3 +20,11 @@ export const formatDateFromNano = (time: bigint): string => {
   const date = new Date(Number(time / 1_000_000n));
   return date.toISOString().substring(0, 10);
 };
+
+export const shortenErr = (err: string | Error) => {
+  const full = err.toString();
+  const line = full.split("\n")[0];
+  console.log(full, null, line);
+  const parts = line.split(":");
+  return parts[parts.length - 1];
+};

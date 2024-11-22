@@ -3,6 +3,7 @@ import { Account, GiftInfo } from "../../declarations/backend/backend.did";
 import { encodeAccount } from "./utils";
 import { BackendActor, LedgerActor } from "./use-auth-client";
 import { QueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 export const queryKeys = {
   giftcards: (principal?: Principal) => ["giftcards", principal],
@@ -39,7 +40,7 @@ export const mutations = {
         params.amount,
         params.name,
         params.message,
-        params.design
+        params.design,
       );
       if ("err" in result) {
         throw result.err;
@@ -67,6 +68,7 @@ export const queries = {
               if ("ok" in emailRes) {
                 queryClient.invalidateQueries();
               } else {
+                toast.error("Could not verify email address.");
                 console.log("Error verifying email:", emailRes.err);
               }
             });

@@ -7,7 +7,7 @@ import {
 import { Gift, GiftInfo } from "../../declarations/backend/backend.did";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import AccountInfo from "./AccountInfo";
-import { decodeAccount, encodeAccount } from "./utils";
+import { decodeAccount, encodeAccount, shortenErr } from "./utils";
 import { Link, useNavigate } from "react-router-dom";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
 import { GiftCard } from "./GiftCard";
@@ -15,7 +15,7 @@ import { ThemeSelect } from "./ThemeSelect";
 import { useState } from "react";
 import { queries, mutations } from "./queryKeys";
 import Showcase from "./Showcase";
-import toast, { Toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { confirmDialog } from "./CopyButton";
 
 type Tab = "created" | "new" | "received" | "account";
@@ -38,7 +38,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
       navigate("/send/" + gift.id);
     },
     onError: (err) => {
-      toast.error("Failed to create gift card: " + err);
+      toast.error("Failed to create gift card: " + shortenErr(err));
     },
   });
 
@@ -340,10 +340,10 @@ function Withdraw(props: {
         toast.success("Withdrawal successful!\nTransaction ID " + res.ok);
         queryClient.invalidateQueries();
       } else {
-        toast.error("Error: " + res.err);
+        toast.error("Could not withdraw: " + shortenErr(res.err));
       }
-    } catch (e) {
-      toast.error("Could not withdraw: " + e);
+    } catch (e: any) {
+      toast.error("Could not withdraw: " + shortenErr(e));
       return;
     }
   };

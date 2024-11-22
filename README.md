@@ -15,7 +15,9 @@
 - Custom domain
 - Preload images
 - Auto verify email address
-
+- Toast messages for success and error notifications
+- Lock submit buttons if requests are pending
+- Copy button to copy both html and text content of gift cards, to paste it to messanging or email apps
 
 ## local setup
 
@@ -29,7 +31,4 @@
 - Sending emails
 - Progress indicator for ckBTC minter
 - Add redeem by code (without email verification)
-- Use react query mutations for update calls
-- Lock submit buttons if requests are pending
 - Shortcut to transfer gift card balance to main account
-- Replace alert with toast messages

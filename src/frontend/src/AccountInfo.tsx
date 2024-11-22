@@ -9,7 +9,7 @@ import { GiftInfo } from "../../declarations/backend/backend.did";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
 import { CopyButton } from "./CopyButton";
 import { QRCodeSVG } from "qrcode.react";
-import { encodeAccount } from "./utils";
+import { encodeAccount, shortenErr } from "./utils";
 import { queries, queryKeys } from "./queryKeys";
 import toast from "react-hot-toast";
 
@@ -68,10 +68,10 @@ function UserInfo({
         toast.success("Verified " + res.ok);
         queryClient.invalidateQueries();
       } else {
-        toast.error("Error: " + res.err);
+        toast.error("Failed to verify email:\n" + shortenErr(res.err));
       }
-    } catch (e) {
-      toast.error("Error: " + e);
+    } catch (e: any) {
+      toast.error("Failed to verify email:\n" + shortenErr(e));
     }
   };
 
