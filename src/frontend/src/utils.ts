@@ -1,9 +1,6 @@
 import { decodeIcrcAccount, encodeIcrcAccount } from "@dfinity/ledger-icrc";
-import {
-  Account,
-  Gift,
-  GiftInfo,
-} from "../../declarations/backend/backend.did";
+import { Account } from "../../declarations/backend/backend.did";
+import { toast, Toast } from "react-hot-toast";
 
 export const encodeAccount = (account: Account): string => {
   return encodeIcrcAccount({

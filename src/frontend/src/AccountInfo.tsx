@@ -11,6 +11,7 @@ import { CopyButton } from "./CopyButton";
 import { QRCodeSVG } from "qrcode.react";
 import { encodeAccount } from "./utils";
 import { queries, queryKeys } from "./queryKeys";
+import toast from "react-hot-toast";
 
 function AccountInfo(props: { notify: any }) {
   const { backendActor, minterActor, identity, principal } = useAuth();
@@ -64,12 +65,13 @@ function UserInfo({
       const res = await backend!.getEmail();
       console.log(res);
       if ("ok" in res) {
+        toast.success("Verified " + res.ok);
         queryClient.invalidateQueries();
       } else {
-        window.alert("Error: " + res.err);
+        toast.error("Error: " + res.err);
       }
     } catch (e) {
-      window.alert("Error: " + e);
+      toast.error("Error: " + e);
     }
   };
 

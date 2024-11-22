@@ -3,6 +3,7 @@ import { Gift } from "../../declarations/backend/backend.did";
 import { useAuth } from "./use-auth-client";
 import { formatDateFromNano } from "./utils";
 import { getTheme } from "./cardThemes";
+import { confirmDialog } from "./CopyButton";
 
 export const GiftCard = ({
   gift,
@@ -16,22 +17,20 @@ export const GiftCard = ({
 
   const refund = async () => {
     try {
-      if (
-        !window.confirm(
-          "Do you really want to refund this gift card?\n\nThe balance will be transfered back to your main account. Transaction fees will be deducted.",
-        )
-      ) {
-        return;
-      }
+      await confirmDialog({
+        msg: "Do you really want to refund this gift card?",
+        sub: "The balance will be transfered back to your main account. Transaction fees will be deducted."
+      });
+
       let res = await backendActor!.refund(gift.id, gift.amount - 10n);
       if ("ok" in res) {
-        window.alert("Refund successfull");
+        toast.success("Refund successful");
         queryClient.invalidateQueries();
       } else {
         throw res.err;
       }
     } catch (e) {
-      window.alert("Refund failed: " + e);
+      toast.error("Refund failed: " + e);
     }
   };
 

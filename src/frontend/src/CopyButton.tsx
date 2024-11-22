@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Gift } from "../../declarations/backend/backend.did";
 import { getTheme } from "./cardThemes";
+import toast, { Toast } from "react-hot-toast";
 
 interface CopyButtonProps {
   textToCopy: string;
@@ -91,7 +92,6 @@ export const CopyFormattedContent = ({ gift }: { gift: Gift }) => {
           <p>
             <img src={imageUrl} alt="Card" style={{ maxWidth: "500px" }} />
           </p>
-          <br />
           <p>
             Value: <strong>{gift.amount.toString()} ckSat</strong> (={" "}
             {Number(gift.amount) / 100000000.0} Bitcoin)
@@ -105,14 +105,65 @@ export const CopyFormattedContent = ({ gift }: { gift: Gift }) => {
             </a>
           </p>
           <br />
-          <strong>Message from {gift.sender}:</strong>
           <p>
-            {gift.message.split("\n").map((line, index) => (
-              <p key={index}>{line}</p>
-            ))}
+            <strong>Message from {gift.sender}:</strong>
           </p>
+          {gift.message.split("\n").map((line, index) => (
+            <p key={index}>{line}</p>
+          ))}
         </div>
       ) : null}
     </div>
+  );
+};
+
+export const confirmDialog = ({
+  msg,
+  sub,
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+}: {
+  msg: string;
+  sub?: string;
+  confirmText?: string;
+  cancelText?: string;
+}): Promise<void> => {
+  return toast.promise(
+    new Promise<void>((resolve, reject) => {
+      toast(
+        (t: Toast) => (
+          <div>
+            <p>{msg}</p>
+            {sub && <p>{sub}</p>}
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                onClick={() => {
+                  reject("Cancel");
+                  toast.dismiss(t.id);
+                }}
+                className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800"
+              >
+                {cancelText}
+              </button>
+              <button
+                onClick={() => {
+                  resolve();
+                  toast.dismiss(t.id);
+                }}
+                className="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700"
+              >
+                {confirmText}
+              </button>
+            </div>
+          </div>
+        ),
+        { duration: Infinity },
+      );
+    }),
+    {
+      loading: "Please confirm...",
+      success: "Confirmed",
+      error: "Canceled",
+    },
   );
 };

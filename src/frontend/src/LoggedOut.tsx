@@ -17,7 +17,7 @@ function LoggedOut() {
           introducing loved ones to crypto and the Internet Computer ecosystem.
         </p>
 
-        <div className="bg-blue-100 border border-blue-300 text-blue-800 text-sm rounded-lg p-4 mb-6">
+        <div className="warning">
           ⚠️ <strong>Warning:</strong> The project is still under active
           development. Please avoid loading large amounts onto the gift cards at
           this stage, as there is a risk of funds being lost.

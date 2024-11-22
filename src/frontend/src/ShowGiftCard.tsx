@@ -4,6 +4,7 @@ import { queries, queryKeys } from "./queryKeys";
 import { useAuth } from "./use-auth-client";
 import { GiftCard } from "./GiftCard";
 import { CopyFormattedContent } from "./CopyButton";
+import toast from "react-hot-toast";
 
 const ShowGiftCard = () => {
   const { giftId } = useParams();
@@ -33,13 +34,13 @@ const ShowGiftCard = () => {
       const res = await backendActor!.getEmail();
       console.log(res);
       if ("ok" in res) {
-        window.alert("Verified " + res.ok);
+        toast.success("Verified " + res.ok);
         queryClient.invalidateQueries();
       } else {
-        window.alert("Error: " + res.err);
+        toast.error("Error: " + res.err);
       }
     } catch (e) {
-      window.alert("Error: " + e);
+      toast.error("Error: " + e);
     }
   };
 

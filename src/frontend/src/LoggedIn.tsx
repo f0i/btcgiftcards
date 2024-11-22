@@ -16,6 +16,7 @@ import { useState } from "react";
 import { queries, mutations } from "./queryKeys";
 import Showcase from "./Showcase";
 import toast, { Toast } from "react-hot-toast";
+import { confirmDialog } from "./CopyButton";
 
 type Tab = "created" | "new" | "received" | "account";
 
@@ -64,49 +65,22 @@ function LoggedIn({ tab }: { tab: Tab }) {
       return;
     }
 
-    await toast.promise(
-      new Promise((resolve, reject) => {
-        toast(
-          (t: Toast) => (
-            <div>
-              <p>
-                Create a gift card with {amount.toString()} ckSat for {email}?
-              </p>
-              <p>
-                A total of {(amount + 200n).toString()} ckSat will be deducted
-                from your main account.
-              </p>
-              <div className="mt-4 flex justify-end space-x-2">
-                <button
-                  onClick={() => {
-                    reject("Cancel");
-                    toast.dismiss(t.id);
-                  }}
-                  className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    resolve(null);
-                    toast.dismiss(t.id);
-                  }}
-                  className="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700"
-                >
-                  Confirm
-                </button>
-              </div>
-            </div>
-          ),
-          { duration: Infinity },
-        );
-      }),
-      {
-        loading: "Please confirm...",
-        success: "Confirmed",
-        error: "Canceled",
-      },
-    );
+    await confirmDialog({
+      msg:
+        "Create a gift card with " +
+        amount.toString() +
+        " ckSat for " +
+        email +
+        "?",
+      sub:
+        "A total of " +
+        (amount + 200n).toString() +
+        " ckSat will be deducted from your main account.",
+    });
+
+    if (createGiftCardMutation.isPending) {
+      return;
+    }
 
     createGiftCardMutation.mutate({ email, amount, name, message, design });
     return false;
@@ -331,31 +305,21 @@ function Withdraw(props: {
       const main = event.target.elements.main.value === "main";
       const amount = BigInt(event.target.elements.amount.value);
       const toAccount = decodeAccount(account);
-      if (
-        !window.confirm(
-          "Withdraw " +
-            amount +
-            " ckSat from " +
-            (main ? "Main account" : "Gift Cards") +
-            " to \n" +
-            encodeAccount(toAccount) +
-            "?",
-        )
-      ) {
-        window.alert("Withdrawl canceled.");
-        return;
-      }
+      await confirmDialog({
+        msg: `Withdraw ${amount.toString()} ckSat from ${main ? "Main account" : "Gift Cards"} to:`,
+        sub: encodeAccount(toAccount)
+      });
 
       const res = await props.backend.withdraw(toAccount, amount, main);
       console.log(res);
       if ("ok" in res) {
-        window.alert("Withdrawal was successful!\nTransaction ID " + res.ok);
+        toast.success("Withdrawal successful!\nTransaction ID " + res.ok);
         queryClient.invalidateQueries();
       } else {
-        window.alert("Error: " + res.err);
+        toast.error("Error: " + res.err);
       }
     } catch (e) {
-      window.alert("Could not withdraw: " + e);
+      toast.error("Could not withdraw: " + e);
       return;
     }
   };
