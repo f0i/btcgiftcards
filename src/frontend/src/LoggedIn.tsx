@@ -42,10 +42,15 @@ function LoggedIn({ tab }: { tab: Tab }) {
     },
   });
 
+  const [useCustomAmount, setUseCustomAmount] = useState(false);
+
   const handleSubmit = async (event: any) => {
     event.preventDefault();
     const email: string = event.target.elements.email.value;
-    const amount: bigint = BigInt(event.target.elements.amount.value);
+    var amount: bigint = BigInt(event.target.elements.amount.value);
+    if (useCustomAmount) {
+      amount = BigInt(event.target.elements.customAmount.value);
+    }
     const name: string = event.target.elements.name.value;
     const message: string = event.target.elements.message.value;
     const design: string = event.target.elements.cardTheme.value;
@@ -94,6 +99,11 @@ function LoggedIn({ tab }: { tab: Tab }) {
   };
 
   const balance = useQuery(queries.balance(ckbtc_ledger, data?.account));
+
+  const handleAmountChange = (e: any) => {
+    console.log("Selected amount", e.target.value);
+    setUseCustomAmount(e.target.value === "0");
+  };
 
   return (
     <div className="main">
@@ -154,9 +164,9 @@ function LoggedIn({ tab }: { tab: Tab }) {
               className="w-full bg-yellow-100 border border-yellow-500 text-yellow-700 p-4 rounded text-base"
             >
               ⚠️ <strong>Warning:</strong> <i>{email}</i> is not a Gmail
-              address. You can still use it if the recipient can do "sign in
-              with google" using this address. You will be able to refund until
-              the first sucessful sign in with that email address.
+              address. You can still use it if the recipient can "sign in with
+              google" using this address. You will be able to refund until the
+              first sucessful sign in with that email address.
             </label>
             <label htmlFor="email">Recipient Email: &nbsp;</label>
             <input
@@ -179,15 +189,29 @@ function LoggedIn({ tab }: { tab: Tab }) {
                   : balance.data.toString() + " ckSat"}
             </label>
             <label htmlFor="amount">Amount: &nbsp;</label>
-            <select id="amount">
+            <select id="amount" onChange={handleAmountChange}>
               {/* TODO: get current exchange rate */}
               <option value="1000">1000 ckSat (~1$)</option>
               <option value="2222">2222 ckSat (🦆🦆🦆🦆)</option>
               <option value="1000">5000 ckSat (~5$)</option>
               <option value="10000">10000 ckSat (~10$)</option>
-              <option value="21000">21000 ckSat (~20$)</option>
+              <option value="21000">21000 ckSat (~21$)</option>
               <option value="50000">50000 ckSat (~50$)</option>
+              <option value="0">Custom Amount...</option>
             </select>
+            <div className="w-full" hidden={!useCustomAmount}>
+              <label />
+              <div className="input-container relative">
+                <span className="absolute right-12 top-4">ckBTC</span>
+                <input
+                  type="number"
+                  id="customAmount"
+                  placeholder=""
+                  min={500}
+                  max={100000}
+                />
+              </div>
+            </div>
             <label htmlFor="message">Enter a message: &nbsp;</label>
             <textarea id="message" rows={5} />
             <div className="w-full bg-blue-100 border border-blue-300 text-blue-800 text-base rounded-lg p-4 my-2 inline-block">
@@ -307,7 +331,7 @@ function Withdraw(props: {
       const toAccount = decodeAccount(account);
       await confirmDialog({
         msg: `Withdraw ${amount.toString()} ckSat from ${main ? "Main account" : "Gift Cards"} to:`,
-        sub: encodeAccount(toAccount)
+        sub: encodeAccount(toAccount),
       });
 
       const res = await props.backend.withdraw(toAccount, amount, main);

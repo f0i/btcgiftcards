@@ -27,12 +27,18 @@ h3 {
 
 form {
   label {
-     @apply lg:w-1/3 w-full block float-left pt-4;
-  }
+    @apply lg:w-1/3 w-full block float-left pt-4;
+    }
   input, textarea, select {
     @apply px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500;
     @apply lg:w-2/3 w-full block float-left;
     @apply my-2;
+  }
+  .input-container {
+    @apply lg:w-2/3 w-full block float-left;
+    input {
+      width: 100% !important;
+    }
   }
   button {
     @apply w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition duration-200 mt-2;
