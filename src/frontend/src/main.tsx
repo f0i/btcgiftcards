@@ -10,6 +10,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <Toaster
       toastOptions={{
         duration: 1500,
+        className: "break-all",
       }}
     />
   </React.StrictMode>,

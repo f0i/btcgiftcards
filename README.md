@@ -37,9 +37,9 @@ BTC Gift Cards is a project designed to make gifting Bitcoin easy and accessible
 - Auto verify email address
 - Toast messages for success and error notifications
 - Lock submit buttons if requests are pending
-- Copy button to copy both html and text content of gift cards, to paste it to messanging or email apps
+- Copy button to copy both html and text content of gift cards, to paste it to email or messanging apps
 
-## local setup
+## Local setup
 
 1. create canisters
 2. deploy ledger (./external/setup_ledger.sh)
