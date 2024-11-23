@@ -1,17 +1,22 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Gift } from "../../declarations/backend/backend.did";
+import { Gift, SendStatus } from "../../declarations/backend/backend.did";
 import { useAuth } from "./use-auth-client";
 import { formatDateFromNano, shortenErr } from "./utils";
 import { getTheme } from "./cardThemes";
-import { confirmDialog } from "./CopyButton";
+import { confirmDialog, CopyFormattedContent } from "./CopyButton";
 import toast from "react-hot-toast";
+import { Principal } from "@dfinity/principal";
 
 export const GiftCard = ({
   gift,
   refundable,
+  sendStatus,
+  principal,
 }: {
   gift: Gift;
   refundable: string[];
+  sendStatus: SendStatus[];
+  principal?: Principal;
 }) => {
   let { backendActor } = useAuth();
   let queryClient = useQueryClient();
@@ -35,8 +40,43 @@ export const GiftCard = ({
     }
   };
 
+  const requestSend = async (status: "sendRequest" | "sendCancel") => {
+    try {
+      if (status === "sendRequest") {
+        await confirmDialog({
+          msg:
+            "The gift card will be manually reviewd and send to " +
+            gift.to +
+            "?",
+          sub: "This can take several hours or days! You can also copy the card and send it your self.",
+        });
+      }
+
+      let res = await backendActor!.addToEmailQueue(gift.id, status);
+      if ("ok" in res) {
+        toast.success("Queue updated successfully:\n" + res.ok);
+        queryClient.invalidateQueries();
+      } else {
+        throw res.err;
+      }
+    } catch (e: any) {
+      toast.error("Request was not send:\n" + shortenErr(e));
+    }
+  };
+
   const theme = getTheme(gift.design);
   const showRefund = refundable.indexOf(gift.id) >= 0;
+  const status = sendStatus.find((stat) => stat.id === gift.id) ?? {
+    id: gift.id,
+    status: "unknown",
+  };
+  const canRequestSend =
+    gift.creator.toString() === principal?.toString() &&
+    (status.status === "init" || status.status === "sendCancel");
+  const canCancel =
+    gift.creator.toString() === principal?.toString() &&
+    status?.status === "sendRequest";
+  console.log("status", status, canRequestSend);
 
   return (
     <div className="card relative break-all">
@@ -69,11 +109,34 @@ export const GiftCard = ({
       <br />
       <strong>Message from {gift.sender}:</strong>
       <div>{gift.message}</div>
-      {showRefund ? (
-        <button onClick={refund} className="button absolute right-3 bottom-4">
-          Refund
-        </button>
-      ) : null}
+      <div className="w-full flex felx-row space-x-2 justify-end mt-8">
+        {showRefund ? (
+          <button onClick={refund} className="button">
+            Refund
+          </button>
+        ) : null}
+        {canCancel ? (
+          <button
+            onClick={() => {
+              requestSend("sendCancel");
+            }}
+            className="button"
+          >
+            Cancel Send Request
+          </button>
+        ) : null}
+        {canRequestSend ? (
+          <button
+            onClick={() => {
+              requestSend("sendRequest");
+            }}
+            className="button"
+          >
+            Request Send by Email
+          </button>
+        ) : null}
+        <CopyFormattedContent gift={gift} />
+      </div>
     </div>
   );
 };

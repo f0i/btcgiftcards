@@ -46,15 +46,15 @@ const ShowGiftCard = () => {
   };
 
   const isEmailVerified = !!info.data?.accountEmail?.[0];
-  const isForMe = info.data?.accountEmail?.[0] === data?.to;
+  const isForMe = info.data?.accountEmail?.[0] === data?.gift.to;
   const isGmail =
     !data ||
     isForMe ||
-    data.to.endsWith("gmail.com") ||
-    data.to.endsWith("google.com") ||
-    data.to.endsWith("googlemail.com") ||
-    data.to.endsWith("googlemail.co.uk") ||
-    data.to.endsWith("googleworkspace.com");
+    data.gift.to.endsWith("gmail.com") ||
+    data.gift.to.endsWith("google.com") ||
+    data.gift.to.endsWith("googlemail.com") ||
+    data.gift.to.endsWith("googlemail.co.uk") ||
+    data.gift.to.endsWith("googleworkspace.com");
 
   const changeAccount = async (e: any) => {
     try {
@@ -83,9 +83,13 @@ const ShowGiftCard = () => {
         ) : isError ? (
           "Error: " + error
         ) : (
-          <GiftCard gift={data!} refundable={[]} />
+          <GiftCard
+            gift={data!.gift}
+            refundable={info.data?.refundable ?? []}
+            sendStatus={data ? [data.sendStatus] : []}
+            principal={principal}
+          />
         )}
-        <CopyFormattedContent gift={data!} />
         <br />
         {isGmail ? null : (
           <div className="warning">

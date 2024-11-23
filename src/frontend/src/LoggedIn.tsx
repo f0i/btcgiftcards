@@ -4,7 +4,11 @@ import {
   MinterActor,
   useAuth,
 } from "./use-auth-client";
-import { Gift, GiftInfo } from "../../declarations/backend/backend.did";
+import {
+  Gift,
+  GiftInfo,
+  SendStatus,
+} from "../../declarations/backend/backend.did";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import AccountInfo from "./AccountInfo";
 import { decodeAccount, encodeAccount, shortenErr } from "./utils";
@@ -17,6 +21,7 @@ import { queries, mutations } from "./queryKeys";
 import Showcase from "./Showcase";
 import toast from "react-hot-toast";
 import { confirmDialog } from "./CopyButton";
+import { Principal } from "@dfinity/principal";
 
 type Tab = "created" | "new" | "received" | "account";
 
@@ -241,8 +246,10 @@ function LoggedIn({ tab }: { tab: Tab }) {
             <h3>Received Gift Cards</h3>
             <GiftcardList
               gifts={data?.received ?? []}
-              refundable={data?.refundable ?? []}
+              refundable={[]}
               empty="No gift cards received yet."
+              sendStatus={[]}
+              principal={principal!}
             />
           </section>
         </div>
@@ -255,6 +262,8 @@ function LoggedIn({ tab }: { tab: Tab }) {
               gifts={data?.created ?? []}
               refundable={data?.refundable ?? []}
               empty="No gift cards created yet."
+              sendStatus={data?.sendStatus ?? []}
+              principal={principal!}
             />
           </section>
         </div>
@@ -288,10 +297,14 @@ function GiftcardList({
   gifts,
   refundable,
   empty,
+  sendStatus,
+  principal,
 }: {
   gifts: Gift[];
   refundable: string[];
   empty: string;
+  sendStatus: SendStatus[];
+  principal: Principal;
 }) {
   if (gifts.length === 0) return <div className="warning mt-2">{empty}</div>;
 
@@ -299,7 +312,13 @@ function GiftcardList({
     <div>
       {gifts
         .map((gift) => (
-          <GiftCard gift={gift} key={gift.id} refundable={refundable} />
+          <GiftCard
+            gift={gift}
+            key={gift.id}
+            refundable={refundable}
+            sendStatus={sendStatus}
+            principal={principal}
+          />
         ))
         .reverse()}
     </div>

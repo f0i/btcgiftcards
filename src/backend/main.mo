@@ -138,9 +138,11 @@ actor class Main() = this {
     return #ok(gift);
   };
 
+  type SendStatus = { id : Text; status : Text };
   type GiftInfo = {
     created : [Gift];
     refundable : [Text];
+    sendStatus : [SendStatus];
     received : [Gift];
     email : ?Text;
     account : Account;
@@ -148,8 +150,21 @@ actor class Main() = this {
     caller : Principal;
   };
 
-  public shared query func showGiftcard(id : Text) : async ?Gift {
-    return Map.get(lookup, thash, id);
+  public shared query ({ caller }) func showGiftcard(id : Text) : async ?{
+    gift : Gift;
+    sendStatus : SendStatus;
+  } {
+    switch (Map.get(lookup, thash, id)) {
+      case (?gift) {
+        return ?{
+          gift;
+          sendStatus = if (caller == gift.creator) { getSendStatus(gift) } else {
+            { id = gift.id; status = "hidden" };
+          };
+        };
+      };
+      case (null) return null;
+    };
   };
 
   public shared query ({ caller }) func listGiftcards() : async GiftInfo {
@@ -167,15 +182,29 @@ actor class Main() = this {
 
     let sendArr = Vec.toArray<Gift>(send);
     let refundable = Array.map(Array.filter(sendArr, isRefundable), func(g : Gift) : Text = g.id);
+    let sendStatus = Array.map(sendArr, getSendStatus);
 
     return {
       created = sendArr;
       refundable;
+      sendStatus;
       received = Vec.toArray<Gift>(own);
       email;
       account;
       accountEmail;
       caller;
+    };
+  };
+
+  private func getSendStatus(gift : Gift) : { id : Text; status : Text } {
+    switch (Map.get(revoked, thash, gift.id)) {
+      case (?(_, true, _)) return { id = gift.id; status = "cardRevoked" };
+      case (?(_, false, _)) return { id = gift.id; status = "cardRevoking" };
+      case (null) {};
+    };
+    return {
+      id = gift.id;
+      status = Option.get(Map.get(emailQueue, thash, gift.id), "init");
     };
   };
 
@@ -322,8 +351,8 @@ actor class Main() = this {
   };
 
   public shared ({ caller }) func addToEmailQueue(id : Text, status : Text) : async Result<Text> {
-    let isSendRequest = status != "sendRequest";
-    let isCancelRequest = status != "sendCancel";
+    let isSendRequest = status == "sendRequest";
+    let isCancelRequest = status == "sendCancel";
 
     if ((not isSendRequest) and (not isCancelRequest) and (not Principal.isController(caller))) {
       return #err("Permission denied");

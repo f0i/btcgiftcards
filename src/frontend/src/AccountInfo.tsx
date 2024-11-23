@@ -96,9 +96,15 @@ function UserInfo({
       <div className="warning">
         Minting ckBTC using a Bitcoin transaction will take{" "}
         <b>at least one hour</b> (6 confirmations). A{" "}
-        <b>minimum amount of 0.00055 BTC</b> or more should be transfered to be
-        well above the current minimum and cover the KYT fees. Bitcoin
-        transaction fees apply.
+        <b>minimum amount of 0.00055 BTC</b> (55000 Sat) or more should be
+        transfered to be well above the current minimum and cover the KYT fees.
+        Bitcoin transaction fees apply.{" "}
+        <a
+          href="https://wiki.internetcomputer.org/wiki/Chain-key_Bitcoin"
+          target="_blank"
+        >
+          Learn more about ckBTC
+        </a>
       </div>
       ckBTC deposit account:{" "}
       <CopyButton

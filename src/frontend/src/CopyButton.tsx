@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Gift } from "../../declarations/backend/backend.did";
-import { getTheme } from "./cardThemes";
+import { getTheme, ThemeKey } from "./cardThemes";
 import toast, { Toast } from "react-hot-toast";
 import { shortenErr } from "./utils";
 
@@ -83,7 +83,7 @@ export const CopyFormattedContent = ({ gift }: { gift: Gift }) => {
 
   return (
     <div>
-      <button onClick={handleCopy} className="button">
+      <button onClick={handleCopy} className="button-green">
         Copy gift card
       </button>
       {gift ? (
