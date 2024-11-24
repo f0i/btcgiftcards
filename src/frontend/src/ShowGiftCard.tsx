@@ -114,7 +114,7 @@ const ShowGiftCard = () => {
                   <br />
                   <Link
                     to="/account"
-                    className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition duration-200 mb-4"
+                    className="w-full button-green block text-center"
                   >
                     Go to Your Accout
                   </Link>
