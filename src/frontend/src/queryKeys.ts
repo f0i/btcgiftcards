@@ -34,10 +34,12 @@ export const mutations = {
       name: string;
       message: string;
       design: string;
+      fee: bigint;
     }) => {
       const result = await backend.createGiftCard(
         params.email,
         params.amount,
+        params.fee,
         params.name,
         params.message,
         params.design,

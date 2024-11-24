@@ -29,7 +29,9 @@ actor class Main() = this {
   type Account = { owner : Principal; subaccount : ?Blob };
   let self = Principal.fromActor(this);
 
-  let CARD_FEE = 180;
+  let MIN_CARD_FEE = 10;
+  //  let CARD_FEE = 180;
+  let MIN_AMOUNT = 100;
 
   type Gift = {
     id : Text;
@@ -55,10 +57,13 @@ actor class Main() = this {
   // List of gift IDs that should be send with current status
   stable var emailQueue : Map<Text, Text> = Map.new();
 
-  public shared ({ caller }) func createGiftCard(email : Text, amount : Nat, sender : Text, message : Text, design : Text) : async Result<Gift> {
+  public shared ({ caller }) func createGiftCard(email : Text, amount : Nat, fee : Nat, sender : Text, message : Text, design : Text) : async Result<Gift> {
     // validate email
     if (not Email.isEmail(email)) return #err("Invalid or unsupported email address");
     let #ok(normalized) = Email.normalize(email) else return #err("Failed to normalize email address");
+
+    if (amount < MIN_AMOUNT) return #err("Amount too low");
+    if (fee < MIN_CARD_FEE) return #err("Fee too low");
 
     // transfer funds to subaccount for email
     let fromAccount = getSubaccountPrincipal(caller);
@@ -70,7 +75,16 @@ actor class Main() = this {
     let to = { owner = self; subaccount = ?toAccount };
     var blockIndex = 0;
     try {
-      ignore await transfer(fromAccount, feeAccount, CARD_FEE);
+      let balance = await Ledger.icrc1_balance_of({
+        owner = self;
+        subaccount = ?fromAccount;
+      });
+      if (fee >= 100) {
+        if (balance < (amount + fee)) return #err("Insufficient funds (" # Nat.toText(balance) # " < " # Nat.toText(amount + fee) # ")");
+        ignore await transfer(fromAccount, feeAccount, fee - 20 /* deduct 2x ckBTC transaction fees */);
+      } else {
+        if (balance < (amount + 10)) return #err("Insufficient funds (" # Nat.toText(balance) # " < " # Nat.toText(amount + 10) # ")");
+      };
       let result = await transfer(fromAccount, to, amount);
 
       blockIndex := switch (result) {

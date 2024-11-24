@@ -56,6 +56,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
     if (useCustomAmount) {
       amount = BigInt(event.target.elements.customAmount.value);
     }
+    var fee: bigint = amount >= 10000n ? (amount * 1n) / 100n : 10n; // 1% fee
     const name: string = event.target.elements.name.value;
     const message: string = event.target.elements.message.value;
     const design: string = event.target.elements.cardTheme.value;
@@ -84,7 +85,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
         "?",
       sub:
         "A total of " +
-        (amount + 200n).toString() +
+        (amount + fee).toString() +
         " ckSat will be deducted from your main account.",
     });
 
@@ -92,7 +93,14 @@ function LoggedIn({ tab }: { tab: Tab }) {
       return;
     }
 
-    createGiftCardMutation.mutate({ email, amount, name, message, design });
+    createGiftCardMutation.mutate({
+      email,
+      amount,
+      fee,
+      name,
+      message,
+      design,
+    });
     return false;
   };
 

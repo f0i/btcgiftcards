@@ -19,6 +19,8 @@ BTC Gift Cards is a project designed to make gifting Bitcoin easy and accessible
 
 - Frontend canister: [y4leg-vyaaa-aaaah-aq3ra-cai](https://y4leg-vyaaa-aaaah-aq3ra-cai.icp0.io/)
 - Backend canister: [yvip2-dqaaa-aaaah-aq3qq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=yvip2-dqaaa-aaaah-aq3qq-cai)
+- Presentation video: [BTC Gift Cards - ICP Chain Fusion Hackathon BITCOIN EDITION](https://youtu.be/IGbjgP9lHCA)
+u
 
 ## Features
 
