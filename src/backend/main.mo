@@ -19,10 +19,12 @@ import { phash; thash } "mo:map/Map";
 import Vec "mo:vector";
 import ICLogin "canister:iclogin";
 import Sha256 "mo:sha2/Sha256";
+import TwoWayMap "TwoWayMap";
 
 actor class Main() = this {
   type Result<T> = Result.Result<T, Text>;
   type Map<K, V> = Map.Map<K, V>;
+  type TwoWayMap<K, V> = TwoWayMap.TwoWayMap<K, V>;
   type Set<T> = Set.Set<T>;
   type Vec<V> = Vec.Vector<V>;
   type Time = Time.Time;
@@ -46,7 +48,7 @@ actor class Main() = this {
 
   stable var created : Map<Principal, Vec<Gift>> = Map.new();
   stable var received : Map<Text, Vec<Gift>> = Map.new();
-  // Principal and email address
+  // Lookup table from Principal to verified email address
   stable var verified : Map<Principal, Text> = Map.new();
   // Lookup table from gift ID to Gift
   stable var lookup : Map<Text, Gift> = Map.new();
@@ -56,8 +58,20 @@ actor class Main() = this {
   stable var revoked : Map<Text, (Time, Bool, Gift)> = Map.new();
   // List of gift IDs that should be send with current status
   stable var emailQueue : Map<Text, Text> = Map.new();
+  // Lookup table from "email login principals" to "II principals"
+  stable var securedPrincipals : TwoWayMap<Principal, Principal> = TwoWayMap.new();
+  // Lookup table from "email login principals" to "II principals", awaiting confirmation from II principal
+  var securedPrincipalsPending : TwoWayMap<Principal, Principal> = TwoWayMap.new();
 
   public shared ({ caller }) func createGiftCard(email : Text, amount : Nat, fee : Nat, sender : Text, message : Text, design : Text) : async Result<Gift> {
+    // check if accout is seccured with II
+    if (TwoWayMap.has(securedPrincipals, phash, caller)) return #err("Account is secured. Use II login to create gift cards or withdraw");
+    // get original account owner
+    let subaccountOwner = switch (TwoWayMap.getReverse(securedPrincipals, phash, caller)) {
+      case (?original) { original };
+      case (null) { caller };
+    };
+
     // validate email
     if (not Email.isEmail(email)) return #err("Invalid or unsupported email address");
     let #ok(normalized) = Email.normalize(email) else return #err("Failed to normalize email address");
@@ -66,7 +80,7 @@ actor class Main() = this {
     if (fee < MIN_CARD_FEE) return #err("Fee too low");
 
     // transfer funds to subaccount for email
-    let fromAccount = getSubaccountPrincipal(caller);
+    let fromAccount = getSubaccountPrincipal(subaccountOwner);
 
     let feeAccount = { owner = self; subaccount = ?getSubaccountFor(#fees) };
 
@@ -100,7 +114,7 @@ actor class Main() = this {
     // generate gift card
     let id = giftHash({
       id = "";
-      creator = caller;
+      creator = subaccountOwner;
       to = normalized;
       amount;
       sender;
@@ -110,7 +124,7 @@ actor class Main() = this {
     });
     let gift : Gift = {
       id;
-      creator = caller;
+      creator = subaccountOwner;
       to = normalized;
       amount;
       sender;
@@ -122,7 +136,7 @@ actor class Main() = this {
     ignore Map.update(
       created,
       phash,
-      caller,
+      subaccountOwner,
       func(_ : Principal, x : ?Vec<Gift>) : ?Vec<Gift> {
         switch (x) {
           case (null) ?Vec.init(1, gift);
@@ -162,6 +176,7 @@ actor class Main() = this {
     account : Account;
     accountEmail : ?Account;
     caller : Principal;
+    subaccountOwner : Principal;
   };
 
   public shared query ({ caller }) func showGiftcard(id : Text) : async ?{
@@ -198,6 +213,11 @@ actor class Main() = this {
     let refundable = Array.map(Array.filter(sendArr, isRefundable), func(g : Gift) : Text = g.id);
     let sendStatus = Array.map(sendArr, getSendStatus);
 
+    let subaccountOwner = switch (TwoWayMap.getReverse(securedPrincipals, phash, caller)) {
+      case (?original) { original };
+      case (null) { caller };
+    };
+
     return {
       created = sendArr;
       refundable;
@@ -207,6 +227,7 @@ actor class Main() = this {
       account;
       accountEmail;
       caller;
+      subaccountOwner;
     };
   };
 
@@ -324,16 +345,65 @@ actor class Main() = this {
   };
 
   public shared ({ caller }) func withdraw(to : Account, amount : Nat, main : Bool) : async Result<Nat> {
+    // check if accout is seccured with II
+    if (TwoWayMap.has(securedPrincipals, phash, caller)) return #err("Account is secured. Use II login to create gift cards or withdraw");
+    // get original account owner
+    let subaccountOwner = switch (TwoWayMap.getReverse(securedPrincipals, phash, caller)) {
+      case (?original) { original };
+      case (null) { caller };
+    };
 
     // transfer funds to subaccount for email
     let fromAccount = if (main) {
-      getSubaccountPrincipal(caller);
+      getSubaccountPrincipal(subaccountOwner);
     } else {
-      let ?email = Map.get(verified, phash, caller) else return #err("Email not verified.");
+      let ?email = Map.get(verified, phash, subaccountOwner) else return #err("Email not verified.");
       getSubaccountEmail(email);
     };
 
     return await transfer(fromAccount, to, amount);
+  };
+
+  public shared ({ caller }) func secureAccount(emailAccount : Principal, iiAccount : Principal) : async Result<Text> {
+    if (Principal.isAnonymous(caller)) return #err("Caller must not be anonymous");
+    if (Principal.isAnonymous(emailAccount)) return #err("Email identity must not be anonymous");
+    if (Principal.isAnonymous(iiAccount)) return #err("II identity must not be anonymous");
+    if (caller != emailAccount and caller != iiAccount) return #err("Caller does not match any of the provided principals");
+
+    if (TwoWayMap.has(securedPrincipals, phash, emailAccount)) return #err("Already secured");
+    if (TwoWayMap.has(securedPrincipals, phash, iiAccount)) return #err("Invalid II identity");
+
+    if (not Map.has(verified, phash, emailAccount)) return #err("Email identity not verified");
+    if (Map.has(verified, phash, iiAccount)) return #err("II identity must not have verified email");
+
+    // First request must be from emailAccount
+    if (caller == emailAccount) {
+      switch (TwoWayMap.get(securedPrincipalsPending, phash, emailAccount)) {
+        case (?storedII) {
+          if (storedII != iiAccount) return #err("Already prepared with different II identity");
+          return #ok("Already prepared");
+        };
+        case (null) {
+          TwoWayMap.set(securedPrincipalsPending, phash, phash, emailAccount, iiAccount);
+          return #ok("Prepared");
+        };
+      };
+
+    };
+    // Second request from iiAccount to complete setup
+    if (caller == iiAccount) {
+      switch (TwoWayMap.get(securedPrincipalsPending, phash, emailAccount)) {
+        case (?storedII) {
+          if (storedII != iiAccount) return #err("II principal does not match");
+          TwoWayMap.set(securedPrincipals, phash, phash, emailAccount, iiAccount);
+          return #ok("Secured");
+        };
+        case (null) {
+          return #err("Not prepared");
+        };
+      };
+    };
+    return #err("Invalid principal ids");
   };
 
   public shared query ({ caller }) func stats() : async Text {
