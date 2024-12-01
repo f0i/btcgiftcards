@@ -183,11 +183,17 @@ actor class Main() = this {
     gift : Gift;
     sendStatus : SendStatus;
   } {
+    let subaccountOwner = switch (TwoWayMap.getReverse(securedPrincipals, phash, caller)) {
+      case (?original) { original };
+      case (null) { caller };
+    };
     switch (Map.get(lookup, thash, id)) {
       case (?gift) {
         return ?{
           gift;
-          sendStatus = if (caller == gift.creator) { getSendStatus(gift) } else {
+          sendStatus = if (subaccountOwner == gift.creator) {
+            getSendStatus(gift);
+          } else {
             { id = gift.id; status = "hidden" };
           };
         };
@@ -197,13 +203,18 @@ actor class Main() = this {
   };
 
   public shared query ({ caller }) func listGiftcards() : async GiftInfo {
-    let send = Option.get<Vec<Gift>>(Map.get(created, phash, caller), Vec.new());
-    let email = Map.get(verified, phash, caller);
+    let subaccountOwner = getSubaccountOwner(caller);
+
+    let send = Option.get<Vec<Gift>>(Map.get(created, phash, subaccountOwner), Vec.new());
+    let email = Map.get(verified, phash, subaccountOwner);
     let own : Vec<Gift> = switch (email) {
       case (null) Vec.new<Gift>();
       case (?gmail) Option.get<Vec<Gift>>(Map.get(received, thash, gmail), Vec.new());
     };
-    let account = { owner = self; subaccount = ?getSubaccountPrincipal(caller) };
+    let account = {
+      owner = self;
+      subaccount = ?getSubaccountPrincipal(subaccountOwner);
+    };
     let accountEmail = Option.map<Text, Account>(
       email,
       func(gmail) = { owner = self; subaccount = ?getSubaccountEmail(gmail) },
@@ -212,11 +223,6 @@ actor class Main() = this {
     let sendArr = Vec.toArray<Gift>(send);
     let refundable = Array.map(Array.filter(sendArr, isRefundable), func(g : Gift) : Text = g.id);
     let sendStatus = Array.map(sendArr, getSendStatus);
-
-    let subaccountOwner = switch (TwoWayMap.getReverse(securedPrincipals, phash, caller)) {
-      case (?original) { original };
-      case (null) { caller };
-    };
 
     return {
       created = sendArr;
@@ -257,15 +263,16 @@ actor class Main() = this {
   };
 
   public shared ({ caller }) func getEmail() : async Result<Text> {
-    switch (Map.get(verified, phash, caller)) {
+    let subaccountOwner = getSubaccountOwner(caller);
+    switch (Map.get(verified, phash, subaccountOwner)) {
       case (?email) return #ok(email);
       case (null) {};
     };
     try {
-      let res = await ICLogin.getEmail(caller);
+      let res = await ICLogin.getEmail(subaccountOwner);
       switch (res) {
         case (?email) {
-          Map.set(verified, phash, caller, email);
+          Map.set(verified, phash, subaccountOwner, email);
           Map.set(locked, thash, email, Time.now());
           return #ok(email);
         };
@@ -274,14 +281,15 @@ actor class Main() = this {
         };
       };
     } catch (err) {
-      return #err("Failed to get email address for " # Principal.toText(caller) # ": " # Error.message(err));
+      return #err("Failed to get email address for " # Principal.toText(subaccountOwner) # ": " # Error.message(err));
     };
   };
 
   public shared ({ caller }) func verifyEmail(email : Text) : async Result<Text> {
+    let subaccountOwner = getSubaccountOwner(caller);
     if (not Email.isEmail(email)) return #err("Invalid or unsupported email address");
     let #ok(normalized) = Email.normalize(email) else return #err("Failed to normalize email address");
-    switch (Map.get(verified, phash, caller)) {
+    switch (Map.get(verified, phash, subaccountOwner)) {
       case (?email) {
         if (email == normalized) {
           return #ok(email);
@@ -292,9 +300,9 @@ actor class Main() = this {
       case (null) {};
     };
     try {
-      let res = await ICLogin.checkEmail(caller, email);
+      let res = await ICLogin.checkEmail(subaccountOwner, email);
       if (res) {
-        Map.set(verified, phash, caller, normalized);
+        Map.set(verified, phash, subaccountOwner, normalized);
         Map.set(locked, thash, normalized, Time.now());
         return #ok(email);
       };
@@ -305,8 +313,9 @@ actor class Main() = this {
   };
 
   public shared ({ caller }) func refund(id : Text, expectedAmount : Nat) : async Result<Nat> {
+    let subaccountOwner = getSubaccountOwner(caller);
     let ?gift = Map.get(lookup, thash, id) else return #err("Gift card not found");
-    if (gift.creator != caller) return #err("Not created by you");
+    if (gift.creator != subaccountOwner) return #err("Not created by you");
 
     switch (Map.get(locked, thash, gift.to)) {
       case (?_time) return #err("Recipient account is protected");
@@ -326,7 +335,7 @@ actor class Main() = this {
 
     // transfer funds for email back to subaccount
     let fromAccount = getSubaccountEmail(gift.to);
-    let toAccount = getSubaccountPrincipal(caller);
+    let toAccount = getSubaccountPrincipal(subaccountOwner);
     let to = { owner = self; subaccount = ?toAccount };
     let result = await transfer(fromAccount, to, refundAmount);
 
@@ -348,10 +357,7 @@ actor class Main() = this {
     // check if accout is seccured with II
     if (TwoWayMap.has(securedPrincipals, phash, caller)) return #err("Account is secured. Use II login to create gift cards or withdraw");
     // get original account owner
-    let subaccountOwner = switch (TwoWayMap.getReverse(securedPrincipals, phash, caller)) {
-      case (?original) { original };
-      case (null) { caller };
-    };
+    let subaccountOwner = getSubaccountOwner(caller);
 
     // transfer funds to subaccount for email
     let fromAccount = if (main) {
@@ -370,11 +376,13 @@ actor class Main() = this {
     if (Principal.isAnonymous(iiAccount)) return #err("II identity must not be anonymous");
     if (caller != emailAccount and caller != iiAccount) return #err("Caller does not match any of the provided principals");
 
-    if (TwoWayMap.has(securedPrincipals, phash, emailAccount)) return #err("Already secured");
-    if (TwoWayMap.has(securedPrincipals, phash, iiAccount)) return #err("Invalid II identity");
-
     if (not Map.has(verified, phash, emailAccount)) return #err("Email identity not verified");
     if (Map.has(verified, phash, iiAccount)) return #err("II identity must not have verified email");
+
+    if (TwoWayMap.has(securedPrincipals, phash, emailAccount)) return #err("Email identity already secured");
+    if (TwoWayMap.has(securedPrincipals, phash, iiAccount)) return #err("Invalid II identity");
+    if (TwoWayMap.hasReverse(securedPrincipals, phash, emailAccount)) return #err("Invalid email identity");
+    if (TwoWayMap.hasReverse(securedPrincipals, phash, iiAccount)) return #err("II Identity already used to secure another account");
 
     // First request must be from emailAccount
     if (caller == emailAccount) {
@@ -403,7 +411,8 @@ actor class Main() = this {
         };
       };
     };
-    return #err("Invalid principal ids");
+    // This should be handled already
+    Debug.trap("Unreachable: Caller does not match any of the provided principals.");
   };
 
   public shared query ({ caller }) func stats() : async Text {
@@ -417,9 +426,8 @@ actor class Main() = this {
   };
 
   public shared query ({ caller }) func getEmailQueue(status : Text) : async Result<[{ gift : Gift; status : Text }]> {
-    if (not Principal.isController(caller)) {
-      return #err("Permission denied");
-    };
+    if (not Principal.isController(caller)) return #err("Permission denied");
+
     let out : Vec<{ gift : Gift; status : Text }> = Vec.new();
     for ((id, stat) in Map.entries(emailQueue)) {
       if (stat == status or status == "") {
@@ -442,9 +450,11 @@ actor class Main() = this {
       return #err("Permission denied");
     };
 
+    let subaccountOwner = getSubaccountOwner(caller);
+
     switch (Map.get(lookup, thash, id)) {
       case (?gift) {
-        if (gift.creator != caller and (not Principal.isController(caller))) {
+        if (gift.creator != subaccountOwner and (not Principal.isController(caller))) {
           return #err("You did not create this gift card");
         };
       };
@@ -507,6 +517,13 @@ actor class Main() = this {
     };
   };
 
+  private func getSubaccountOwner(caller : Principal) : Principal {
+    switch (TwoWayMap.getReverse(securedPrincipals, phash, caller)) {
+      case (?original) { return original };
+      case (null) { return caller };
+    };
+  };
+
   private func getSubaccountEmail(email : Text) : Blob {
     let hash = Blob.toArray(Sha256.fromBlob(#sha224, Text.encodeUtf8(email)));
     assert (hash.size() < 32);
@@ -516,8 +533,8 @@ actor class Main() = this {
 
   private func getSubaccountFor(category : { #fees; #donate }) : Blob {
     switch (category) {
-      case (#fees) Blob.fromArray(Array.tabulate(32, func(i : Nat) : Nat8 = if (i == 0) 0xff else 0x00));
-      case (#donate) Blob.fromArray(Array.tabulate(32, func(i : Nat) : Nat8 = if (i == 0) 0xdd else 0x00));
+      case (#fees) Blob.fromArray(Array.tabulate(32, func(i : Nat) : Nat8 = if (i == 31) 0xff else 0x00));
+      case (#donate) Blob.fromArray(Array.tabulate(32, func(i : Nat) : Nat8 = if (i == 31) 0xdd else 0x00));
     };
   };
 
