@@ -49,7 +49,8 @@ u
 
 ## Roadmap
 
-- Sending emails
+- Secure account by creating an II
+- Automate sending emails
 - Progress indicator for ckBTC minter
 - Add redeem by code (without email verification)
 - Shortcut to transfer gift card balance to main account
