@@ -76,6 +76,8 @@ export const GiftCard = ({
   const canCancel =
     gift.creator.toString() === principal?.toString() &&
     status?.status === "sendRequest";
+  const revoked =
+    status.status === "cardRevoked" || status.status === "cardRevoking";
   console.log("status", status, canRequestSend);
 
   return (
@@ -91,7 +93,7 @@ export const GiftCard = ({
       <br />
       <div>You received a gift from {gift.sender}</div>
       <br />
-      <div>
+      <div className={revoked ? "line-through" : ""}>
         Value: <strong>{gift.amount.toString()} ckSat</strong> (={" "}
         {Number(gift.amount) / 100000000.0} Bitcoin)
       </div>
@@ -109,6 +111,11 @@ export const GiftCard = ({
       <br />
       <strong>Message from {gift.sender}:</strong>
       <div>{gift.message}</div>
+      {revoked ? (
+        <div className="warning w-full">
+          ⚠️ <strong>Warning:</strong> This Card has been revoked.
+        </div>
+      ) : null}
       <div className="w-full flex felx-row space-x-2 justify-end mt-8">
         {showRefund ? (
           <button onClick={refund} className="button">
@@ -135,7 +142,7 @@ export const GiftCard = ({
             Request Send by Email
           </button>
         ) : null}
-        <CopyFormattedContent gift={gift} />
+        {revoked ? null : <CopyFormattedContent gift={gift} />}
       </div>
     </div>
   );

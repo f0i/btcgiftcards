@@ -34,7 +34,7 @@ export const ThemeSelect = ({ id }: { id: string }) => {
 
   return (
     <>
-      <div className="flex flex-row">
+      <div className="flex flex-row overflow-x-auto">
         <ThemeButton setActive={setActive} design="xmas" active={active} />
         <ThemeButton setActive={setActive} design="btcFuture" active={active} />
         <ThemeButton setActive={setActive} design="btcPlan" active={active} />
