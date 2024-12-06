@@ -317,10 +317,11 @@ function GiftcardList({
   if (gifts.length === 0) return <div className="warning mt-2">{empty}</div>;
 
   return (
-    <div>
+    <div className="flex flex-row flex-wrap gap-4">
       {gifts
         .map((gift) => (
           <GiftCard
+            className="TODO:w-[calc(50%-1em)]" // TODO fix buttons
             gift={gift}
             key={gift.id}
             refundable={refundable}

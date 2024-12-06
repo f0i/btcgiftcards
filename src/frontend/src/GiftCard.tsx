@@ -12,11 +12,13 @@ export const GiftCard = ({
   refundable,
   sendStatus,
   principal,
+  className,
 }: {
   gift: Gift;
   refundable: string[];
   sendStatus: SendStatus[];
   principal?: Principal;
+  className?: string;
 }) => {
   let { backendActor } = useAuth();
   let queryClient = useQueryClient();
@@ -81,13 +83,17 @@ export const GiftCard = ({
   console.log("status", status, canRequestSend);
 
   return (
-    <div className="card relative break-all">
-      <div className="relative text-gray-500 text-lg">
+    <div
+      className={
+        "card relative break-all text-lg max-w-[30em] " + (className ?? "")
+      }
+    >
+      <div className="relative text-gray-500 text-base">
         <div className="card-date">{formatDateFromNano(gift.created)}</div>
         <div>To: {gift.to}</div>
       </div>
       <img
-        className="w-full max-w-full object-cover rounded-lg max-h-[25em]"
+        className="w-full max-w-full object-cover rounded-lg max-h-[25em] aspect-video"
         src={theme.cover}
       />
       <br />
@@ -110,7 +116,7 @@ export const GiftCard = ({
       <br />
       <br />
       <strong>Message from {gift.sender}:</strong>
-      <div>{gift.message}</div>
+      <div className="whitespace-pre">{gift.message}</div>
       {revoked ? (
         <div className="warning w-full">
           ⚠️ <strong>Warning:</strong> This Card has been revoked.
