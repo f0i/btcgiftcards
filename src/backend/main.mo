@@ -82,8 +82,6 @@ actor class Main() = this {
     // transfer funds to subaccount for email
     let fromAccount = getSubaccountPrincipal(subaccountOwner);
 
-    let feeAccount = { owner = self; subaccount = ?getSubaccountFor(#fees) };
-
     let toAccount = getSubaccountEmail(email);
 
     let to = { owner = self; subaccount = ?toAccount };
@@ -93,12 +91,7 @@ actor class Main() = this {
         owner = self;
         subaccount = ?fromAccount;
       });
-      if (fee >= 100) {
-        if (balance < (amount + fee)) return #err("Insufficient funds (" # Nat.toText(balance) # " < " # Nat.toText(amount + fee) # ")");
-        ignore await transfer(fromAccount, feeAccount, fee - 20 /* deduct 2x ckBTC transaction fees */);
-      } else {
-        if (balance < (amount + 10)) return #err("Insufficient funds (" # Nat.toText(balance) # " < " # Nat.toText(amount + 10) # ")");
-      };
+      if (balance < (amount + 10)) return #err("Insufficient funds (" # Nat.toText(balance) # " < " # Nat.toText(amount + 10) # ")");
       let result = await transfer(fromAccount, to, amount);
 
       blockIndex := switch (result) {
@@ -529,13 +522,6 @@ actor class Main() = this {
     assert (hash.size() < 32);
 
     Blob.fromArray(Array.tabulate(32, func(i : Nat) : Nat8 = if (i < hash.size()) hash[i] else 0xee));
-  };
-
-  private func getSubaccountFor(category : { #fees; #donate }) : Blob {
-    switch (category) {
-      case (#fees) Blob.fromArray(Array.tabulate(32, func(i : Nat) : Nat8 = if (i == 31) 0xff else 0x00));
-      case (#donate) Blob.fromArray(Array.tabulate(32, func(i : Nat) : Nat8 = if (i == 31) 0xdd else 0x00));
-    };
   };
 
   private func getSubaccountPrincipal(principal : Principal) : Blob {
