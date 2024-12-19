@@ -215,7 +215,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
             <div className="w-full" hidden={!useCustomAmount}>
               <label />
               <div className="input-container relative">
-                <span className="absolute right-12 top-4">ckBTC</span>
+                <span className="absolute right-12 top-4">ckSat</span>
                 <input
                   type="number"
                   id="customAmount"

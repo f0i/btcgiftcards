@@ -101,7 +101,7 @@ const ShowGiftCard = () => {
             >
               support.google.com
             </a>{" "}
-            for instructions
+            for instructions.
           </div>
         )}
         <div>

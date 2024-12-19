@@ -81,11 +81,12 @@ export const GiftCard = ({
   const revoked =
     status.status === "cardRevoked" || status.status === "cardRevoking";
   console.log("status", status, canRequestSend);
+  if (revoked) return null;
 
   return (
     <div
       className={
-        "card relative break-all text-lg max-w-[30em] " + (className ?? "")
+        "card relative text-break text-lg max-w-[30em] " + (className ?? "")
       }
     >
       <div className="relative text-gray-500 text-base">
@@ -116,7 +117,7 @@ export const GiftCard = ({
       <br />
       <br />
       <strong>Message from {gift.sender}:</strong>
-      <div className="whitespace-pre">{gift.message}</div>
+      <div className="text-pre">{gift.message}</div>
       {revoked ? (
         <div className="warning w-full">
           ⚠️ <strong>Warning:</strong> This Card has been revoked.

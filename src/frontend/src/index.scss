@@ -92,6 +92,17 @@ form {
   @apply button-tab border rounded-md mb-1 hover:bg-gray-100;
 }
 
+.text-break {
+  overflow-wrap: break-word; /* Primary: Breaks long words */
+  word-break: break-word;   /* Fallback: Breaks anywhere for long words */
+  white-space: normal;      /* Wraps at natural spaces */
+}
+
+.text-bre {
+  white-space: pre-wrap;     /* Preserve line breaks and multiple spaces */
+  overflow-wrap: break-word; /* Break long words if necessary */
+  word-break: break-word;    /* Fallback for long words */
+}
 
 #giftcard {
   margin: 10px auto;
