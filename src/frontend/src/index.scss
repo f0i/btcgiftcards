@@ -98,7 +98,7 @@ form {
   white-space: normal;      /* Wraps at natural spaces */
 }
 
-.text-bre {
+.text-pre {
   white-space: pre-wrap;     /* Preserve line breaks and multiple spaces */
   overflow-wrap: break-word; /* Break long words if necessary */
   word-break: break-word;    /* Fallback for long words */

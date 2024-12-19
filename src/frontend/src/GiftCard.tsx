@@ -86,7 +86,7 @@ export const GiftCard = ({
   return (
     <div
       className={
-        "card relative text-break text-lg max-w-[30em] " + (className ?? "")
+        "card relative text-break text-lg max-w-[33em] " + (className ?? "")
       }
     >
       <div className="relative text-gray-500 text-base">
