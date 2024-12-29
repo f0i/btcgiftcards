@@ -21,7 +21,7 @@ export const ThemeButton = ({
     <img
       src={theme.cover}
       className={
-        "w-1/4 max-w-1/4 max-h-[5em] object-cover rounded-lg max-h-[25em] border-4 cursor-pointer " +
+        "max-w-48 object-cover rounded-lg border-4 cursor-pointer aspect-video " +
         border
       }
       onClick={() => setActive(theme.name)}

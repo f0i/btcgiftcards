@@ -2,7 +2,7 @@ import { useAuth, AuthProvider } from "./use-auth-client";
 import LoggedOut from "./LoggedOut";
 import LoggedIn from "./LoggedIn";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import ShowGiftCard from "./ShowGiftCard";
 import { useEffect } from "react";
 import { preloadImages } from "./cardThemes";
@@ -15,38 +15,44 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            isAuthenticated ? <LoggedIn tab="received" /> : <LoggedOut />
-          }
-        />
-        <Route
-          path="/create"
-          element={isAuthenticated ? <LoggedIn tab="new" /> : <LoggedOut />}
-        />
-        <Route
-          path="/created"
-          element={isAuthenticated ? <LoggedIn tab="created" /> : <LoggedOut />}
-        />
-        <Route
-          path="/received"
-          element={
-            isAuthenticated ? <LoggedIn tab="received" /> : <LoggedOut />
-          }
-        />
-        <Route
-          path="/account"
-          element={isAuthenticated ? <LoggedIn tab="account" /> : <LoggedOut />}
-        />
-        <Route path="/show/:giftId" element={<ShowGiftCard />} />
-        <Route path="/send/:giftId" element={<ShowGiftCard />} />
-        <Route path="/colors" element={<ColorTest />} />
-        <Route path="/signin" element={<LoggedOut />} />
-      </Routes>
-    </Router>
+    <>
+      <Router>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? <LoggedIn tab="received" /> : <LoggedOut />
+            }
+          />
+          <Route
+            path="/create"
+            element={isAuthenticated ? <LoggedIn tab="new" /> : <LoggedOut />}
+          />
+          <Route
+            path="/created"
+            element={
+              isAuthenticated ? <LoggedIn tab="created" /> : <LoggedOut />
+            }
+          />
+          <Route
+            path="/received"
+            element={
+              isAuthenticated ? <LoggedIn tab="received" /> : <LoggedOut />
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              isAuthenticated ? <LoggedIn tab="account" /> : <LoggedOut />
+            }
+          />
+          <Route path="/show/:giftId" element={<ShowGiftCard />} />
+          <Route path="/send/:giftId" element={<ShowGiftCard />} />
+          <Route path="/colors" element={<ColorTest />} />
+          <Route path="/signin" element={<LoggedOut />} />
+        </Routes>
+      </Router>
+    </>
   );
 }
 

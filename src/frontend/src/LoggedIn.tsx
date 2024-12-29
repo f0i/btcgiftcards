@@ -22,8 +22,7 @@ import Showcase from "./Showcase";
 import toast from "react-hot-toast";
 import { confirmDialog } from "./CopyButton";
 import { Principal } from "@dfinity/principal";
-
-type Tab = "created" | "new" | "received" | "account";
+import TopNav, { Tab } from "./components/TopNav";
 
 function LoggedIn({ tab }: { tab: Tab }) {
   const queryClient = useQueryClient();
@@ -119,185 +118,143 @@ function LoggedIn({ tab }: { tab: Tab }) {
   };
 
   return (
-    <div className="main">
-      <button id="logout" onClick={logout} className="group">
-        🚶‍➡️🚪
-        <div className="hidden group-hover:block">Sign out</div>
-      </button>
-      <div className="content max-w-4xl mb-4">
-        <h1>
-          BTC<span className=" text-gray-300">-</span>Gift
-          <span className="text-gray-300">-</span>Cards
-          <span className="text-gray-300 text-base">.com</span>
-        </h1>
-      </div>
-      <div className="flex w-full max-w-4xl space-x-4 overflow-x-auto overflow-y-hidden mb-[-10px] pb-[10px] pt-1">
-        <Link
-          to="/create"
-          className={
-            tab === "new" ? "button-tab-active" : "button-tab-inactive"
-          }
-        >
-          Create
-        </Link>
-        <Link
-          to="/received"
-          className={
-            tab === "received" ? "button-tab-active" : "button-tab-inactive"
-          }
-        >
-          Received
-        </Link>
-        <Link
-          to="/created"
-          className={
-            tab === "created" ? "button-tab-active" : "button-tab-inactive"
-          }
-        >
-          Created
-        </Link>
-        <Link
-          to="/account"
-          className={
-            tab === "account" ? "button-tab-active" : "button-tab-inactive"
-          }
-        >
-          Account
-        </Link>
-      </div>
-      {tab !== "new" ? null : (
-        <div className="content max-w-4xl mb-4">
-          <form action="#" onSubmit={handleSubmit}>
-            <h3 className="w-full">New Gift Card</h3>
-            <ThemeSelect id="cardTheme" />
-            <label htmlFor="name">Enter your name: &nbsp;</label>
-            <input id="name" alt="Name" type="text" />
-            <label
-              hidden={isGmail(email)}
-              className="w-full bg-yellow-100 border border-yellow-500 text-yellow-700 p-4 rounded text-base"
-            >
-              ⚠️ <strong>Warning:</strong> <i>{email}</i> is not a Gmail
-              address. You can still use it if the recipient can "sign in with
-              google" using this address. You will be able to refund until the
-              first successful sign in with that email address.
-            </label>
-            <label htmlFor="email">Recipient Email: &nbsp;</label>
-            <input
-              id="email"
-              alt="Email"
-              type="email"
-              onBlur={(e: any) => {
-                setEmail(e.target.value);
-              }}
-              onChange={(e: any) => setEmail("")}
-            />
-            <label className="w-full text-base text-right">
-              Current balance:{" "}
-              {balance.isLoading
-                ? "loading..."
-                : balance.isError ||
-                    balance.data === null ||
-                    balance.data === undefined
-                  ? "-"
-                  : balance.data.toString() + " ckSat"}
-            </label>
-            <label htmlFor="amount">Amount: &nbsp;</label>
-            <select id="amount" onChange={handleAmountChange}>
-              {/* TODO: get current exchange rate */}
-              <option value="1000">1000 ckSat (~1$)</option>
-              <option value="2222">2222 ckSat (🦆🦆🦆🦆)</option>
-              <option value="1000">5000 ckSat (~5$)</option>
-              <option value="10000">10000 ckSat (~10$)</option>
-              <option value="21000">21000 ckSat (~21$)</option>
-              <option value="50000">50000 ckSat (~50$)</option>
-              <option value="0">Custom Amount...</option>
-            </select>
-            <div className="w-full" hidden={!useCustomAmount}>
-              <label />
-              <div className="input-container relative">
-                <span className="absolute right-12 top-4">ckSat</span>
-                <input
-                  type="number"
-                  id="customAmount"
-                  placeholder=""
-                  min={500}
-                  max={100000}
-                />
-              </div>
-            </div>
-            <label htmlFor="message">Enter a message: &nbsp;</label>
-            <textarea id="message" rows={5} />
-            <div className="w-full bg-blue-100 border border-blue-300 text-blue-800 text-base rounded-lg p-4 my-2 inline-block">
-              ⚠️ <strong>Warning:</strong> The project is still under active
-              development. Please avoid loading large amounts onto the gift
-              cards at this stage, as there is a risk of funds being lost.
-            </div>
-            <button
-              type="submit"
-              disabled={createGiftCardMutation.isPending}
-              className={
-                createGiftCardMutation.isPending
-                  ? "opacity-50 cursor-not-allowed"
-                  : ""
-              }
-            >
-              {createGiftCardMutation.isPending
-                ? "Creating..."
-                : "Create Gift Card!"}
-            </button>
-          </form>
-        </div>
-      )}
-      {tab !== "received" ? null : (
-        <div className="content max-w-4xl mb-4">
-          <section id="received" className="min-h-[16em]">
-            <h3>Received Gift Cards</h3>
-            <GiftcardList
-              gifts={data?.received ?? []}
-              refundable={[]}
-              empty="No gift cards received yet."
-              sendStatus={[]}
-              principal={principal!}
-            />
-          </section>
-        </div>
-      )}
-      {tab !== "created" ? null : (
-        <div className="content max-w-4xl mb-4">
-          <section id="created" className="min-h-[16em]">
-            <h3>Created Gift Cards</h3>
-            <GiftcardList
-              gifts={data?.created ?? []}
-              refundable={data?.refundable ?? []}
-              empty="No gift cards created yet."
-              sendStatus={data?.sendStatus ?? []}
-              principal={principal!}
-            />
-          </section>
-        </div>
-      )}
-      {tab !== "account" ? null : (
-        <div className="content max-w-4xl mb-4">
-          <section id="withdraw">
-            <h3>Account</h3>
-            <AccountInfo notify={(_: unknown) => {}} />
-            <h3 className="mt-12">Withdraw</h3>
-            {!data || !backendActor || !minterActor ? null : (
-              <Withdraw
-                info={data}
-                ledger={ckbtc_ledger}
-                backend={backendActor}
-                minter={minterActor}
+    <>
+      <TopNav tab={tab} />
+      <div className="main">
+        {tab !== "new" ? null : (
+          <div className="content max-w-4xl mb-4">
+            <form action="#" onSubmit={handleSubmit}>
+              <h3 className="w-full">New Gift Card</h3>
+              <ThemeSelect id="cardTheme" />
+              <label htmlFor="name">Enter your name: &nbsp;</label>
+              <input id="name" alt="Name" type="text" />
+              <label
+                hidden={isGmail(email)}
+                className="w-full bg-yellow-100 border border-yellow-500 text-yellow-700 p-4 rounded text-base"
+              >
+                ⚠️ <strong>Warning:</strong> <i>{email}</i> is not a Gmail
+                address. You can still use it if the recipient can "sign in with
+                google" using this address. You will be able to refund until the
+                first successful sign in with that email address.
+              </label>
+              <label htmlFor="email">Recipient Email: &nbsp;</label>
+              <input
+                id="email"
+                alt="Email"
+                type="email"
+                onBlur={(e: any) => {
+                  setEmail(e.target.value);
+                }}
+                onChange={(e: any) => setEmail("")}
               />
-            )}
-          </section>
-          <section className="mt-16">
-            <h3>What to do with ckBTC?</h3>
-            <Showcase />
-          </section>
-        </div>
-      )}
-    </div>
+              <label className="w-full text-base text-right">
+                Current balance:{" "}
+                {balance.isLoading
+                  ? "loading..."
+                  : balance.isError ||
+                      balance.data === null ||
+                      balance.data === undefined
+                    ? "-"
+                    : balance.data.toString() + " ckSat"}
+              </label>
+              <label htmlFor="amount">Amount: &nbsp;</label>
+              <select id="amount" onChange={handleAmountChange}>
+                {/* TODO: get current exchange rate */}
+                <option value="1000">1000 ckSat (~1$)</option>
+                <option value="2222">2222 ckSat (🦆🦆🦆🦆)</option>
+                <option value="5000">5000 ckSat (~5$)</option>
+                <option value="10000">10000 ckSat (~10$)</option>
+                <option value="21000">21000 ckSat (~21$)</option>
+                <option value="50000">50000 ckSat (~50$)</option>
+                <option value="0">Custom Amount...</option>
+              </select>
+              <div className="w-full" hidden={!useCustomAmount}>
+                <label />
+                <div className="input-container relative">
+                  <span className="absolute right-12 top-4">ckSat</span>
+                  <input
+                    type="number"
+                    id="customAmount"
+                    placeholder=""
+                    min={500}
+                    max={100000}
+                  />
+                </div>
+              </div>
+              <label htmlFor="message">Enter a message: &nbsp;</label>
+              <textarea id="message" rows={5} />
+              <div className="w-full bg-blue-100 border border-blue-300 text-blue-800 text-base rounded-lg p-4 my-2 inline-block">
+                ⚠️ <strong>Warning:</strong> The project is still under active
+                development. Please avoid loading large amounts onto the gift
+                cards at this stage, as there is a risk of funds being lost.
+              </div>
+              <button
+                type="submit"
+                disabled={createGiftCardMutation.isPending}
+                className={
+                  createGiftCardMutation.isPending
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }
+              >
+                {createGiftCardMutation.isPending
+                  ? "Creating..."
+                  : "Create Gift Card!"}
+              </button>
+            </form>
+          </div>
+        )}
+        {tab !== "received" ? null : (
+          <div className="content max-w-4xl mb-4">
+            <section id="received" className="min-h-[16em]">
+              <h3>Received Gift Cards</h3>
+              <GiftcardList
+                gifts={data?.received ?? []}
+                refundable={[]}
+                empty="No gift cards received yet."
+                sendStatus={[]}
+                principal={principal!}
+              />
+            </section>
+          </div>
+        )}
+        {tab !== "created" ? null : (
+          <div className="content max-w-4xl mb-4">
+            <section id="created" className="min-h-[16em]">
+              <h3>Created Gift Cards</h3>
+              <GiftcardList
+                gifts={data?.created ?? []}
+                refundable={data?.refundable ?? []}
+                empty="No gift cards created yet."
+                sendStatus={data?.sendStatus ?? []}
+                principal={principal!}
+              />
+            </section>
+          </div>
+        )}
+        {tab !== "account" ? null : (
+          <div className="content max-w-4xl mb-4">
+            <section id="withdraw">
+              <h3>Account</h3>
+              <AccountInfo notify={(_: unknown) => {}} />
+              <h3 className="mt-12">Withdraw</h3>
+              {!data || !backendActor || !minterActor ? null : (
+                <Withdraw
+                  info={data}
+                  ledger={ckbtc_ledger}
+                  backend={backendActor}
+                  minter={minterActor}
+                />
+              )}
+            </section>
+            <section className="mt-16">
+              <h3>What to do with ckBTC?</h3>
+              <Showcase />
+            </section>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 

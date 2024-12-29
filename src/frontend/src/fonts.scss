@@ -1,0 +1,157 @@
+/* Handlee */
+@font-face {
+  font-family: 'Handlee';
+  src: url('/fonts/Handlee/Handlee-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Parisienne */
+@font-face {
+  font-family: 'Parisienne';
+  src: url('/fonts/Parisienne/Parisienne-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Convergence */
+@font-face {
+  font-family: 'Convergence';
+  src: url('/fonts/Convergence/Convergence-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Mina */
+@font-face {
+  font-family: 'Mina';
+  src: url('/fonts/Mina/Mina-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Mina';
+  src: url('/fonts/Mina/Mina-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* Lexend */
+@font-face {
+  font-family: 'Lexend';
+  src: url('/fonts/Lexend/static/Lexend-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Lexend';
+  src: url('/fonts/Lexend/static/Lexend-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Lexend';
+  src: url('/fonts/Lexend/static/Lexend-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Lexend';
+  src: url('/fonts/Lexend/static/Lexend-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Lexend';
+  src: url('/fonts/Lexend/static/Lexend-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Lexend';
+  src: url('/fonts/Lexend/static/Lexend-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Lexend';
+  src: url('/fonts/Lexend/static/Lexend-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Lexend';
+  src: url('/fonts/Lexend/static/Lexend-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Lexend';
+  src: url('/fonts/Lexend/static/Lexend-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+/* Lora */
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora/static/Lora-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora/static/Lora-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora/static/Lora-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora/static/Lora-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora/static/Lora-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora/static/Lora-SemiBoldItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora/static/Lora-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora/static/Lora-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+}
+
+/* Defaults */
+body {
+  font-family: 'Lora', serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Lexend', sans-serif;
+  font-weight: 700;
+}
+
+.handwritten {
+  font-family: 'Handlee', sans-serif;
+}
