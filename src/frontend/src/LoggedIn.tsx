@@ -23,11 +23,12 @@ import toast from "react-hot-toast";
 import { confirmDialog } from "./CopyButton";
 import { Principal } from "@dfinity/principal";
 import TopNav, { Tab } from "./components/TopNav";
+import Footer from "./Footer";
 
 function LoggedIn({ tab }: { tab: Tab }) {
   const queryClient = useQueryClient();
 
-  const { backendActor, logout, minterActor, principal } = useAuth();
+  const { backendActor, minterActor, principal } = useAuth();
   const navigate = useNavigate();
 
   const { data } = useQuery(
@@ -253,7 +254,16 @@ function LoggedIn({ tab }: { tab: Tab }) {
             </section>
           </div>
         )}
+        {tab !== "learn" ? null : (
+          <div className="content max-w-4xl mb-4">
+            <h3>Learn</h3>
+            <section className="mt-16">
+              <h3>Coming soon</h3>
+            </section>
+          </div>
+        )}
       </div>
+      <Footer />
     </>
   );
 }

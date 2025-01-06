@@ -50,6 +50,8 @@ function App() {
           <Route path="/send/:giftId" element={<ShowGiftCard />} />
           <Route path="/colors" element={<ColorTest />} />
           <Route path="/signin" element={<LoggedOut />} />
+          <Route path="/learn/:topic" element={<LoggedIn tab="learn" />} />
+          <Route path="*" element={<LoggedIn tab="learn" />} />
         </Routes>
       </Router>
     </>

@@ -8,8 +8,8 @@ export type Tab = "created" | "new" | "received" | "account" | "learn";
 const TopNav = ({ tab }: { tab: Tab }) => {
   const { login, logout, isAuthenticated } = useAuth();
   return (
-    <div className="w-full flex felx-row space-x-8 bg-white p-5 shadow-md sticky top-0 z-50 whitespace-nowrap">
-      <nav className="flex w-full space-x-4">
+    <div className="w-full flex felx-row space-x-8 bg-white p-1 shadow-md sticky top-0 z-50 whitespace-nowrap">
+      <nav className="flex w-full space-x-4 overflow-x-hidden p-1">
         <Link to="/" className="logo">
           <Logo />
         </Link>
@@ -19,18 +19,27 @@ const TopNav = ({ tab }: { tab: Tab }) => {
         >
           Account
         </Link>
-        <Link to="/create" className={tab === "new" ? "active" : "inactive"}>
+        <Link
+          to="/create"
+          className={
+            "hidden sm:block " + (tab === "new" ? "active" : "inactive")
+          }
+        >
           Create
         </Link>
         <Link
           to="/received"
-          className={tab === "received" ? "active" : "inactive"}
+          className={
+            "hidden sm:block " + (tab === "received" ? "active" : "inactive")
+          }
         >
           Received
         </Link>
         <Link
           to="/created"
-          className={tab === "created" ? "active" : "inactive"}
+          className={
+            "hidden md:block " + (tab === "created" ? "active" : "inactive")
+          }
         >
           Created
         </Link>
