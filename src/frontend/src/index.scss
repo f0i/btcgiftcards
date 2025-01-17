@@ -32,6 +32,16 @@ h3, h4, h5, h6 {
   @apply pb-2 text-2xl;
 }
 
+.banner {
+  background-image: url("/visuals/gradient.jpg");
+  background-size: cover;
+  background-position: bottom center;
+}
+
+.text-xxl {
+  font-size: 9rem;
+}
+
 .row {
   @apply py-12;
 }
@@ -71,10 +81,10 @@ form {
   @apply w-full bg-white p-8;
 }
 .main {
-  @apply flex flex-col items-center justify-center min-h-screen // bg-gray-50 p-6;
+  @apply flex flex-col items-center justify-center grow
 }
 
-nav > a:not(.logo) {
+nav > a:not(.logo):not(.button-hover-danger) {
   @apply px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 hover:text-black focus:outline-none focus:ring-2 focus:ring-gray-300;
 }
 
@@ -88,6 +98,10 @@ nav > a:not(.logo) {
 
 .button {
   @apply px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 hover:text-black focus:outline-none focus:ring-2 focus:ring-gray-300;
+}
+
+.button-hover-danger {
+  @apply px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:text-black hover:bg-red-300 focus:outline-none focus:ring-2 focus:ring-gray-300;
 }
 
 .button-green {
@@ -144,7 +158,6 @@ nav > a:not(.logo) {
 .card, .box {
   border: solid 1px #248;
   padding: 0 1em 1em 1em;
-  margin: .5em auto;
   //max-width: 30em;
   @apply bg-white rounded shadow
 }

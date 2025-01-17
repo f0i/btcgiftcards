@@ -18,7 +18,6 @@ import { GiftCard } from "./GiftCard";
 import { ThemeSelect } from "./ThemeSelect";
 import { useState } from "react";
 import { queries, mutations } from "./queryKeys";
-import Showcase from "./Showcase";
 import toast from "react-hot-toast";
 import { confirmDialog } from "./CopyButton";
 import { Principal } from "@dfinity/principal";
@@ -121,7 +120,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
   return (
     <>
       <TopNav tab={tab} />
-      <div className="main">
+      <div className="main grow">
         {tab !== "new" ? null : (
           <div className="content max-w-4xl mb-4">
             <form action="#" onSubmit={handleSubmit}>
@@ -185,9 +184,12 @@ function LoggedIn({ tab }: { tab: Tab }) {
               <label htmlFor="message">Enter a message: &nbsp;</label>
               <textarea id="message" rows={5} />
               <div className="w-full bg-blue-100 border border-blue-300 text-blue-800 text-base rounded-lg p-4 my-2 inline-block">
-                ⚠️ <strong>Warning:</strong> The project is still under active
+                ⚠️ <strong>Warning:</strong> This project is still under active
                 development. Please avoid loading large amounts onto the gift
-                cards at this stage, as there is a risk of funds being lost.
+                cards.{" "}
+                <Link to="/learn/security" className="link">
+                  Learn more
+                </Link>
               </div>
               <button
                 type="submit"
@@ -207,7 +209,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
         )}
         {tab !== "received" ? null : (
           <div className="content max-w-4xl mb-4">
-            <section id="received" className="min-h-[16em]">
+            <section id="received" className="min-h-[8em]">
               <h3>Received Gift Cards</h3>
               <GiftcardList
                 gifts={data?.received ?? []}
@@ -221,8 +223,8 @@ function LoggedIn({ tab }: { tab: Tab }) {
         )}
         {tab !== "created" ? null : (
           <div className="content max-w-4xl mb-4">
-            <section id="created" className="min-h-[16em]">
-              <h3>Created Gift Cards</h3>
+            <section id="created" className="min-h-[8em]">
+              <h3 className="pb-4">Created Gift Cards</h3>
               <GiftcardList
                 gifts={data?.created ?? []}
                 refundable={data?.refundable ?? []}
@@ -248,10 +250,6 @@ function LoggedIn({ tab }: { tab: Tab }) {
                 />
               )}
             </section>
-            <section className="mt-16">
-              <h3>What to do with ckBTC?</h3>
-              <Showcase />
-            </section>
           </div>
         )}
         {tab !== "learn" ? null : (
@@ -265,6 +263,39 @@ function LoggedIn({ tab }: { tab: Tab }) {
       </div>
       <Footer />
     </>
+  );
+}
+
+function GiftcardTable({
+  gifts,
+  refundable,
+  empty,
+  sendStatus,
+  principal,
+}: {
+  gifts: Gift[];
+  refundable: string[];
+  empty: string;
+  sendStatus: SendStatus[];
+  principal: Principal;
+}) {
+  if (gifts.length === 0) return <div className="warning mt-2">{empty}</div>;
+
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      {gifts
+        .map((gift) => (
+          <GiftCard
+            className="w-full" // TODO fix buttons
+            gift={gift}
+            key={gift.id}
+            refundable={refundable}
+            sendStatus={sendStatus}
+            principal={principal}
+          />
+        ))
+        .reverse()}
+    </div>
   );
 }
 
@@ -284,11 +315,11 @@ function GiftcardList({
   if (gifts.length === 0) return <div className="warning mt-2">{empty}</div>;
 
   return (
-    <div className="flex flex-row flex-wrap gap-4">
+    <div className="grid grid-cols-2 gap-4">
       {gifts
         .map((gift) => (
           <GiftCard
-            className="TODO:w-[calc(50%-1em)]" // TODO fix buttons
+            className="w-full" // TODO fix buttons
             gift={gift}
             key={gift.id}
             refundable={refundable}

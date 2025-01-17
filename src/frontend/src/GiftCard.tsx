@@ -84,11 +84,7 @@ export const GiftCard = ({
   if (revoked) return null;
 
   return (
-    <div
-      className={
-        "card relative text-break text-lg max-w-[33em] " + (className ?? "")
-      }
-    >
+    <div className={"border border-2 p-4 flex flex-col " + (className ?? "")}>
       <div className="relative text-gray-500 text-base">
         <div className="card-date">{formatDateFromNano(gift.created)}</div>
         <div>To: {gift.to}</div>
@@ -117,7 +113,7 @@ export const GiftCard = ({
       <br />
       <br />
       <strong>Message from {gift.sender}:</strong>
-      <div className="text-pre">{gift.message}</div>
+      <div className="text-pre grow">{gift.message}</div>
       {revoked ? (
         <div className="warning w-full">
           ⚠️ <strong>Warning:</strong> This Card has been revoked.
@@ -125,7 +121,7 @@ export const GiftCard = ({
       ) : null}
       <div className="w-full flex felx-row space-x-2 justify-end mt-8">
         {showRefund ? (
-          <button onClick={refund} className="button">
+          <button onClick={refund} className="button w-32">
             Refund
           </button>
         ) : null}

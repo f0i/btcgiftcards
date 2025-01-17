@@ -13,14 +13,14 @@ BTC Gift Cards is a project designed to make gifting Bitcoin easy and accessible
 - **Powered by ckBTC**: Leverages the Internet Computer's ckBTC for secure and efficient transactions.  
 - **Easy Onboarding**: Perfect for introducing new users to Bitcoin and the ICP ecosystem.  
 
-⚠️ **Disclaimer**: This project is under active development. Please avoid loading large amounts onto the gift cards at this stage, as there is a risk of funds being lost.
+⚠️ **Disclaimer**: This project is under active development. Please avoid loading large amounts onto the gift cards.
 
 ### 🌐 Demo Link
 
+- App: [BTC-Gift-Cards.com](https://btc-gift-cards.com)
 - Frontend canister: [y4leg-vyaaa-aaaah-aq3ra-cai](https://y4leg-vyaaa-aaaah-aq3ra-cai.icp0.io/)
 - Backend canister: [yvip2-dqaaa-aaaah-aq3qq-cai](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=yvip2-dqaaa-aaaah-aq3qq-cai)
-- Presentation video: [BTC Gift Cards - ICP Chain Fusion Hackathon BITCOIN EDITION](https://youtu.be/IGbjgP9lHCA)
-u
+- Presentation: [Encode Club - ICP Chain Fusion Hackathon BITCOIN EDITION: Finale](https://youtu.be/KhSwGzRhYc0)
 
 ## Features
 
@@ -49,8 +49,22 @@ u
 
 ## Roadmap
 
-- Secure account by creating an II
-- Automate sending emails
+The following outlines the next features that are considered for implementation.
+All of those are subject to change based on user feedback, or changes in development resources.
+
+### March 2025
+
+During the Encode Culb Hackathon, BTC Gift Cards received a developer grant which will cover development of the following features.
+
+- Implement new design
+- Forward Gift Cards
+- Automated testing
+- Documentation
+
+### Further plans
+
+- Secure account by creating an II (To introduce new users to Internet Identity, which is widely used by apps on the IC)
+- Automate sending emails (most likeley needed at some point, currently still manual)
 - Progress indicator for ckBTC minter
 - Add redeem by code (without email verification)
 - Shortcut to transfer gift card balance to main account

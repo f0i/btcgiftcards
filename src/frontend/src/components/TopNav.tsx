@@ -9,7 +9,7 @@ const TopNav = ({ tab }: { tab: Tab }) => {
   const { login, logout, isAuthenticated } = useAuth();
   return (
     <div className="w-full flex felx-row space-x-8 bg-white p-1 shadow-md sticky top-0 z-50 whitespace-nowrap">
-      <nav className="flex w-full space-x-4 overflow-x-hidden p-1">
+      <nav className="flex w-max-center space-x-4 overflow-x-hidden p-1">
         <Link to="/" className="logo">
           <Logo />
         </Link>
@@ -48,7 +48,7 @@ const TopNav = ({ tab }: { tab: Tab }) => {
         </Link>
         <div className="grow" />
         {isAuthenticated ? (
-          <Link to="/" onClick={logout} className="button">
+          <Link to="/" onClick={logout} className="button-hover-danger">
             Sign out
           </Link>
         ) : (

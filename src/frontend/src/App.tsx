@@ -6,6 +6,8 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import ShowGiftCard from "./ShowGiftCard";
 import { useEffect } from "react";
 import { preloadImages } from "./cardThemes";
+import Landing from "./Landing";
+import Learn from "./Learn";
 
 function App() {
   const { isAuthenticated } = useAuth();
@@ -18,12 +20,7 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route
-            path="/"
-            element={
-              isAuthenticated ? <LoggedIn tab="received" /> : <LoggedOut />
-            }
-          />
+          <Route path="/" element={<Landing />} />
           <Route
             path="/create"
             element={isAuthenticated ? <LoggedIn tab="new" /> : <LoggedOut />}
@@ -50,7 +47,7 @@ function App() {
           <Route path="/send/:giftId" element={<ShowGiftCard />} />
           <Route path="/colors" element={<ColorTest />} />
           <Route path="/signin" element={<LoggedOut />} />
-          <Route path="/learn/:topic" element={<LoggedIn tab="learn" />} />
+          <Route path="/learn/:topic" element={<Learn tab="learn" />} />
           <Route path="*" element={<LoggedIn tab="learn" />} />
         </Routes>
       </Router>
