@@ -58,3 +58,19 @@ record {
 
 export LEDGER_ID=$(dfx canister id ckbtc_ledger)
 dfx deploy ckbtc_index --argument "(opt variant {\"Init\" = (record {ledger_id = principal \"${LEDGER_ID}\"})})"
+
+dfx deploy ckbtc_minter --argument "(
+  variant {
+    Init = record {
+      kyt_principal = null;
+      ecdsa_key_name = \"ecdsa_key_name\";
+      mode = variant { GeneralAvailability };
+      retrieve_btc_min_amount = 100 : nat64;
+      ledger_id = principal \"${LEDGER_ID}\";
+      max_time_in_queue_nanos = 10_000_000_000_000 : nat64;
+      btc_network = variant { Testnet };
+      min_confirmations = opt (1 : nat32);
+      kyt_fee = opt (0 : nat64);
+    }
+  },
+)"
