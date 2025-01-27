@@ -51,8 +51,18 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
   );
 };
 
-export const CopyFormattedContent = ({ gift }: { gift: Gift }) => {
+export const CopyFormattedContent = ({
+  gift,
+  isPreview,
+}: {
+  gift: Gift;
+  isPreview?: boolean;
+}) => {
   const handleCopy = async () => {
+    if (isPreview) {
+      toast.error("Link to redeem is not available in preview.");
+      return;
+    }
     try {
       const htmlContent = hiddenDivRef.current?.innerHTML;
       const textContent = hiddenDivRef.current?.innerText;
@@ -83,7 +93,10 @@ export const CopyFormattedContent = ({ gift }: { gift: Gift }) => {
 
   return (
     <div>
-      <button onClick={handleCopy} className="button-green">
+      <button
+        onClick={handleCopy}
+        className={isPreview ? "button-disabled" : "button-green"}
+      >
         Copy gift card
       </button>
       {gift ? (

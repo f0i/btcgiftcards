@@ -29,18 +29,47 @@ export const ThemeButton = ({
   );
 };
 
-export const ThemeSelect = ({ id }: { id: string }) => {
+export const ThemeSelect = ({
+  id,
+  onChange,
+}: {
+  id: string;
+  onChange?: (e: any) => void;
+}) => {
   const [active, setActive] = useState<ThemeKey>(getTheme("").name);
+  const setActiveChange = (theme: ThemeKey) => {
+    setActive(theme);
+    if (onChange) {
+      console.log("asdfasdf", theme);
+      onChange({ target: { id: id, value: theme } });
+    }
+  };
 
   return (
     <>
       <div className="flex flex-row overflow-x-auto">
-        <ThemeButton setActive={setActive} design="xmas" active={active} />
-        <ThemeButton setActive={setActive} design="btcFuture" active={active} />
-        <ThemeButton setActive={setActive} design="btcPlan" active={active} />
-        <ThemeButton setActive={setActive} design="birthday" active={active} />
         <ThemeButton
-          setActive={setActive}
+          setActive={setActiveChange}
+          design="xmas"
+          active={active}
+        />
+        <ThemeButton
+          setActive={setActiveChange}
+          design="btcFuture"
+          active={active}
+        />
+        <ThemeButton
+          setActive={setActiveChange}
+          design="btcPlan"
+          active={active}
+        />
+        <ThemeButton
+          setActive={setActiveChange}
+          design="birthday"
+          active={active}
+        />
+        <ThemeButton
+          setActive={setActiveChange}
           design="xmasThankYou"
           active={active}
         />

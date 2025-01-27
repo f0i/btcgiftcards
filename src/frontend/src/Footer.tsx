@@ -1,6 +1,7 @@
 import { BsDiscord, BsTwitterX } from "react-icons/bs";
+import { useAuth } from "./use-auth-client";
 
-const Footer = ({}) => {
+const Footer = () => {
   return (
     <div className="row footer bg-gray-700 text-gray-100">
       <div className="text-center text-lg pb-4">
@@ -57,7 +58,7 @@ const Footer = ({}) => {
           title="Legal"
           links={[
             ["About CubeWorks", "https://cubeworksgmbh.de/"],
-            ["Impressum", "https://cubeworksgmbh.de/impressum.html"],
+            ["Legal notice", "https://cubeworksgmbh.de/impressum.html"],
             ["Contact", "https://cubeworksgmbh.de/kontakt.html"],
           ]}
         />
@@ -73,6 +74,28 @@ const Footer = ({}) => {
         </a>
         . Thanks for checking it out!
       </p>
+    </div>
+  );
+};
+
+export const TinyFooter = () => {
+  return (
+    <div className="py-2 footer bg-gray-700 text-gray-300">
+      <div className="justify-center flex flex-row gap-4">
+        <a href="https://x.com/f0i" target="_blank">
+          <BsTwitterX className="inline-block" />
+        </a>
+        <a href="https://discordapp.com/users/f0i" target="_blank">
+          <BsDiscord className="inline-block" />
+        </a>
+        <a
+          href="https://cubeworksgmbh.de/impressum.html"
+          target="_blank"
+          className=""
+        >
+          Leagal Notice
+        </a>
+      </div>
     </div>
   );
 };
@@ -95,52 +118,6 @@ const FooterLinkBlock = ({
     <div className="">
       <h3>{title}</h3>
       <ul>{lis}</ul>
-    </div>
-  );
-};
-
-const ImageTextCTA = ({
-  title,
-  text,
-  cta,
-  img,
-  imageRight,
-  className,
-}: {
-  title: string;
-  text: string;
-  cta: string;
-  img: string;
-  imageRight: boolean;
-  className?: string;
-}) => {
-  const { login } = useAuth();
-
-  return (
-    <div className={"pt-8" + (className ? " " + className : "")}>
-      <div
-        className={
-          "w-max-center pb-8 flex flex-col lg:flex-row gap-4" +
-          (imageRight ? " lg:flex-row-reverse" : "")
-        }
-      >
-        <img
-          src={img}
-          className="w-full max-w-full lg:w-1/2 rounded object-cover"
-        />
-        <div className="w-full lg:w-1/2 px-8 py-4 flex flex-col text-lg">
-          <div className="grow" />
-          <h2>{title}</h2>
-          <p className="w-2/3 py-8">{text}</p>
-          <button
-            onClick={login}
-            className="w-full lg:w-2/3 max-w-md m-auto lg:m-0 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition duration-200"
-          >
-            {cta}
-          </button>
-          <div className="grow" />
-        </div>
-      </div>
     </div>
   );
 };

@@ -13,12 +13,14 @@ export const GiftCard = ({
   sendStatus,
   principal,
   className,
+  isPreview,
 }: {
   gift: Gift;
   refundable: string[];
   sendStatus: SendStatus[];
   principal?: Principal;
   className?: string;
+  isPreview?: boolean;
 }) => {
   let { backendActor } = useAuth();
   let queryClient = useQueryClient();
@@ -103,13 +105,19 @@ export const GiftCard = ({
       <br />
       Visit the following link to redeem it:
       <br />
-      <a
-        href={"/show/" + gift.id}
-        target="_blank"
-        className="link text-blue-900"
-      >
-        {document.location.origin}/show/{gift.id}
-      </a>
+      {isPreview ? (
+        <span className="link text-blue-900">
+          {document.location.origin}/show/xxxxxxxxxxxxxxxx
+        </span>
+      ) : (
+        <a
+          href={"/show/" + gift.id}
+          target="_blank"
+          className="link text-blue-900"
+        >
+          {document.location.origin}/show/{gift.id}
+        </a>
+      )}
       <br />
       <br />
       <strong>Message from {gift.sender}:</strong>
@@ -145,7 +153,9 @@ export const GiftCard = ({
             Request Send by Email
           </button>
         ) : null}
-        {revoked ? null : <CopyFormattedContent gift={gift} />}
+        {revoked ? null : (
+          <CopyFormattedContent gift={gift} isPreview={isPreview} />
+        )}
       </div>
     </div>
   );

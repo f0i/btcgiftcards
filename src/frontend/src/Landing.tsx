@@ -12,7 +12,13 @@ import Footer from "./Footer";
 import { useNavigate } from "react-router-dom";
 
 function Landing() {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
+
+  const navigate = useNavigate();
+
+  if (isAuthenticated) {
+    navigate("/account");
+  }
 
   return (
     <>

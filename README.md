@@ -43,9 +43,31 @@ BTC Gift Cards is a project designed to make gifting Bitcoin easy and accessible
 
 ## Local setup
 
-1. create canisters
-2. deploy ledger (./external/setup_ledger.sh)
-3. dfx deploy
+Create and deploy canisters:
+
+```bash
+# create all canisters
+dfx canister create --all`
+# deploy ledger canisters
+(cd external/ && ./setup_ledger.sh)
+# build and deploy remaining canisters
+dfx deploy
+```
+
+For frontend development run the vite server:
+
+```bash
+npm start
+```
+
+Now you should be to access the application and sign in.
+
+To get some funds for testing, call the transfer function on the ledger and specify the deposit address shown on the account page.
+
+```bash
+# when prompted, input principal and subaccount as show inside the app
+dfx canister call ckbtc_ledger icrc1_transfer
+```
 
 ## Roadmap
 
@@ -68,3 +90,4 @@ During the Encode Culb Hackathon, BTC Gift Cards received a developer grant whic
 - Progress indicator for ckBTC minter
 - Add redeem by code (without email verification)
 - Shortcut to transfer gift card balance to main account
+

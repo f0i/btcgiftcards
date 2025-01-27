@@ -3,7 +3,13 @@ import Logo from "./Logo";
 import { useAuth } from "../use-auth-client";
 import { BsCaretDown } from "react-icons/bs";
 
-export type Tab = "created" | "new" | "received" | "account" | "learn";
+export type Tab =
+  | "created"
+  | "new"
+  | "received"
+  | "account"
+  | "withdraw"
+  | "learn";
 
 const TopNav = ({ tab }: { tab: Tab }) => {
   const { login, logout, isAuthenticated } = useAuth();
@@ -18,6 +24,12 @@ const TopNav = ({ tab }: { tab: Tab }) => {
           className={tab === "account" ? "active" : "inactive"}
         >
           Account
+        </Link>
+        <Link
+          to="/withdraw"
+          className={tab === "withdraw" ? "active" : "inactive"}
+        >
+          Withdraw
         </Link>
         <Link
           to="/create"

@@ -12,9 +12,10 @@ import { QRCodeSVG } from "qrcode.react";
 import { encodeAccount, shortenErr } from "./utils";
 import { queries, queryKeys } from "./queryKeys";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
-function AccountInfo(props: { notify: any }) {
-  const { backendActor, minterActor, identity, principal } = useAuth();
+function Account(props: {}) {
+  const { backendActor, minterActor, principal } = useAuth();
   const queryClient = useQueryClient();
 
   const { isLoading, isError, data, error } = useQuery(
@@ -22,7 +23,7 @@ function AccountInfo(props: { notify: any }) {
   );
 
   return (
-    <div className="w-full">
+    <div className="max-w-center">
       {isLoading ? "loading..." : isError ? "Error " + error : ""}
       {data && backendActor && minterActor && (
         <UserInfo
@@ -36,7 +37,7 @@ function AccountInfo(props: { notify: any }) {
   );
 }
 
-export default AccountInfo;
+export default Account;
 
 function UserInfo({
   info,
@@ -79,6 +80,7 @@ function UserInfo({
 
   return (
     <div>
+      <h3 className="mt-8">Personal Information</h3>
       Your email address:{" "}
       {email ? (
         email
@@ -90,29 +92,42 @@ function UserInfo({
           </button>
         </>
       )}
-      <br />
-      <br />
-      <DepositAddressBTC minter={minter} info={info} />
-      <div className="warning">
-        Minting ckBTC using a Bitcoin transaction will take{" "}
-        <b>at least one hour</b> (6 confirmations). A{" "}
-        <b>minimum amount of 0.00055 BTC</b> (55000 Sat) or more should be
-        transfered to be well above the current minimum and cover the KYT fees.
-        Bitcoin transaction fees apply.{" "}
-        <a
-          href="https://wiki.internetcomputer.org/wiki/Chain-key_Bitcoin"
-          target="_blank"
-        >
-          Learn more about ckBTC
-        </a>
-      </div>
+      <h3 className="mt-8">ckBTC</h3>
+      <p>
+        You need ckBTC to create new gift cards. You can either deposit your
+        ckBTC your personal account shown below, or connect a wallet with ckBTC
+        in it. See{" "}
+        <Link to="/learn/ckbtc" className="link text-blue-700">
+          About ckBTC
+        </Link>{" "}
+        to learn how to get and deposit ckBTC.
+      </p>
+      {/*
+        // disabel ckBTC minting, creator of Gift Cards should go through the NNS to Mint ckBTC!
+        <>
+          <DepositAddressBTC minter={minter} info={info} />
+          <div className="warning">
+            Minting ckBTC using a Bitcoin transaction will take{" "}
+            <b>at least one hour</b> (6 confirmations). A{" "}
+            <b>minimum amount of 0.00055 BTC</b> (55000 Sat) or more should be
+            transfered to be well above the current minimum and cover the KYT
+            fees. Bitcoin transaction fees apply.{" "}
+            <a
+              href="https://wiki.internetcomputer.org/wiki/Chain-key_Bitcoin"
+              target="_blank"
+            >
+              Learn more about ckBTC
+            </a>
+          </div>
+        </>
+     */}
+      <h3 className="mt-8">Deposit ckBTC</h3>
       ckBTC deposit account:{" "}
       <CopyButton
         label="Copy ckBTC Deposit Account"
         textToCopy={encodeAccount(info.account)}
       />
       <div className="info-address">{encodeAccount(info.account)}</div>
-      <br />
       Account balance:{" "}
       {isLoading
         ? "loading..."
@@ -128,7 +143,18 @@ function UserInfo({
           : giftCardBalance.isError
             ? "Error: " + error
             : giftCardBalance.data?.toString() + " ckSat"}
-      <br />
+      <h3 className="mt-8">Connect your own wallet</h3>
+      If you already have ckBTC in your own wallet, you can connect it here:
+      <div className="flex flex-row gap-4 py-4">
+        <button className="button w-32">
+          <img className="h-16" src="/external/plug.svg" />
+          Plug wallet
+        </button>
+        <button className="button w-32">
+          <img className="h-16" src="/external/stoic.svg" />
+          Stoic wallet
+        </button>
+      </div>
     </div>
   );
 }

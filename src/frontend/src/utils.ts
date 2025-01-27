@@ -21,6 +21,11 @@ export const formatDateFromNano = (time: bigint): string => {
   return date.toISOString().substring(0, 10);
 };
 
+export const formatDateTimeFromNano = (time: bigint): string => {
+  const date = new Date(Number(time / 1_000_000n));
+  return date.toLocaleString();
+};
+
 export const shortenErr = (err: string | Error) => {
   const full = err.toString();
   const line = full.split("\n")[0];
