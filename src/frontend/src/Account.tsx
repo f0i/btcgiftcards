@@ -9,12 +9,12 @@ import { GiftInfo } from "../../declarations/backend/backend.did";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
 import { CopyButton } from "./CopyButton";
 import { QRCodeSVG } from "qrcode.react";
-import { encodeAccount, shortenErr } from "./utils";
-import { queries, queryKeys } from "./queryKeys";
+import { encodeAccount, shortenErr, stringify } from "./utils";
+import { queries } from "./queryKeys";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 
-function Account(props: {}) {
+function Account() {
   const { backendActor, minterActor, principal } = useAuth();
   const queryClient = useQueryClient();
 
@@ -23,7 +23,7 @@ function Account(props: {}) {
   );
 
   return (
-    <div className="max-w-center">
+    <div className="w-max-center">
       {isLoading ? "loading..." : isError ? "Error " + error : ""}
       {data && backendActor && minterActor && (
         <UserInfo
@@ -33,6 +33,7 @@ function Account(props: {}) {
           backend={backendActor}
         />
       )}
+      <div className="text-gray-200 text-pre">{stringify(data ?? "-")}</div>
     </div>
   );
 }
@@ -161,7 +162,7 @@ function UserInfo({
 
 function DepositAddressBTC(props: { info: GiftInfo; minter: MinterActor }) {
   const account = props.info.account;
-  const { isLoading, isError, data, error, refetch } = useQuery({
+  const { isLoading, isError, data } = useQuery({
     queryKey: ["deposit-address-btc", props.info.account.subaccount.toString()],
     queryFn: () => {
       return props.minter.get_btc_address({

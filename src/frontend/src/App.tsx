@@ -2,7 +2,7 @@ import { useAuth, AuthProvider } from "./use-auth-client";
 import LoggedOut from "./LoggedOut";
 import LoggedIn from "./LoggedIn";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ShowGiftCard from "./ShowGiftCard";
 import { useEffect } from "react";
 import { preloadImages } from "./cardThemes";

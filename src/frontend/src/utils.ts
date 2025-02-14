@@ -1,6 +1,5 @@
 import { decodeIcrcAccount, encodeIcrcAccount } from "@dfinity/ledger-icrc";
 import { Account } from "../../declarations/backend/backend.did";
-import { toast, Toast } from "react-hot-toast";
 
 export const encodeAccount = (account: Account): string => {
   return encodeIcrcAccount({
@@ -33,3 +32,14 @@ export const shortenErr = (err: string | Error) => {
   const parts = line.split(":");
   return parts[parts.length - 1];
 };
+
+export const stringify = (data: any): string => {
+  return JSON.stringify(data, replacer);
+};
+
+function replacer(_key: any, value: any) {
+  if (typeof value === "bigint") {
+    return `${value}n`; // Append 'n' to indicate a BigInt
+  }
+  return value;
+}

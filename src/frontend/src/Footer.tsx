@@ -1,5 +1,4 @@
 import { BsDiscord, BsTwitterX } from "react-icons/bs";
-import { useAuth } from "./use-auth-client";
 
 const Footer = () => {
   return (

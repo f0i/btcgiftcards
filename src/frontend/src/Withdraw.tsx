@@ -6,7 +6,7 @@ import { queries } from "./queryKeys";
 import toast from "react-hot-toast";
 import { confirmDialog } from "./CopyButton";
 
-function Withdraw(props: {}) {
+function Withdraw() {
   const queryClient = useQueryClient();
 
   const { backendActor, principal } = useAuth();
@@ -50,7 +50,7 @@ function Withdraw(props: {}) {
   };
 
   return (
-    <div className="max-w-center">
+    <div className="w-max-center">
       <section id="withdraw">
         <h3>Withdraw</h3>
         <form action="#" onSubmit={formWithdraw}>

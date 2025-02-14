@@ -60,7 +60,7 @@ h3, h4, h5, h6 {
 form {
   label {
     @apply lg:w-1/3 w-full block float-left pt-4;
-    }
+  }
   input, textarea, select {
     @apply px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500;
     @apply lg:w-2/3 w-full block float-left;
@@ -162,7 +162,6 @@ nav > a:not(.logo):not(.button-hover-danger) {
 .card, .box {
   border: solid 1px #248;
   padding: 0 1em 1em 1em;
-  //max-width: 30em;
   @apply bg-white rounded shadow
 }
 

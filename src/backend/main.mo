@@ -159,7 +159,20 @@ actor class Main() = this {
     return #ok(gift);
   };
 
-  type SendStatus = { id : Text; status : Text };
+  type SendStatus = {
+    #sendRequested : Time;
+    #sendCanceled;
+    #send : Time;
+    #init;
+    #claimed : Time;
+    #revoking : Time;
+    #revoked : Time;
+  };
+  type SendStatusEntry = {
+    id : Text;
+    status : SendStatus;
+  };
+
   type GiftInfo = {
     created : [Gift];
     refundable : [Text];
@@ -172,23 +185,15 @@ actor class Main() = this {
     subaccountOwner : Principal;
   };
 
-  public shared query ({ caller }) func showGiftcard(id : Text) : async ?{
+  public shared query func showGiftcard(id : Text) : async ?{
     gift : Gift;
     sendStatus : SendStatus;
   } {
-    let subaccountOwner = switch (TwoWayMap.getReverse(securedPrincipals, phash, caller)) {
-      case (?original) { original };
-      case (null) { caller };
-    };
     switch (Map.get(lookup, thash, id)) {
       case (?gift) {
         return ?{
           gift;
-          sendStatus = if (subaccountOwner == gift.creator) {
-            getSendStatus(gift);
-          } else {
-            { id = gift.id; status = "hidden" };
-          };
+          sendStatus = getSendStatus(gift);
         };
       };
       case (null) return null;
@@ -230,16 +235,13 @@ actor class Main() = this {
     };
   };
 
-  private func getSendStatus(gift : Gift) : { id : Text; status : Text } {
+  private func getSendStatus(gift : Gift) : SendStatus {
     switch (Map.get(revoked, thash, gift.id)) {
-      case (?(_, true, _)) return { id = gift.id; status = "cardRevoked" };
-      case (?(_, false, _)) return { id = gift.id; status = "cardRevoking" };
+      case (?(time, true, _)) return #revoked(time);
+      case (?(time, false, _)) return #revoking(time);
       case (null) {};
     };
-    return {
-      id = gift.id;
-      status = Option.get(Map.get(emailQueue, thash, gift.id), "init");
-    };
+    return Option.get(Map.get(emailQueue, thash, gift.id), #init);
   };
 
   private func isRefundable(gift : Gift) : Bool {
@@ -255,14 +257,14 @@ actor class Main() = this {
     return true;
   };
 
-  public shared ({ caller }) func getEmail() : async Result<Text> {
+  public shared ({ caller }) func getEmail(origin : Text) : async Result<Text> {
     let subaccountOwner = getSubaccountOwner(caller);
     switch (Map.get(verified, phash, subaccountOwner)) {
       case (?email) return #ok(email);
       case (null) {};
     };
     try {
-      let res = await ICLogin.getEmail(subaccountOwner);
+      let res = await ICLogin.getEmail(subaccountOwner, origin);
       switch (res) {
         case (?email) {
           Map.set(verified, phash, subaccountOwner, email);
@@ -418,12 +420,18 @@ actor class Main() = this {
     gifts;
   };
 
-  public shared query ({ caller }) func getEmailQueue(status : Text) : async Result<[{ gift : Gift; status : Text }]> {
+  public shared query ({ caller }) func getEmailQueue(all : Bool) : async Result<[{ gift : Gift; status : SendStatus }]> {
     if (not Principal.isController(caller)) return #err("Permission denied");
 
-    let out : Vec<{ gift : Gift; status : Text }> = Vec.new();
-    for ((id, stat) in Map.entries(emailQueue)) {
-      if (stat == status or status == "") {
+    let out : Vec<{ gift : Gift; status : SendStatus }> = Vec.new();
+    for ((id, status) in Map.entries(emailQueue)) {
+      let show = all or (
+        switch (status) {
+          case (#sendRequested(_)) true;
+          case (_) false;
+        }
+      );
+      if (show) {
         switch (Map.get(lookup, thash, id)) {
           case (?gift) Vec.add(out, { gift; status });
           case (null) {
@@ -435,9 +443,60 @@ actor class Main() = this {
     return #ok(Vec.toArray(out));
   };
 
-  public shared ({ caller }) func addToEmailQueue(id : Text, status : Text) : async Result<Text> {
-    let isSendRequest = status == "sendRequest";
-    let isCancelRequest = status == "sendCancel";
+  public shared ({ caller }) func claim(id : Text) : async Result<Text> {
+    let claimAll = id == "*";
+    let now = Time.now();
+
+    let subaccountOwner = getSubaccountOwner(caller);
+
+    let email = Map.get(verified, phash, subaccountOwner);
+    let own : Vec<Gift> = switch (email) {
+      case (null) Vec.new<Gift>();
+      case (?gmail) Option.get<Vec<Gift>>(Map.get(received, thash, gmail), Vec.new());
+    };
+
+    if (claimAll) {
+      var count = 0;
+      for (gift in Vec.vals(own)) {
+        switch (getSendStatus(gift)) {
+          // ignore claimed and revoked
+          case (#claimed(_time)) {};
+          case (#revoking(_time)) {};
+          case (#revoked(_time)) {};
+          // set status to claimed
+          case (_) {
+            Map.set(emailQueue, thash, id, #claimed(now));
+            count += 1;
+          };
+        };
+      };
+      #ok(if (count == 1) "1 gift card claimed" else (Nat.toText(count) # " gift cards claimed"));
+    } else {
+      let ?gift = Map.get(lookup, thash, id) else return #err("Invalid gift ID");
+
+      switch (getSendStatus(gift)) {
+        // ignore claimed and revoked
+        case (#claimed(_time)) return #err("Already claimed");
+        case (#revoking(_time)) return #err("Revoked");
+        case (#revoked(_time)) return #err("Revoked");
+        // set status to claimed
+        case (_) {
+          Map.set(emailQueue, thash, id, #claimed(now));
+          return #ok("gift card claimed");
+        };
+      };
+    };
+  };
+
+  public shared ({ caller }) func addToEmailQueue(id : Text, status : SendStatus) : async Result<Text> {
+    let isSendRequest = switch (status) {
+      case (#sendRequested(_)) true;
+      case (_) false;
+    };
+    let isCancelRequest = switch (status) {
+      case (#sendCanceled(_)) true;
+      case (_) false;
+    };
 
     if ((not isSendRequest) and (not isCancelRequest) and (not Principal.isController(caller))) {
       return #err("Permission denied");
@@ -455,7 +514,7 @@ actor class Main() = this {
     };
 
     switch (Map.get(emailQueue, thash, id)) {
-      case (?"sendRequest") {
+      case (? #sendRequested(_time)) {
         if (isSendRequest) {
           return #ok("Already in queue");
         } else if (isCancelRequest) {
@@ -464,7 +523,7 @@ actor class Main() = this {
           return #err("Gift Card already added to queue");
         };
       };
-      case (?"sendCancel") {
+      case (? #sendCanceled(_time)) {
         if (isCancelRequest) {
           return #ok("Already canceled");
         } else if (isSendRequest) {
@@ -486,7 +545,7 @@ actor class Main() = this {
     if (isSendRequest) {
       return #ok("Added to queue");
     } else {
-      return #ok("Status updated to " # status);
+      return #ok("Status updated");
     };
   };
 

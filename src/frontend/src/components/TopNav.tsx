@@ -16,8 +16,16 @@ const TopNav = ({ tab }: { tab: Tab }) => {
   return (
     <div className="w-full flex felx-row space-x-8 bg-white p-1 shadow-md sticky top-0 z-50 whitespace-nowrap">
       <nav className="flex w-max-center space-x-4 overflow-x-hidden p-1">
-        <Link to="/" className="logo">
+        <Link
+          to="/"
+          className="logo flex flex-row gap-4 text-gray-600 font-bold leading-none items-center text-orange-700"
+        >
           <Logo />
+          <div className="hidden">
+            Bitcoin
+            <br />
+            Giftcards
+          </div>
         </Link>
         <Link
           to="/account"

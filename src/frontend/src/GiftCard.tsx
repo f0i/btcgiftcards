@@ -86,7 +86,12 @@ export const GiftCard = ({
   if (revoked) return null;
 
   return (
-    <div className={"border border-2 p-4 flex flex-col " + (className ?? "")}>
+    <div
+      className={
+        "border border-2 p-4 flex flex-col bg-white rounded-lg " +
+        (className ?? "")
+      }
+    >
       <div className="relative text-gray-500 text-base">
         <div className="card-date">{formatDateFromNano(gift.created)}</div>
         <div>To: {gift.to}</div>

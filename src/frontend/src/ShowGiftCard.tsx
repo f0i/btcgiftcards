@@ -3,9 +3,10 @@ import { Link, useParams } from "react-router-dom";
 import { queries, queryKeys } from "./queryKeys";
 import { useAuth } from "./use-auth-client";
 import { GiftCard } from "./GiftCard";
-import { CopyFormattedContent } from "./CopyButton";
 import toast from "react-hot-toast";
 import { shortenErr } from "./utils";
+import TopNav from "./components/TopNav";
+import { TinyFooter } from "./Footer";
 
 const ShowGiftCard = () => {
   const { giftId } = useParams();
@@ -32,7 +33,8 @@ const ShowGiftCard = () => {
   const formVerifyEmail = async (event: any) => {
     event.preventDefault();
     try {
-      const res = await backendActor!.getEmail();
+      const origin = document.location.origin;
+      const res = await backendActor!.getEmail(origin);
       console.log(res);
       if ("ok" in res) {
         toast.success("Verified " + res.ok);
@@ -65,19 +67,9 @@ const ShowGiftCard = () => {
   };
 
   return (
-    <div className="main">
-      <div className="content max-w-4xl mb-4">
-        <h1>
-          BTC<span className=" text-gray-300">-</span>Gift
-          <span className="text-gray-300">-</span>Cards
-          <span className="text-gray-300 text-base">.com</span>
-        </h1>
-        <br />
-        <Link to="/received" className="button-sm inline-block">
-          {"<"} Show all Received Gift Cards
-        </Link>
-      </div>
-      <div className="content max-w-4xl mb-4 min-h-72">
+    <div className="flex flex-col min-h-screen">
+      <TopNav tab="account" />
+      <div className="w-max-center pb-4 min-h-72 grow">
         {isLoading ? (
           "Loading gift card " + giftId + "..."
         ) : isError ? (
@@ -88,6 +80,7 @@ const ShowGiftCard = () => {
             refundable={info.data?.refundable ?? []}
             sendStatus={data ? [data.sendStatus] : []}
             principal={principal}
+            className="max-w-2xl m-auto mt-8"
           />
         )}
         <br />
@@ -137,13 +130,17 @@ const ShowGiftCard = () => {
                 Your email address has not been verified
                 <br />
                 <br />
-                <form action="#" onSubmit={formVerifyEmail}>
+                <form
+                  action="#"
+                  onSubmit={formVerifyEmail}
+                  className="flex flex-row gap-4"
+                >
                   <button type="submit" className="w-2/3">
                     Verify Email Address
                   </button>
                   <button
                     onClick={changeAccount}
-                    className="w-1/3 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition duration-200 mb-4"
+                    className="w-1/3 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition duration-200"
                   >
                     Change Account
                   </button>
@@ -165,6 +162,7 @@ const ShowGiftCard = () => {
           )}
         </div>
       </div>
+      <TinyFooter />
     </div>
   );
 };

@@ -3,27 +3,16 @@ type TransformArgs =
    context: blob;
    response: HttpResponsePayload;
  };
-type Result_3 = 
+type Time = int;
+type Result_2 = 
  variant {
    err: text;
    ok;
  };
-type Result_2 = 
- variant {
-   err: text;
-   ok: record {
-         auth: AuthResponse;
-         emailSet: bool;
-       };
- };
 type Result_1 = 
  variant {
    err: text;
-   ok: record {
-         caller: principal;
-         email: text;
-         "principal": principal;
-       };
+   ok: record {auth: AuthResponse;};
  };
 type Result = 
  variant {
@@ -43,9 +32,27 @@ type PrepRes =
  variant {
    err: text;
    ok: record {
+         expireAt: Time;
          pubKey: vec nat8;
-         register: bool;
        };
+ };
+type Main = 
+ service {
+   addMod: (principal) -> (Result_2);
+   checkEmail: (principal, text) -> (bool) query;
+   fetchGoogleKeys: () -> (Result);
+   getBalance: () -> (record {
+                        "text": text;
+                        val: nat;
+                      }) query;
+   getDelegation: (text, text, vec nat8, Time) -> (Result_1) query;
+   /// Get an email address for a principal
+   getEmail: (principal, text) -> (opt text) query;
+   getPrincipal: () -> (text) query;
+   getStats: () -> (vec text) query;
+   prepareDelegation: (text, text, vec nat8, nat) -> (PrepRes);
+   setGoogleKeys: (text) -> (Result);
+   transform: (TransformArgs) -> (CanisterHttpResponsePayload) query;
  };
 type HttpResponsePayload = 
  record {
@@ -81,16 +88,4 @@ type AuthResponse =
    kind: text;
    userPublicKey: vec nat8;
  };
-service : {
-  addMod: (principal) -> (Result_3);
-  checkEmail: (principal, text) -> (bool) query;
-  fetchGoogleKeys: () -> (Result);
-  getDelegations: (text, text, vec nat8, nat) -> (Result_2) query;
-  getEmail: (principal) -> (opt text) query;
-  getPrincipal: () -> (text) query;
-  getStats: () -> (vec text) query;
-  prepareDelegation: (text, text, nat32) -> (PrepRes);
-  setEmail: (text, text) -> (Result_1);
-  setGoogleKeys: (text) -> (Result);
-  transform: (TransformArgs) -> (CanisterHttpResponsePayload) query;
-}
+service : () -> Main

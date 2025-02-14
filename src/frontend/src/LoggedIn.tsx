@@ -1,18 +1,12 @@
 import { useAuth } from "./use-auth-client";
 import { Gift, SendStatus } from "../../declarations/backend/backend.did";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { shortenErr, formatDateTimeFromNano } from "./utils";
-import { Link, useNavigate } from "react-router-dom";
-import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { formatDateTimeFromNano } from "./utils";
 import { GiftCard } from "./GiftCard";
-import { ThemeSelect } from "./ThemeSelect";
-import { useState } from "react";
-import { queries, mutations } from "./queryKeys";
-import toast from "react-hot-toast";
-import { confirmDialog } from "./CopyButton";
+import { queries } from "./queryKeys";
 import { Principal } from "@dfinity/principal";
 import TopNav, { Tab } from "./components/TopNav";
-import Footer, { TinyFooter } from "./Footer";
+import { TinyFooter } from "./Footer";
 import DataTable from "react-data-table-component";
 import { BsLock, BsUnlock } from "react-icons/bs";
 import { isRefundable, isRevoked, status } from "./gift";
@@ -35,7 +29,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
       <div className="main grow">
         {tab !== "new" ? null : <Create />}
         {tab !== "received" ? null : (
-          <div className="content max-w-4xl mb-4">
+          <div className="content w-max-center mb-4">
             <section id="received" className="min-h-[8em]">
               <h3>Received Gift Cards</h3>
               <GiftcardList
@@ -65,7 +59,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
         {tab !== "account" ? null : <Account />}
         {tab !== "withdraw" ? null : <Withdraw />}
         {tab !== "learn" ? null : (
-          <div className="content max-w-4xl mb-4">
+          <div className="content w-max-center mb-4">
             <h3>Learn</h3>
             <section className="mt-16">
               <h3>Coming soon</h3>
@@ -169,7 +163,7 @@ function GiftcardTable({
           },
           {
             name: "Actions",
-            minWidth: "300px",
+            width: "200px",
             cell: (gift) => (
               <>
                 {isRefundable(gift, refundable) ? (
@@ -217,13 +211,6 @@ function GiftcardList({
         .reverse()}
     </div>
   );
-}
-
-function replacer(key: any, value: any) {
-  if (typeof value === "bigint") {
-    return `${value}n`; // Append 'n' to indicate a BigInt
-  }
-  return value;
 }
 
 export default LoggedIn;
