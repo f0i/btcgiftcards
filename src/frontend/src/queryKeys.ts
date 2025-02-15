@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 
 export const queryKeys = {
   giftcards: (principal?: Principal) => ["giftcards", principal],
-  userinfo: (info: GiftInfo) => ["userinfo", encodeAccountOrNull(info.account)],
+  userinfo: (info: GiftInfo) => ["userinfo", info.caller],
   balance: (account?: Account) => ["balance", encodeAccountOrNull(account)],
   show: (id: string, account?: Account) => [
     "show",
@@ -64,7 +64,8 @@ export const queries = {
         if (backend && principal && !principal.isAnonymous()) {
           var res = await backend.listGiftcards();
           console.log(res);
-          if (res.email.length === 0) {
+          if ("err" in res) {
+            // TODO: check the error
             // don't await! This should not stop user from other interactions
             const origin = document.location.origin;
             backend.getEmail(origin).then((emailRes) => {

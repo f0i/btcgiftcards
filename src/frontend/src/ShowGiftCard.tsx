@@ -47,8 +47,9 @@ const ShowGiftCard = () => {
     }
   };
 
-  const isEmailVerified = !!info.data?.email?.[0];
-  const isForMe = info.data?.email?.[0] === data?.gift.to;
+  const isEmailVerified = "ok" in info;
+  const isForMe =
+    info.data && "ok" in info.data && info.data?.ok.email === data?.gift.to;
   const isGmail =
     !data ||
     isForMe ||
@@ -77,7 +78,9 @@ const ShowGiftCard = () => {
         ) : (
           <GiftCard
             gift={data!.gift}
-            refundable={info.data?.refundable ?? []}
+            refundable={
+              (info.data && "ok" in info.data && info.data.ok.refundable) || []
+            }
             sendStatus={
               data ? [{ id: data.gift.id, status: data.sendStatus }] : []
             }

@@ -14,27 +14,22 @@ function Withdraw() {
     queries.giftcards(queryClient, backendActor, principal),
   );
 
-  const { data: mainBalance } = useQuery(
-    queries.balance(ckbtc_ledger, gift?.account),
-  );
+  const account = (gift && "ok" in gift && gift.ok.account) || undefined;
 
-  const { data: giftBalance } = useQuery(
-    queries.balance(ckbtc_ledger, gift?.accountEmail?.[0]),
-  );
+  const { data: balance } = useQuery(queries.balance(ckbtc_ledger, account));
 
   const formWithdraw = async (event: any) => {
     event.preventDefault();
     try {
       const account = event.target.elements.account.value;
-      const main = event.target.elements.main.value === "main";
-      const amount = BigInt(event.target.elements.amount.value);
       const toAccount = decodeAccount(account);
+      const amount = BigInt(event.target.elements.amount.value);
       await confirmDialog({
-        msg: `Withdraw ${amount.toString()} ckSat from ${main ? "Main account" : "Gift Cards"} to:`,
+        msg: `Withdraw ${amount.toString()} ckSat from your account to:`,
         sub: encodeAccount(toAccount),
       });
 
-      const res = await backendActor?.withdraw(toAccount, amount, main);
+      const res = await backendActor?.withdraw(toAccount, amount);
       console.log(res);
       if (!res) throw "not logged in";
       if ("ok" in res) {
@@ -57,10 +52,7 @@ function Withdraw() {
           <label htmlFor="main">From: &nbsp;</label>
           <select id="main">
             <option value="card">
-              Gift Cards ({giftBalance?.toString() ?? "-"} ckSat)
-            </option>
-            <option value="main">
-              Deposit Account ({mainBalance?.toString() ?? "-"} ckSat)
+              Gift Cards ({balance?.toString() ?? "-"} ckSat)
             </option>
           </select>
           <label htmlFor="amount">Amount: &nbsp;</label>

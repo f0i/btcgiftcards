@@ -32,13 +32,17 @@ function LoggedIn({ tab }: { tab: Tab }) {
           <div className="content w-max-center mb-4">
             <section id="received" className="min-h-[8em]">
               <h3>Received Gift Cards</h3>
-              <GiftcardList
-                gifts={data?.received ?? []}
-                refundable={[]}
-                empty="No gift cards received yet."
-                sendStatus={[]}
-                principal={principal!}
-              />
+              {data && "ok" in data ? (
+                <GiftcardList
+                  gifts={data.ok.received}
+                  refundable={[]}
+                  empty="No gift cards received yet."
+                  sendStatus={[]}
+                  principal={principal!}
+                />
+              ) : (
+                "Loading..."
+              )}
             </section>
           </div>
         )}
@@ -46,13 +50,17 @@ function LoggedIn({ tab }: { tab: Tab }) {
           <div className="content w-max-center mb-4">
             <section id="created" className="min-h-[8em]">
               <h3 className="pb-4">Created Gift Cards</h3>
-              <GiftcardTable
-                gifts={data?.created ?? []}
-                refundable={data?.refundable ?? []}
-                empty="No gift cards created yet."
-                sendStatus={data?.sendStatus ?? []}
-                principal={principal!}
-              />
+              {data && "ok" in data ? (
+                <GiftcardTable
+                  gifts={data.ok.created}
+                  refundable={data.ok.refundable}
+                  empty="No gift cards created yet."
+                  sendStatus={data.ok.sendStatus}
+                  principal={principal!}
+                />
+              ) : (
+                "Loading.."
+              )}
             </section>
           </div>
         )}

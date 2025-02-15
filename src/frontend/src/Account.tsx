@@ -25,9 +25,9 @@ function Account() {
   return (
     <div className="w-max-center">
       {isLoading ? "loading..." : isError ? "Error " + error : ""}
-      {data && backendActor && minterActor && (
+      {data && backendActor && minterActor && "ok" in data && (
         <UserInfo
-          info={data}
+          info={data.ok}
           ledger={ckbtc_ledger}
           minter={minterActor}
           backend={backendActor}
@@ -43,7 +43,6 @@ export default Account;
 function UserInfo({
   info,
   ledger,
-  minter,
   backend,
 }: {
   info: GiftInfo;
@@ -55,10 +54,6 @@ function UserInfo({
 
   const { isLoading, isError, data, error } = useQuery(
     queries.balance(ledger, info.account),
-  );
-
-  const giftCardBalance = useQuery(
-    queries.balance(ledger, info.accountEmail?.[0]),
   );
 
   const verifyEmail = async (event: any) => {
@@ -104,25 +99,6 @@ function UserInfo({
         </Link>{" "}
         to learn how to get and deposit ckBTC.
       </p>
-      {/*
-        // disabel ckBTC minting, creator of Gift Cards should go through the NNS to Mint ckBTC!
-        <>
-          <DepositAddressBTC minter={minter} info={info} />
-          <div className="warning">
-            Minting ckBTC using a Bitcoin transaction will take{" "}
-            <b>at least one hour</b> (6 confirmations). A{" "}
-            <b>minimum amount of 0.00055 BTC</b> (55000 Sat) or more should be
-            transfered to be well above the current minimum and cover the KYT
-            fees. Bitcoin transaction fees apply.{" "}
-            <a
-              href="https://wiki.internetcomputer.org/wiki/Chain-key_Bitcoin"
-              target="_blank"
-            >
-              Learn more about ckBTC
-            </a>
-          </div>
-        </>
-     */}
       <h3 className="mt-8">Deposit ckBTC</h3>
       ckBTC deposit account:{" "}
       <CopyButton
@@ -136,15 +112,6 @@ function UserInfo({
         : isError
           ? "Error: " + error
           : data?.toString() + " ckSat"}
-      <br />
-      Gift card balance:{" "}
-      {!email
-        ? "-"
-        : giftCardBalance.isLoading
-          ? "loading..."
-          : giftCardBalance.isError
-            ? "Error: " + error
-            : giftCardBalance.data?.toString() + " ckSat"}
       <h3 className="mt-8">Connect your own wallet</h3>
       If you already have ckBTC in your own wallet, you can connect it here:
       <div className="flex flex-row gap-4 py-4">

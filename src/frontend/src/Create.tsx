@@ -106,7 +106,8 @@ function Create() {
     return email.toLowerCase().trim().endsWith("@gmail.com");
   };
 
-  const balance = useQuery(queries.balance(ckbtc_ledger, data?.account));
+  const account = data && "ok" in data ? data.ok.account : undefined;
+  const balance = useQuery(queries.balance(ckbtc_ledger, account));
 
   const handleAmountChange = (e: any) => {
     console.log("Selected amount", e.target.value);
