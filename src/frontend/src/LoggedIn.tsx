@@ -1,5 +1,5 @@
 import { useAuth } from "./use-auth-client";
-import { Gift, SendStatus } from "../../declarations/backend/backend.did";
+import { Gift, SendStatusEntry } from "../../declarations/backend/backend.did";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDateTimeFromNano } from "./utils";
 import { GiftCard } from "./GiftCard";
@@ -9,7 +9,7 @@ import TopNav, { Tab } from "./components/TopNav";
 import { TinyFooter } from "./Footer";
 import DataTable from "react-data-table-component";
 import { BsLock, BsUnlock } from "react-icons/bs";
-import { isRefundable, isRevoked, status } from "./gift";
+import { isRefundable, isRevoked, statusText } from "./gift";
 import Account from "./Account";
 import Create from "./Create";
 import Withdraw from "./Withdraw";
@@ -82,7 +82,7 @@ function GiftcardTable({
   gifts: Gift[];
   refundable: string[];
   empty: string;
-  sendStatus: SendStatus[];
+  sendStatus: SendStatusEntry[];
   principal: Principal;
 }) {
   if (gifts.length === 0) return <div className="warning mt-2">{empty}</div>;
@@ -141,7 +141,7 @@ function GiftcardTable({
           },
           {
             name: "Status",
-            selector: (gift) => status(gift, sendStatus),
+            selector: (gift) => statusText(gift, sendStatus),
             width: "100px",
             style: { margin: "auto" },
           },
@@ -190,7 +190,7 @@ function GiftcardList({
   gifts: Gift[];
   refundable: string[];
   empty: string;
-  sendStatus: SendStatus[];
+  sendStatus: SendStatusEntry[];
   principal: Principal;
 }) {
   if (gifts.length === 0) return <div className="warning mt-2">{empty}</div>;

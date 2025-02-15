@@ -78,7 +78,9 @@ const ShowGiftCard = () => {
           <GiftCard
             gift={data!.gift}
             refundable={info.data?.refundable ?? []}
-            sendStatus={data ? [data.sendStatus] : []}
+            sendStatus={
+              data ? [{ id: data.gift.id, status: data.sendStatus }] : []
+            }
             principal={principal}
             className="max-w-2xl m-auto mt-8"
           />

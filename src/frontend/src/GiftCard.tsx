@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Gift, SendStatus } from "../../declarations/backend/backend.did";
+import { Gift, SendStatusEntry } from "../../declarations/backend/backend.did";
 import { useAuth } from "./use-auth-client";
 import { formatDateFromNano, shortenErr } from "./utils";
 import { getTheme } from "./cardThemes";
@@ -17,7 +17,7 @@ export const GiftCard = ({
 }: {
   gift: Gift;
   refundable: string[];
-  sendStatus: SendStatus[];
+  sendStatus: SendStatusEntry[];
   principal?: Principal;
   className?: string;
   isPreview?: boolean;
@@ -44,9 +44,9 @@ export const GiftCard = ({
     }
   };
 
-  const requestSend = async (status: "sendRequest" | "sendCancel") => {
+  const requestSend = async (request: boolean) => {
     try {
-      if (status === "sendRequest") {
+      if (request) {
         await confirmDialog({
           msg:
             "The gift card will be manually reviewd and send to " +
@@ -56,7 +56,7 @@ export const GiftCard = ({
         });
       }
 
-      let res = await backendActor!.addToEmailQueue(gift.id, status);
+      let res = await backendActor!.addToEmailQueue(gift.id, request);
       if ("ok" in res) {
         toast.success("Queue updated successfully:\n" + res.ok);
         queryClient.invalidateQueries();
@@ -141,7 +141,7 @@ export const GiftCard = ({
         {canCancel ? (
           <button
             onClick={() => {
-              requestSend("sendCancel");
+              requestSend(false);
             }}
             className="button"
           >
@@ -151,7 +151,7 @@ export const GiftCard = ({
         {canRequestSend ? (
           <button
             onClick={() => {
-              requestSend("sendRequest");
+              requestSend(true);
             }}
             className="button"
           >

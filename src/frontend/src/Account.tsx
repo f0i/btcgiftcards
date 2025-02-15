@@ -64,7 +64,8 @@ function UserInfo({
   const verifyEmail = async (event: any) => {
     event.preventDefault();
     try {
-      const res = await backend!.getEmail();
+      const origin = document.location.origin;
+      const res = await backend!.getEmail(origin);
       console.log(res);
       if ("ok" in res) {
         toast.success("Verified " + res.ok);

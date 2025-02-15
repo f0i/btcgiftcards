@@ -66,7 +66,8 @@ export const queries = {
           console.log(res);
           if (res.email.length === 0) {
             // don't await! This should not stop user from other interactions
-            backend.getEmail().then((emailRes) => {
+            const origin = document.location.origin;
+            backend.getEmail(origin).then((emailRes) => {
               if ("ok" in emailRes) {
                 queryClient.invalidateQueries();
               } else {

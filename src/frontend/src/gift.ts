@@ -1,32 +1,57 @@
-import { Gift, SendStatus } from "../../declarations/backend/backend.did";
+import {
+  Gift,
+  SendStatus,
+  SendStatusEntry,
+} from "../../declarations/backend/backend.did";
+export type SendStatusKey = keyof SendStatus;
 
 export const getSendStatus = (
   gift: Gift,
-  sendStatus: SendStatus[],
+  sendStatus: SendStatusEntry[],
 ): SendStatus => {
-  const status = sendStatus.find((stat) => stat.id === gift.id) ?? {
+  const s: SendStatusEntry = sendStatus.find((stat) => stat.id === gift.id) ?? {
     id: gift.id,
-    status: "unknown",
+    status: { init: null },
   };
-  return status;
+  return s.status;
 };
 
-export const status = (gift: Gift, sendStatus: SendStatus[]): string => {
+export const statusKey = (
+  gift: Gift,
+  sendStatus: SendStatusEntry[],
+): SendStatusKey => {
   let stat = getSendStatus(gift, sendStatus);
-  switch (stat.status) {
-    case "cardRevoked":
-    case "cardRevoking":
-      return "revoked";
-    case "init":
-    case "sendCancel":
-      return "new";
-    default:
-      return stat.status;
-  }
+  const key = Object.keys(stat)[0] as keyof SendStatus;
+  return key;
 };
 
-export const isRevoked = (gift: Gift, sendStatus: SendStatus[]): boolean => {
-  return status(gift, sendStatus) === "revoked";
+export const statusText = (
+  gift: Gift,
+  sendStatus: SendStatusEntry[],
+): string => {
+  return statusKey(gift, sendStatus);
+};
+
+export const isRevoked = (
+  gift: Gift,
+  sendStatus: SendStatusEntry[],
+): boolean => {
+  let s: SendStatusKey = statusKey(gift, sendStatus);
+
+  const key = Object.keys(s)[0] as keyof SendStatus;
+
+  switch (key) {
+    case "revoked":
+    case "revoking":
+      return true;
+    case "init":
+    case "send":
+    case "sendCanceled":
+    case "claimed":
+      return false;
+  }
+
+  return false;
 };
 
 export const isRefundable = (gift: Gift, refundable: string[]): boolean => {

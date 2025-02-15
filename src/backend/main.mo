@@ -32,7 +32,6 @@ actor class Main() = this {
   let self = Principal.fromActor(this);
 
   let MIN_CARD_FEE = 10;
-  //  let CARD_FEE = 180;
   let MIN_AMOUNT = 100;
 
   type Gift = {
@@ -57,7 +56,8 @@ actor class Main() = this {
   // List of gift IDs that have been revoked with time of revocation and completion status
   stable var revoked : Map<Text, (Time, Bool, Gift)> = Map.new();
   // List of gift IDs that should be send with current status
-  stable var emailQueue : Map<Text, Text> = Map.new();
+  stable var emailQueue : Map<Text, SendStatus> = Map.new();
+  emailQueue := Map.new(); // TODO: remove after next deployment
   // Lookup table from "email login principals" to "II principals"
   stable var securedPrincipals : TwoWayMap<Principal, Principal> = TwoWayMap.new();
   // Lookup table from "email login principals" to "II principals", awaiting confirmation from II principal
@@ -168,7 +168,7 @@ actor class Main() = this {
     #revoking : Time;
     #revoked : Time;
   };
-  type SendStatusEntry = {
+  public type SendStatusEntry = {
     id : Text;
     status : SendStatus;
   };
@@ -176,7 +176,7 @@ actor class Main() = this {
   type GiftInfo = {
     created : [Gift];
     refundable : [Text];
-    sendStatus : [SendStatus];
+    sendStatus : [SendStatusEntry];
     received : [Gift];
     email : ?Text;
     account : Account;
@@ -220,7 +220,7 @@ actor class Main() = this {
 
     let sendArr = Vec.toArray<Gift>(send);
     let refundable = Array.map(Array.filter(sendArr, isRefundable), func(g : Gift) : Text = g.id);
-    let sendStatus = Array.map(sendArr, getSendStatus);
+    let sendStatus = Array.map(sendArr, getSendStatusEntry);
 
     return {
       created = sendArr;
@@ -242,6 +242,13 @@ actor class Main() = this {
       case (null) {};
     };
     return Option.get(Map.get(emailQueue, thash, gift.id), #init);
+  };
+
+  private func getSendStatusEntry(gift : Gift) : SendStatusEntry {
+    return {
+      id = gift.id;
+      status = getSendStatus(gift);
+    };
   };
 
   private func isRefundable(gift : Gift) : Bool {
@@ -488,20 +495,7 @@ actor class Main() = this {
     };
   };
 
-  public shared ({ caller }) func addToEmailQueue(id : Text, status : SendStatus) : async Result<Text> {
-    let isSendRequest = switch (status) {
-      case (#sendRequested(_)) true;
-      case (_) false;
-    };
-    let isCancelRequest = switch (status) {
-      case (#sendCanceled(_)) true;
-      case (_) false;
-    };
-
-    if ((not isSendRequest) and (not isCancelRequest) and (not Principal.isController(caller))) {
-      return #err("Permission denied");
-    };
-
+  public shared ({ caller }) func addToEmailQueue(id : Text, request : Bool) : async Result<Text> {
     let subaccountOwner = getSubaccountOwner(caller);
 
     switch (Map.get(lookup, thash, id)) {
@@ -515,37 +509,34 @@ actor class Main() = this {
 
     switch (Map.get(emailQueue, thash, id)) {
       case (? #sendRequested(_time)) {
-        if (isSendRequest) {
+        if (request) {
           return #ok("Already in queue");
-        } else if (isCancelRequest) {
-          // allowed to cancel
         } else {
-          return #err("Gift Card already added to queue");
+          // allowed to cancel
         };
       };
       case (? #sendCanceled(_time)) {
-        if (isCancelRequest) {
+        if (not request) {
           return #ok("Already canceled");
-        } else if (isSendRequest) {
-          // allowed to restart
         } else {
-          return #err("Gift Card already added to queue");
+          // allowed to restart
         };
       };
-      case (?status) {
-        return #err("Gift card already added to queue");
+      case (?_) {
+        return #err("Gift card already processed");
       };
       case (null) {
         // no previous request
       };
     };
 
+    let status = if (request) #sendRequested(Time.now()) else #sendCanceled;
     Map.set(emailQueue, thash, id, status);
 
-    if (isSendRequest) {
+    if (request) {
       return #ok("Added to queue");
     } else {
-      return #ok("Status updated");
+      return #ok("Removed from queue");
     };
   };
 
