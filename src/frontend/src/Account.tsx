@@ -8,22 +8,28 @@ import {
 import { GiftInfo } from "../../declarations/backend/backend.did";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
 import { CopyButton } from "./CopyButton";
-import { encodeAccount, shortenErr, stringify } from "./utils";
+import { encodeAccount, shortenErr } from "./utils";
 import { queries } from "./queryKeys";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { PageLoading } from "./PageLoading";
 
 function Account() {
   const { backendActor, minterActor, principal } = useAuth();
   const queryClient = useQueryClient();
 
-  const { isLoading, isError, data, error } = useQuery(
+  const { isLoading, isError, data, error, failureCount } = useQuery(
     queries.giftcards(queryClient, backendActor, principal),
   );
 
   return (
     <div className="w-max-center">
-      {isLoading ? "loading..." : isError ? "Error " + error : ""}
+      <PageLoading
+        isLoading={isLoading}
+        isError={isError}
+        error={error}
+        failureCount={failureCount}
+      />
       {data && backendActor && minterActor && "ok" in data && (
         <UserInfo
           info={data.ok}
@@ -32,7 +38,6 @@ function Account() {
           backend={backendActor}
         />
       )}
-      <div className="text-gray-200 text-pre">{stringify(data ?? "-")}</div>
     </div>
   );
 }

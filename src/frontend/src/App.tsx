@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { preloadImages } from "./cardThemes";
 import Landing from "./Landing";
 import Learn from "./Learn";
+import Debug from "./Debug";
 
 function App() {
   const { isAuthenticated } = useAuth();
@@ -54,6 +55,7 @@ function App() {
           <Route path="/colors" element={<ColorTest />} />
           <Route path="/signin" element={<LoggedOut />} />
           <Route path="/learn/:topic" element={<Learn tab="learn" />} />
+          <Route path="/debug" element={<Debug />} />
           <Route path="*" element={<LoggedIn tab="learn" />} />
         </Routes>
       </Router>

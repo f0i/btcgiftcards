@@ -13,13 +13,14 @@ import { isRefundable, isRevoked, statusText } from "./gift";
 import Account from "./Account";
 import Create from "./Create";
 import Withdraw from "./Withdraw";
+import { PageLoading } from "./PageLoading";
 
 function LoggedIn({ tab }: { tab: Tab }) {
   const queryClient = useQueryClient();
 
   const { backendActor, principal } = useAuth();
 
-  const { data } = useQuery(
+  const { data, isLoading, isError, error, failureCount } = useQuery(
     queries.giftcards(queryClient, backendActor, principal),
   );
 
@@ -41,7 +42,12 @@ function LoggedIn({ tab }: { tab: Tab }) {
                   principal={principal!}
                 />
               ) : (
-                "Loading..."
+                <PageLoading
+                  isLoading={isLoading}
+                  isError={isError}
+                  error={error}
+                  failureCount={failureCount}
+                />
               )}
             </section>
           </div>
@@ -59,7 +65,12 @@ function LoggedIn({ tab }: { tab: Tab }) {
                   principal={principal!}
                 />
               ) : (
-                "Loading.."
+                <PageLoading
+                  isLoading={isLoading}
+                  isError={isError}
+                  error={error}
+                  failureCount={failureCount}
+                />
               )}
             </section>
           </div>
