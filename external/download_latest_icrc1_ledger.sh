@@ -31,13 +31,13 @@ for COMMIT in $COMMITS; do
         continue
     fi
 
-    wget https://raw.githubusercontent.com/dfinity/ic/refs/heads/master/rs/bitcoin/ckbtc/minter/ckbtc_minter.did -O ckbtc_minter.did
-    wget https://download.dfinity.systems/ic/ac04d772c23ff771eaf526bee9ca9e9b411e129d/canisters/ic-ckbtc-minter.wasm.gz -O ckbtc_minter.wasm.gz
+    #wget https://raw.githubusercontent.com/dfinity/ic/refs/heads/master/rs/bitcoin/ckbtc/minter/ckbtc_minter.did -O ckbtc_minter.did
+    #wget https://download.dfinity.systems/ic/ac04d772c23ff771eaf526bee9ca9e9b411e129d/canisters/ic-ckbtc-minter.wasm.gz -O ckbtc_minter.wasm.gz
 
     echo "Found artifacts for commit $COMMIT."
     echo "Downloading .did and .wasm.gz for icrc1 ledger, icrc1 index, and internet identity."
 
-    curl -sLf "https://raw.githubusercontent.com/dfinity/ic/$COMMIT/rs/rosetta-api/icrc1/ledger/ledger.did" \
+    curl -sLf "https://raw.githubusercontent.com/dfinity/ic/$COMMIT/rs/ledger_suite/icrc1/ledger/ledger.did" \
         -o icrc1_ledger.did
     if [ "$?" -ne "0" ]; then
         echo >&2 "Unable to download the icrc1 ledger did file. Please try again"
@@ -50,7 +50,7 @@ for COMMIT in $COMMITS; do
         exit 3
     fi
 
-    curl -sLf "https://raw.githubusercontent.com/dfinity/ic/$COMMIT/rs/rosetta-api/icrc1/index-ng/index-ng.did" \
+    curl -sLf "https://raw.githubusercontent.com/dfinity/ic/$COMMIT/rs/ledger_suite/icrc1/index-ng/index-ng.did" \
         -o icrc1_index.did
     if [ "$?" -ne "0" ]; then
         echo >&2 "Unable to download the icrc1 index did file. Please try again"
