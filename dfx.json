@@ -49,6 +49,17 @@
           "ic": "fhzgg-waaaa-aaaah-aqzvq-cai"
         }
       }
+    },
+    "internet_identity": {
+      "type": "custom",
+      "candid": "./external/internet_identity.did",
+      "wasm": "./external/internet_identity.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+        }
+      },
+      "frontend": {}
     }
   },
   "defaults": {
