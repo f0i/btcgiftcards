@@ -20,6 +20,10 @@ export type LedgerActor = typeof ckbtc_ledger;
 const AuthContext = createContext({} as AuthProps);
 
 export const getIdentityProvider = () => {
+  if (process.env.DFX_NETWORK === "local") {
+    const ii = process.env.CANISTER_ID_INTERNET_IDENTITY;
+    return "http://" + ii + ".localhost:4943/";
+  }
   return "https://login.f0i.de";
 };
 

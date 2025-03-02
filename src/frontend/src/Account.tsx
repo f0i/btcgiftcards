@@ -77,22 +77,12 @@ function UserInfo({
     }
   };
 
-  const email = info.email[0];
+  const email = info.email;
 
   return (
     <div>
       <h3 className="mt-8">Personal Information</h3>
-      Your email address:{" "}
-      {email ? (
-        email
-      ) : (
-        <>
-          Not verified
-          <button className="button-sm-green" onClick={verifyEmail}>
-            Verify Email Address
-          </button>
-        </>
-      )}
+      Your email address: {info.email}
       <h3 className="mt-8">ckBTC</h3>
       <p>
         You need ckBTC to create new gift cards. You can either deposit your

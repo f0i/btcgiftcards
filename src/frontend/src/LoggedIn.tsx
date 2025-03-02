@@ -79,9 +79,28 @@ function LoggedIn({ tab }: { tab: Tab }) {
         {tab !== "withdraw" ? null : <Withdraw />}
         {tab !== "learn" ? null : (
           <div className="content w-max-center mb-4">
-            <h3>Learn</h3>
             <section className="mt-16">
-              <h3>Coming soon</h3>
+              <div>
+                <h3 className="">What is ckBTC?</h3>
+                <p className="text-sm text-gray-600 mt-2">
+                  ckBTC is a Bitcoin-backed token running on the Internet
+                  Computer (IC), offering fast, low-cost transactions while
+                  remaining fully backed 1:1 by Bitcoin. Unlike traditional
+                  Bitcoin transactions, which can be slow and costly, ckBTC
+                  enables near-instant transfers with fees as low as one cent.
+                  It acts as a trustless, decentralized sidechain for Bitcoin,
+                  allowing seamless interactions with the IC ecosystem without
+                  compromising security or decentralization.
+                </p>
+              </div>
+
+              <a
+                className="button"
+                target="_blank"
+                href="https://internetcomputer.org/ckbtc"
+              >
+                Learn more at internetcomputer.org/ckbtc
+              </a>
             </section>
           </div>
         )}

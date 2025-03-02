@@ -50,19 +50,22 @@ function Withdraw() {
         <h3>Withdraw</h3>
         <form action="#" onSubmit={formWithdraw}>
           <label htmlFor="main">From: &nbsp;</label>
-          <select id="main">
-            <option value="card">
-              Gift Cards ({balance?.toString() ?? "-"} ckSat)
-            </option>
-          </select>
+          <input
+            id="main"
+            value={"Main account (" + (balance ?? "-") + " ckSat)"}
+          />
           <label htmlFor="amount">Amount: &nbsp;</label>
           <div className="input-container relative">
             <span className="absolute right-12 top-4">ckSat</span>
-            <input type="number" id="amount" placeholder="" min={500} />
+            <input type="number" id="amount" placeholder="" min={200} />
           </div>
           <label htmlFor="account">To Account: &nbsp;</label>
           <input id="account" alt="Name" type="text" />
-          <button type="submit">Withdraw</button>
+          <div className="px-1/3">
+            <button type="submit" className="">
+              Withdraw
+            </button>
+          </div>
         </form>
       </section>
     </div>

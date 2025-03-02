@@ -62,7 +62,7 @@ dfx deploy ckbtc_index --argument "(opt variant {\"Init\" = (record {ledger_id =
 dfx deploy ckbtc_minter --argument "(
   variant {
     Init = record {
-      kyt_principal = null;
+      kyt_principal = opt (principal \"${MINTER}\");
       ecdsa_key_name = \"ecdsa_key_name\";
       mode = variant { GeneralAvailability };
       retrieve_btc_min_amount = 100 : nat64;

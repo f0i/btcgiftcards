@@ -73,7 +73,7 @@ const TopNav = ({ tab }: { tab: Tab }) => {
           </Link>
         ) : (
           <Link to="/" onClick={login} className="button">
-            Sign in <BsCaretDown className="inline-block" />
+            Sign in
           </Link>
         )}
       </nav>

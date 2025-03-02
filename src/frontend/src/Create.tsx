@@ -9,6 +9,7 @@ import { queries, mutations } from "./queryKeys";
 import toast from "react-hot-toast";
 import { confirmDialog } from "./CopyButton";
 import { GiftCard } from "./GiftCard";
+import EmailTemplate from "./email/EmailTemplate";
 
 function Create() {
   const queryClient = useQueryClient();
@@ -219,12 +220,18 @@ function Create() {
       </form>
       <div className="w-full">
         <h3 className="w-full">Preview</h3>
-        <GiftCard
-          gift={formData}
-          refundable={[]}
-          sendStatus={[]}
-          isPreview={true}
-        />
+
+        <div className="border border-4 border-gray-200 bg-gray-200 text-right text-gray-400 pr-2 w-full">
+          O O O
+        </div>
+        <div className="border border-4">
+          <EmailTemplate
+            recipientName="asdf"
+            amount="0.001"
+            senderName="qwer"
+            customMessage={"Hello\n\n\nWorld!"}
+          />
+        </div>
       </div>
     </div>
   );
