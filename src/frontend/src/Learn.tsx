@@ -1,27 +1,43 @@
-import { useAuth } from "./use-auth-client";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import TopNav, { Tab } from "./components/TopNav";
-import Footer from "./Footer";
-import Showcase from "./Showcase";
+import { useNavigate, useParams } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "./components/ui/button";
+import { Info, CheckCircle, Clock, DollarSign } from "lucide-react";
+import CkBTCPage from "./learn/CkBTCPage";
+import BitcoinPage from "./learn/BitcoinPage";
+import TopNav from "./components/TopNav";
+import { TinyFooter } from "./Footer";
+import DepositCkBTCPage from "./learn/DepositPage";
+import InternetComputerPage from "./learn/InternetComputerPage";
+import Create from "./Create";
+import CreateGiftCardPage from "./learn/CreateGiftCardPage";
 
-function Learn({ tab }: { tab: Tab }) {
+function Learn() {
   const queryClient = useQueryClient();
 
   const navigate = useNavigate();
-
+  let { topic } = useParams();
   return (
     <>
-      <TopNav tab={tab} />
+      <TopNav tab={"learn"} />
       <div className="main grow">
-        <div className="content max-w-4xl mb-4">
-          <section className="mt-16">
-            <h3>What to do with ckBTC?</h3>
-            <Showcase />
-          </section>
-        </div>
+        {topic === "bitcoin" ? (
+          <BitcoinPage />
+        ) : topic === "ckbtc" ? (
+          <CkBTCPage />
+        ) : topic === "icp" ? (
+          <InternetComputerPage />
+        ) : topic === "deposit" ? (
+          <DepositCkBTCPage />
+        ) : topic === "create" ? (
+          <CreateGiftCardPage />
+        ) : topic === "withdraw" ? (
+          <div>TODO</div>
+        ) : (
+          <CkBTCPage />
+        )}
       </div>
-      <Footer />
+      <TinyFooter />
     </>
   );
 }

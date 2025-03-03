@@ -54,9 +54,9 @@ function App() {
           <Route path="/send/:giftId" element={<ShowGiftCard />} />
           <Route path="/colors" element={<ColorTest />} />
           <Route path="/signin" element={<LoggedOut />} />
-          <Route path="/learn/:topic" element={<Learn tab="learn" />} />
+          <Route path="/learn" element={<Learn />} />
+          <Route path="/learn/:topic" element={<Learn />} />
           <Route path="/debug" element={<Debug />} />
-          <Route path="*" element={<LoggedIn tab="learn" />} />
         </Routes>
       </Router>
     </>
