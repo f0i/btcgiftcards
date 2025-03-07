@@ -16,7 +16,7 @@ const Footer = () => {
           <BsDiscord className="inline-block" />
         </a>
       </div>
-      <div className="w-max-center border-top border-y border-gray-500 py-4 flex flex-row gap-8 justify-around">
+      <div className="w-max-center border-top border-y border-gray-500 py-4 grid lg:grid-cols-5 sm:grid-cols-3 grid-cols-2 mx-8 gap-8">
         <FooterLinkBlock
           title="Features"
           links={[
@@ -62,7 +62,7 @@ const Footer = () => {
           ]}
         />
       </div>
-      <p className="text-sm text-gray-200 text-center mt-6">
+      <p className="text-sm text-gray-200 text-center mt-6 px-8">
         I'd love to hear your feedback and suggestions via{" "}
         <a
           href="https://discordapp.com/users/f0i"
@@ -107,7 +107,7 @@ const FooterLinkBlock = ({
   links: [string, string][];
 }) => {
   const lis = links.map(([title, link], index) => (
-    <li key={index + link}>
+    <li key={index + link} className={index > 2 ? "hidden sm:block" : ""}>
       <a href={link} target="_blank">
         {title}
       </a>

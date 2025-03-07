@@ -1,8 +1,6 @@
-# BTC Gift Cards
+# Bitcoin Gift Cards
 
 Create gift cards on [btc-gift-cards.com](https://btc-gift-cards.com)!
-
-# BTC Gift Cards
 
 ### 🎁 A Simple Way to Gift Bitcoin
 
@@ -15,7 +13,7 @@ BTC Gift Cards is a project designed to make gifting Bitcoin easy and accessible
 
 ⚠️ **Disclaimer**: This project is under active development. Please avoid loading large amounts onto the gift cards.
 
-### 🌐 Demo Link
+### 🌐 Links
 
 - App: [BTC-Gift-Cards.com](https://btc-gift-cards.com)
 - Frontend canister: [y4leg-vyaaa-aaaah-aq3ra-cai](https://y4leg-vyaaa-aaaah-aq3ra-cai.icp0.io/)
@@ -24,7 +22,6 @@ BTC Gift Cards is a project designed to make gifting Bitcoin easy and accessible
 
 ## Features
 
-- Deposit or mint ckBTC
 - Show account balances
 - Create gift cards
   - Assign an amount of ckBTC to be send with it

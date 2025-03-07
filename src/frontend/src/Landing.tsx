@@ -261,7 +261,7 @@ export const ImageTextCTA = ({
           src={img}
           className="w-full max-w-full lg:w-1/2 rounded object-cover"
         />
-        <div className="w-full lg:w-1/2 px-8 py-4 flex flex-col text-lg">
+        <div className="w-full lg:w-1/2 px-4 sm:px-8 py-4 flex flex-col text-lg">
           <div className="grow" />
           <h2>{title}</h2>
           <p className="w-2/3 py-8">{text}</p>
