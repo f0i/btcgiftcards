@@ -93,7 +93,7 @@ export default function DepositCkBTCPage() {
           variant="outline"
           onClick={() => navigate("/learn/create")}
         >
-          How to deposit ckBTC <ArrowRight />
+          How to create a Bitcoin Gift Card <ArrowRight />
         </Button>
       </div>
     </div>

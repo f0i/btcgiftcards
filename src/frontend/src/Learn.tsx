@@ -11,6 +11,7 @@ import DepositCkBTCPage from "./learn/DepositPage";
 import InternetComputerPage from "./learn/InternetComputerPage";
 import Create from "./Create";
 import CreateGiftCardPage from "./learn/CreateGiftCardPage";
+import WithdrawPage from "./learn/WithdrawPage";
 
 function Learn() {
   const queryClient = useQueryClient();
@@ -32,9 +33,9 @@ function Learn() {
         ) : topic === "create" ? (
           <CreateGiftCardPage />
         ) : topic === "withdraw" ? (
-          <div>TODO</div>
+          <WithdrawPage />
         ) : (
-          <CkBTCPage />
+          <BitcoinPage />
         )}
       </div>
       <TinyFooter />

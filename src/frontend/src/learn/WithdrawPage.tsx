@@ -10,17 +10,17 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-export default function CreateGiftCardPage() {
+export default function WithdrawPage() {
   const navigate = useNavigate();
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       {/* Hero Section */}
       <Card className="p-6 text-center">
         <CardContent className="flex flex-col items-center gap-4">
-          <h1 className="text-3xl font-bold">Create a Bitcoin Gift Card</h1>
+          <h1 className="text-3xl font-bold">Withdraw ckBTC to the NNS</h1>
           <p className="text-gray-600 max-w-2xl">
-            Bitcoin Gift Cards allow you to send Bitcoin or ckBTC as a gift.
-            Follow these steps to create your own Bitcoin Gift Card.
+            You can withdraw your ckBTC from Bitcoin Gift Cards and send it back
+            to the NNS. Follow these steps to complete the process.
           </p>
         </CardContent>
       </Card>
@@ -32,12 +32,17 @@ export default function CreateGiftCardPage() {
             <Info className="w-8 h-8 text-primary" />
             <div>
               <h3 className="text-lg font-semibold">
-                Step 1: Ensure You Have ckBTC
+                Step 1: Find Your NNS ckBTC Address
               </h3>
               <p className="text-gray-600">
-                Before creating a gift card, make sure you have ckBTC deposited
-                in your account. If not, follow the steps to deposit ckBTC
-                first.
+                Log in to the{" "}
+                <a
+                  href="https://nns.ic0.app/"
+                  className="text-blue-600 hover:underline"
+                >
+                  NNS
+                </a>{" "}
+                and navigate to your ckBTC account to find your deposit address.
               </p>
             </div>
           </CardContent>
@@ -48,12 +53,11 @@ export default function CreateGiftCardPage() {
             <ClipboardList className="w-8 h-8 text-primary" />
             <div>
               <h3 className="text-lg font-semibold">
-                Step 2: Enter Gift Card Details
+                Step 2: Initiate Withdrawal
               </h3>
               <p className="text-gray-600">
-                Navigate to the "Create" page, fill in the recipient's email
-                address, select the Bitcoin or ckBTC amount, and add a personal
-                message.
+                Go to the Bitcoin Gift Cards account page, enter your NNS ckBTC
+                address, and specify the amount you want to withdraw.
               </p>
             </div>
           </CardContent>
@@ -64,11 +68,12 @@ export default function CreateGiftCardPage() {
             <Eye className="w-8 h-8 text-primary" />
             <div>
               <h3 className="text-lg font-semibold">
-                Step 3: Preview Your Gift Card
+                Step 3: Review and Confirm
               </h3>
               <p className="text-gray-600">
-                Before finalizing, check the preview to ensure all details are
-                correct.
+                Double-check the withdrawal details, including the destination
+                address and amount. Once verified, proceed to confirm the
+                transaction.
               </p>
             </div>
           </CardContent>
@@ -78,33 +83,23 @@ export default function CreateGiftCardPage() {
           <CardContent className="p-6 flex gap-4 items-start">
             <Send className="w-8 h-8 text-primary" />
             <div>
-              <h3 className="text-lg font-semibold">Step 4: Create and Send</h3>
+              <h3 className="text-lg font-semibold">
+                Step 4: Complete the Withdrawal
+              </h3>
               <p className="text-gray-600">
-                Click the "Create" button to generate your Bitcoin Gift Card.
-                Once created, it will appear in your list of gift cards.
+                Click the "Withdraw" button to send your ckBTC to the NNS. The
+                transaction will be processed, and your ckBTC balance should
+                update shortly in the NNS.
               </p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* CTA */}
-      <div className="text-center">
-        <Button className="px-6 py-3 text-lg">Create a Gift Card</Button>
-      </div>
-
       {/* Navigation Buttons */}
       <div className="flex justify-between">
-        <Button variant="outline" onClick={() => navigate("/learn/deposit")}>
-          <ArrowLeft /> How to deposit ckBTC
-        </Button>
-        <Button
-          className="ml-auto"
-          variant="outline"
-          onClick={() => navigate("/learn/withdraw")}
-        >
-          How to withdraw ckBTC
-          <ArrowRight />
+        <Button variant="outline" onClick={() => navigate("/learn/create")}>
+          <ArrowLeft /> How to create a Bitcoin Gift Card
         </Button>
       </div>
     </div>

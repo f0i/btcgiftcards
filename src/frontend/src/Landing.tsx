@@ -73,25 +73,12 @@ function Landing() {
         <a id="more" />
       </div>
 
-      <div className="row bg-gray-100 hidden">
-        <div className="video-container aspect-video w-max-center">
-          <iframe
-            className="m-auto"
-            src="https://www.youtube.com/embed/KhSwGzRhYc0?si=9bN7uvKF4UO9EiI-&amp;start=2733"
-            title="YouTube video player"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen={true}
-          />
-        </div>
-      </div>
-
       <div className="row">
         <div className="w-max-center text-xl py-8 text-center">
           <h2 className="text-center w-full pt-4">How it works</h2>
         </div>
         <div className="w-max-center py-8 text-center">
-          <div className="w-max-center grid grid-cols-4 gap-4">
+          <div className="w-max-center grid grid-cols-1 lg:grid-cols-4 gap-4">
             <p>
               <img
                 src="/external/bitcoin.svg"
@@ -141,7 +128,7 @@ function Landing() {
         <div className="w-max-center py-8 text-center">
           <h2 className="text-center w-full pt-4">What our users are saying</h2>
         </div>
-        <div className="w-max-center pb-8 flex flex-row gap-x-8 justify-between">
+        <div className="w-max-center pb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 justify-between">
           <div className="flex-1 handwritten max-w-52 text-lg">
             <BsQuote />
             This Gift Card is the gateway to exploring Bitcoin firsthand.
