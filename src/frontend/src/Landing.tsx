@@ -10,6 +10,7 @@ import {
 } from "react-icons/bs";
 import Footer from "./Footer";
 import { useNavigate } from "react-router-dom";
+import { Button } from "./components/ui/button";
 
 function Landing() {
   const { login, isAuthenticated } = useAuth();
@@ -43,12 +44,14 @@ function Landing() {
             <br />
             your first gift card.
             <br />
-            <button
+            <Button
               onClick={login}
-              className="w-60 mt-8 lg:mt-16 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition duration-200 mb-4"
+              size="lg"
+              variant="cta"
+              className="w-64 mt-8 lg:mt-16"
             >
               Create a New Gift Card
-            </button>
+            </Button>
           </div>
           <div className="hidden md:flex w-12 flex-col items-center text-gray-400 text-nowrap">
             <div className="border w-0 h-10 grow" />
@@ -59,12 +62,14 @@ function Landing() {
             Already have a gift card?
             <br />
             Redeem it here!
-            <button
+            <Button
               onClick={login}
-              className="w-60 mt-8 lg:mt-16 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition duration-200 mb-4"
+              size="lg"
+              variant="cta"
+              className="w-64 mt-8 lg:mt-16"
             >
               Redeem Your Gift Card
-            </button>
+            </Button>
           </div>
         </div>
         <a href="#more">
@@ -82,7 +87,7 @@ function Landing() {
             <p>
               <img
                 src="/external/bitcoin.svg"
-                className="object-fit py-4 w-full max-w-32 h-44"
+                className="object-fit py-4 w-24 h-24"
               />
               <h3>Gift Bitcoin Easily</h3>
               Send Bitcoin as a gift with just a few clicks. Personalize your
@@ -91,7 +96,7 @@ function Landing() {
             <p>
               <img
                 src="/external/ckbtc.svg"
-                className="object-fit py-4 w-full max-w-32 h-44"
+                className="object-fit py-4 w-24 h-24"
               />
               <h3> Powered by ckBTC</h3>
               Enjoy low transaction fees and fast transfers using ckBTC, a token
@@ -100,18 +105,18 @@ function Landing() {
             <p>
               <img
                 src="/external/google.svg"
-                className="object-fit py-4 w-full max-w-32 h-44"
+                className="object-fit py-4 w-24 h-24"
               />
-              <h3>Email Verification with Google</h3>
+              <h3>Email Verification with&nbsp;Google</h3>
               Protect your gift cards with Google Sign-In. Only the recipient
               can access and redeem the Bitcoin securely.
             </p>
             <p>
               <img
                 src="/external/icp.svg"
-                className="object-fit py-4 w-full max-w-44 h-44"
+                className="object-fit py-4 w-24 h-24"
               />
-              <h3>Built on the Internet Computer</h3>
+              <h3>Built on the Internet&nbsp;Computer</h3>
               Experience the speed, security, and scalability of the Internet
               Computer blockchain, enabling seamless Bitcoin transactions.
             </p>
@@ -178,10 +183,10 @@ function Landing() {
       />
 
       <ImageTextCTA
-        title="Valentine’s Day BTC Gift Card"
-        text="This Valentine’s Day, show your love with a special gift! Personalize a BTC Gift Card with romantic designs and a heartfelt message for someone special."
+        title="A Gift Card for Someone Special"
+        text="Show your love and appreciation with a heartfelt Bitcoin Gift Card. Add a personal message and make it a meaningful gift for someone special."
         img="/visuals/valentine-paper-orange.jpeg"
-        cta="Create a Valentine’s Gift Card"
+        cta="Create a Special Gift"
         imageRight={false}
       />
 
@@ -210,12 +215,14 @@ function Landing() {
           </div>
         </div>
         <div className="w-max-center text-center">
-          <button
+          <Button
+            variant="cta"
+            size="lg"
             onClick={login}
-            className="w-full lg:w-2/3 max-w-md m-auto lg:m-0 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition duration-200"
+            className="w-full lg:w-2/3 max-w-md m-auto lg:m-0"
           >
             Create Your Gift Card
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -258,12 +265,14 @@ export const ImageTextCTA = ({
           <div className="grow" />
           <h2>{title}</h2>
           <p className="w-2/3 py-8">{text}</p>
-          <button
+          <Button
+            variant="cta"
+            size="lg"
             onClick={isAuthenticated ? () => navigate("/account") : login}
-            className="w-full lg:w-2/3 max-w-md m-auto lg:m-0 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition duration-200"
+            className="w-full lg:w-2/3 max-w-md m-auto lg:m-0"
           >
             {cta}
-          </button>
+          </Button>
           <div className="grow" />
         </div>
       </div>
