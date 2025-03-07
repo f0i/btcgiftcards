@@ -43,7 +43,14 @@ BTC Gift Cards is a project designed to make gifting Bitcoin easy and accessible
 
 ## Local setup
 
+Init toolchain
+
+```bash
+mops toolchain init
+```
+
 Create and deploy canisters:
+
 
 ```bash
 # create all canisters
@@ -85,9 +92,14 @@ During the Encode Culb Hackathon, BTC Gift Cards received a developer grant whic
 
 ### Further plans
 
-- Secure account by creating an II (To introduce new users to Internet Identity, which is widely used by apps on the IC)
 - Automate sending emails (most likeley needed at some point, currently still manual)
-- Progress indicator for ckBTC minter
 - Add redeem by code (without email verification)
-- Shortcut to transfer gift card balance to main account
 
+### Obsolete
+
+- Shortcut to transfer gift card balance to main account
+  - Not relevant as there is only one account for both gift cards and deposits.
+- Progress indicator for ckBTC minter
+  - Minting ckBTC has been removed. Users should use the NNS to convert between ckBTC and Bitcoin.
+- Secure account by creating an II (To introduce new users to Internet Identity, which is widely used by apps on the IC)
+  - Does not add much value for the app and makes it more confusing for new users. Users can learn about II by getting introduced to the NNS and other dApps on the IC.
