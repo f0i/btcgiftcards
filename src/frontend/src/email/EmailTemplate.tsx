@@ -1,5 +1,5 @@
 import { getTheme, ThemeKey } from "@/cardThemes";
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export type ScrollTarget = "message" | "theme";
 
@@ -28,15 +28,58 @@ const EmailTemplate: React.FC<EmailTemplateProps> = ({
 
   const t = getTheme(theme);
 
-  const emailHtml = template(
-    messageDivRef.current?.innerHTML ?? "-",
-    senderDivRef.current?.innerHTML ?? "-",
-    recipientDivRef.current?.innerHTML ?? "-",
+  const [emailHtml, setEmailHtml] = useState("");
+
+  // Trigger a second update once refs have updated content
+  useEffect(() => {
+    if (
+      !messageDivRef.current ||
+      !senderDivRef.current ||
+      !recipientDivRef.current
+    ) {
+      return;
+    }
+
+    const updatedHtml = template(
+      messageDivRef.current.innerHTML,
+      senderDivRef.current.innerHTML,
+      recipientDivRef.current.innerHTML,
+      amount,
+      value,
+      t.cover,
+      scrollTo,
+    );
+
+    setEmailHtml(updatedHtml);
+  }, [
+    recipientName,
+    senderName,
     amount,
     value,
-    t.cover,
+    customMessage,
+    theme,
     scrollTo,
-  );
+  ]);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      if (!iframeRef.current?.contentWindow) {
+        console.log("asdfqwer");
+        return;
+      }
+      const iframeDoc = iframeRef.current.contentWindow.document;
+      iframeDoc.open();
+      iframeDoc.write(emailHtml);
+      iframeDoc.close();
+    });
+  }, [
+    emailHtml,
+    messageDivRef,
+    senderDivRef.current?.innerHTML,
+    recipientDivRef,
+  ]);
+
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   return (
     <div className="h-full">
@@ -53,7 +96,7 @@ const EmailTemplate: React.FC<EmailTemplateProps> = ({
           </p>
         ))}
       </div>
-      <iframe srcDoc={emailHtml} className="w-full h-full" />
+      <iframe srcDoc={""} className="w-full h-full" ref={iframeRef} />
     </div>
   );
 };
@@ -345,7 +388,7 @@ const template = (
                               </td>
                             </tr>
                           </table>
-                          <table class="image_block block-5" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
+                          <table id="theme" class="image_block block-5" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
                             <tr>
                               <td class="pad" style="width:100%;">
                                 <div class="alignment" align="center" style="line-height:10px">
@@ -840,7 +883,7 @@ const template = (
     </tbody>
   </table><!-- End -->
 
-${scrollTo ? ` <xscript> ${scrollTo}?.scrollIntoView({ block: "center" }); </script>` : ""}
+${scrollTo ? ` <script> ${scrollTo}?.scrollIntoView({ behavior: "smooth", block: "center" }); </script>` : ""}
 </body>
 
 </html>

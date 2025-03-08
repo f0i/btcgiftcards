@@ -30,7 +30,9 @@ export const formatCurrency = (
   div: number,
   decimals: number,
 ): string => {
-  return (Number(val) / div).toFixed(decimals);
+  if (decimals == 0) return (Number(val) / div).toString();
+  if (decimals > 0) return (Number(val) / div).toFixed(decimals);
+  return (Number(val) / div).toPrecision(-decimals);
 };
 
 export const shortenErr = (err: string | Error) => {

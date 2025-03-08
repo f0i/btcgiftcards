@@ -38,6 +38,7 @@ function Create() {
   const [formData, setFormData] = useState({
     id: "xxxxxxxxxxxxxxxxx",
     amount: 1000n,
+    customAmount: 100n,
     to: "",
     design: "",
     sender: "",
@@ -195,18 +196,12 @@ function Create() {
               placeholder=""
               min={500}
               max={100000}
+              onChange={handleChange}
             />
           </div>
         </div>
         <label htmlFor="message">Enter a message: &nbsp;</label>
         <textarea id="message" rows={5} onChange={handleChange} />
-        <div className="w-full bg-blue-100 border border-blue-300 text-blue-800 text-base rounded-lg p-4 my-2 inline-block">
-          ⚠️ <strong>Warning:</strong> This project is still under active
-          development. Please avoid loading large amounts onto the gift cards.{" "}
-          <Link to="/learn/security" className="link">
-            Learn more
-          </Link>
-        </div>
         <button
           type="submit"
           disabled={createGiftCardMutation.isPending}
@@ -230,8 +225,16 @@ function Create() {
         <div className="border border-4 flex-grow flex flex-col">
           <EmailTemplate
             recipientName={formData.to}
-            amount={formatCurrency(formData.amount, 10000000, 8)}
-            value={formatCurrency(formData.amount, 1000, 2)}
+            amount={formatCurrency(
+              useCustomAmount ? formData.customAmount : formData.amount,
+              10000000,
+              0,
+            )}
+            value={formatCurrency(
+              useCustomAmount ? formData.customAmount : formData.amount,
+              1000,
+              2,
+            )}
             senderName={formData.sender}
             customMessage={formData.message}
             theme={formData.design as ThemeKey}
