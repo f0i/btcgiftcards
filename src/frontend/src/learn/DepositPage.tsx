@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle, Send, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function DepositCkBTCPage() {
@@ -8,7 +8,7 @@ export default function DepositCkBTCPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
-      {/* Header Section */}
+      {/* Hero Section */}
       <Card className="p-6 text-center">
         <CardContent className="flex flex-col items-center gap-4">
           <h1 className="text-3xl font-bold">How to Deposit ckBTC</h1>
@@ -20,69 +20,62 @@ export default function DepositCkBTCPage() {
         </CardContent>
       </Card>
 
-      {/* Step-by-Step Guide */}
+      {/* Steps */}
       <div className="space-y-6">
         <Card>
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold">
-              Step 1: Find Your Deposit Address
-            </h3>
-            <p className="text-gray-600 mt-2">
-              Navigate to the <strong>Account Page</strong> in Bitcoin Gift
-              Cards. There, you will find your unique ckBTC deposit address.
-            </p>
-            <img
-              src="/screenshots/account-page.png"
-              alt="Account Page Screenshot"
-              className="mt-4 rounded-lg shadow"
-            />
+          <CardContent className="p-6 flex gap-4 items-start">
+            <Wallet className="w-8 h-8 text-primary" />
+            <div>
+              <h3 className="text-lg font-semibold">
+                Step 1: Find Your Deposit Address
+              </h3>
+              <p className="text-gray-600">
+                Navigate to the Account Page in Bitcoin Gift Cards. There,
+                you’ll find your unique ckBTC deposit address.
+              </p>
+            </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold">
-              Step 2: Send ckBTC from the NNS
-            </h3>
-            <p className="text-gray-600 mt-2">
-              Visit the{" "}
-              <a
-                href="https://nns.ic0.app/"
-                className="text-blue-600 hover:underline"
-              >
-                NNS dApp
-              </a>{" "}
-              and log into your account. Navigate to your ckBTC balance, then
-              transfer ckBTC to the deposit address you found in Step 1.
-            </p>
-            <img
-              src="/screenshots/nns-transfer.png"
-              alt="NNS Transfer Screenshot"
-              className="mt-4 rounded-lg shadow"
-            />
+          <CardContent className="p-6 flex gap-4 items-start">
+            <Send className="w-8 h-8 text-primary" />
+            <div>
+              <h3 className="text-lg font-semibold">
+                Step 2: Send ckBTC from the NNS
+              </h3>
+              <p className="text-gray-600">
+                Visit the{" "}
+                <a
+                  href="https://nns.ic0.app/"
+                  className="text-blue-500 underline"
+                >
+                  NNS dApp
+                </a>{" "}
+                and log into your account. Navigate to your ckBTC balance, then
+                transfer ckBTC to the deposit address you found in Step 1.
+              </p>
+            </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold">
-              Step 3: Check Your Balance
-            </h3>
-            <p className="text-gray-600 mt-2">
-              After a few seconds, your deposited ckBTC should appear in your
-              Bitcoin Gift Cards account balance. You can now start creating
-              gift cards!
-            </p>
-            <img
-              src="/screenshots/balance-updated.png"
-              alt="Updated Balance Screenshot"
-              className="mt-4 rounded-lg shadow"
-            />
+          <CardContent className="p-6 flex gap-4 items-start">
+            <CheckCircle className="w-8 h-8 text-primary" />
+            <div>
+              <h3 className="text-lg font-semibold">
+                Step 3: Check Your Balance
+              </h3>
+              <p className="text-gray-600">
+                After a few seconds, your deposited ckBTC should appear in your
+                Bitcoin Gift Cards account balance. You can now start creating
+                gift cards!
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Navigation Buttons */}
       {/* Navigation Buttons */}
       <div className="flex justify-between">
         <Button variant="outline" onClick={() => navigate("/learn/icp")}>

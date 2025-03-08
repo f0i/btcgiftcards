@@ -40,7 +40,6 @@ export const ThemeSelect = ({
   const setActiveChange = (theme: ThemeKey) => {
     setActive(theme);
     if (onChange) {
-      console.log("asdfasdf", theme);
       onChange({ target: { id: id, value: theme } });
     }
   };
@@ -50,27 +49,22 @@ export const ThemeSelect = ({
       <div className="flex flex-row overflow-x-auto">
         <ThemeButton
           setActive={setActiveChange}
-          design="xmas"
+          design="valentine"
           active={active}
         />
         <ThemeButton
           setActive={setActiveChange}
-          design="btcFuture"
+          design="easter"
           active={active}
         />
         <ThemeButton
           setActive={setActiveChange}
-          design="btcPlan"
+          design="wedding"
           active={active}
         />
         <ThemeButton
           setActive={setActiveChange}
           design="birthday"
-          active={active}
-        />
-        <ThemeButton
-          setActive={setActiveChange}
-          design="xmasThankYou"
           active={active}
         />
       </div>

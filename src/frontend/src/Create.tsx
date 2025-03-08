@@ -1,6 +1,6 @@
 import { useAuth } from "./use-auth-client";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { shortenErr } from "./utils";
+import { formatCurrency, shortenErr } from "./utils";
 import { Link, useNavigate } from "react-router-dom";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
 import { ThemeSelect } from "./ThemeSelect";
@@ -9,7 +9,8 @@ import { queries, mutations } from "./queryKeys";
 import toast from "react-hot-toast";
 import { confirmDialog } from "./CopyButton";
 import { GiftCard } from "./GiftCard";
-import EmailTemplate from "./email/EmailTemplate";
+import EmailTemplate, { ScrollTarget } from "./email/EmailTemplate";
+import { ThemeKey } from "./cardThemes";
 
 function Create() {
   const queryClient = useQueryClient();
@@ -101,6 +102,7 @@ function Create() {
   };
 
   const [email, setEmail] = useState("");
+  const [scroll, setScroll] = useState<ScrollTarget | undefined>(undefined);
 
   const isGmail = (email: string) => {
     if (email.indexOf("@") < 0) return true;
@@ -119,6 +121,7 @@ function Create() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { id, value } = e.target;
+    setScroll(id === "design" ? "theme" : "message");
     console.log("asdfasdfasd", id, value, formData);
     setFormData((prevData) => ({
       ...prevData,
@@ -218,18 +221,21 @@ function Create() {
             : "Create Gift Card!"}
         </button>
       </form>
-      <div className="w-full">
+      <div className="w-full flex flex-col">
         <h3 className="w-full">Preview</h3>
 
         <div className="border border-4 border-gray-200 bg-gray-200 text-right text-gray-400 pr-2 w-full">
           O O O
         </div>
-        <div className="border border-4">
+        <div className="border border-4 flex-grow flex flex-col">
           <EmailTemplate
-            recipientName="asdf"
-            amount="0.001"
-            senderName="qwer"
-            customMessage={"Hello\n\n\nWorld!"}
+            recipientName={formData.to}
+            amount={formatCurrency(formData.amount, 10000000, 8)}
+            value={formatCurrency(formData.amount, 1000, 2)}
+            senderName={formData.sender}
+            customMessage={formData.message}
+            theme={formData.design as ThemeKey}
+            scrollTo={scroll}
           />
         </div>
       </div>

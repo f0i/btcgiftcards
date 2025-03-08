@@ -25,6 +25,14 @@ export const formatDateTimeFromNano = (time: bigint): string => {
   return date.toLocaleString();
 };
 
+export const formatCurrency = (
+  val: bigint,
+  div: number,
+  decimals: number,
+): string => {
+  return (Number(val) / div).toFixed(decimals);
+};
+
 export const shortenErr = (err: string | Error) => {
   const full = err.toString();
   const line = full.split("\n")[0];

@@ -90,7 +90,12 @@ export default function CreateGiftCardPage() {
 
       {/* CTA */}
       <div className="text-center">
-        <Button className="px-6 py-3 text-lg">Create a Gift Card</Button>
+        <Button
+          className="px-6 py-3 text-lg"
+          onClick={() => navigate("/create")}
+        >
+          Create a Gift Card
+        </Button>
       </div>
 
       {/* Navigation Buttons */}

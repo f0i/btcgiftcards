@@ -59,7 +59,7 @@ actor class Main() = this {
   stable var emailQueue : Map<Text, SendStatus> = Map.new();
   emailQueue := Map.new(); // TODO: remove after next deployment
 
-  let testUser = Principal.fromText("63rpc-z6r5w-mrp54-3v4zx-zqu6c-iwmvr-fhqr3-w7okj-sgw2g-ao7pv-zqe");
+  let testUser = Principal.fromText("3ozfr-64z5x-ibat6-k3e3u-afjmp-7yutb-xw2xb-olugq-ztyd3-qbxrc-4ae");
   Map.set(verified, phash, testUser, "asdf@localhost");
 
   public shared ({ caller }) func createGiftCard(email : Text, amount : Nat, fee : Nat, sender : Text, message : Text, design : Text) : async Result<Gift> {
@@ -415,14 +415,14 @@ actor class Main() = this {
     };
 
     switch (Map.get(emailQueue, thash, id)) {
-      case (? #sendRequested(_time)) {
+      case (?#sendRequested(_time)) {
         if (request) {
           return #ok("Already in queue");
         } else {
           // allowed to cancel
         };
       };
-      case (? #sendCanceled(_time)) {
+      case (?#sendCanceled(_time)) {
         if (not request) {
           return #ok("Already canceled");
         } else {
