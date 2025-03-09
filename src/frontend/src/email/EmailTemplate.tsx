@@ -10,6 +10,7 @@ interface EmailTemplateProps {
   value: string;
   customMessage: string;
   theme: ThemeKey;
+  redeemPath: string;
   scrollTo?: ScrollTarget;
 }
 
@@ -20,6 +21,7 @@ const EmailTemplate: React.FC<EmailTemplateProps> = ({
   value,
   customMessage,
   theme,
+  redeemPath,
   scrollTo,
 }) => {
   const messageDivRef = useRef<HTMLDivElement>(null);
@@ -47,6 +49,7 @@ const EmailTemplate: React.FC<EmailTemplateProps> = ({
       amount,
       value,
       t.cover,
+      redeemPath,
       scrollTo,
     );
 
@@ -58,6 +61,7 @@ const EmailTemplate: React.FC<EmailTemplateProps> = ({
     value,
     customMessage,
     theme,
+    redeemPath,
     scrollTo,
   ]);
 
@@ -82,7 +86,7 @@ const EmailTemplate: React.FC<EmailTemplateProps> = ({
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   return (
-    <div className="h-full">
+    <div className="w-full h-full">
       <div ref={senderDivRef} style={{ display: "none" }} className="border">
         {senderName}
       </div>
@@ -96,7 +100,7 @@ const EmailTemplate: React.FC<EmailTemplateProps> = ({
           </p>
         ))}
       </div>
-      <iframe srcDoc={""} className="w-full h-full" ref={iframeRef} />
+      <iframe className="w-full h-full" ref={iframeRef} />
     </div>
   );
 };
@@ -110,10 +114,13 @@ const template = (
   amount: string,
   value: string,
   mainImage: string,
+  redeemPath: string,
   scrollTo?: string,
 ) => {
   const baseUrl = "";
   //const baseUrl = "https://btc-gift-cards.com";
+
+  const redeemLink = redeemPath.length > 2 ? baseUrl + redeemPath : "#";
 
   return `
 <!DOCTYPE html>
@@ -494,8 +501,8 @@ const template = (
                           <table class="button_block block-8" width="100%" border="0" cellpadding="25" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
                             <tr>
                               <td class="pad">
-                                <div class="alignment" align="center"><a href="${baseUrl}/redeem" target="_blank" style="color:#000;text-decoration:none;"><!--[if mso]>
-<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"  href="${baseUrl}/redeem"  style="height:42px;width:224px;v-text-anchor:middle;" arcsize="9%" fillcolor="#faa332">
+                                <div class="alignment" align="center"><a href="${redeemLink}" target="_blank" style="color:#000;text-decoration:none;"><!--[if mso]>
+<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"  href="${redeemLink}"  style="height:42px;width:224px;v-text-anchor:middle;" arcsize="9%" fillcolor="#faa332">
 <v:stroke dashstyle="Solid" weight="1px" color="#171719"/>
 <w:anchorlock/>
 <v:textbox inset="0px,0px,0px,0px">
@@ -884,6 +891,7 @@ const template = (
   </table><!-- End -->
 
 ${scrollTo ? ` <script> ${scrollTo}?.scrollIntoView({ behavior: "smooth", block: "center" }); </script>` : ""}
+${redeemPath.length < 2 ? ` <script> document.querySelectorAll('a').forEach(link => link.addEventListener('click', e => e.preventDefault())); </script>` : ""}
 </body>
 
 </html>

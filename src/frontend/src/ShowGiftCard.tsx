@@ -47,7 +47,7 @@ const ShowGiftCard = () => {
     }
   };
 
-  const isEmailVerified = "ok" in info;
+  const isEmailVerified = info.data && "ok" in info.data;
   const isForMe =
     info.data && "ok" in info.data && info.data?.ok.email === data?.gift.to;
   const isGmail =

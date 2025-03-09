@@ -11,6 +11,7 @@ import { confirmDialog } from "./CopyButton";
 import { GiftCard } from "./GiftCard";
 import EmailTemplate, { ScrollTarget } from "./email/EmailTemplate";
 import { ThemeKey } from "./cardThemes";
+import { Button } from "./components/ui/button";
 
 function Create() {
   const queryClient = useQueryClient();
@@ -202,7 +203,7 @@ function Create() {
         </div>
         <label htmlFor="message">Enter a message: &nbsp;</label>
         <textarea id="message" rows={5} onChange={handleChange} />
-        <button
+        <Button
           type="submit"
           disabled={createGiftCardMutation.isPending}
           className={
@@ -214,7 +215,7 @@ function Create() {
           {createGiftCardMutation.isPending
             ? "Creating..."
             : "Create Gift Card!"}
-        </button>
+        </Button>
       </form>
       <div className="w-full flex flex-col">
         <h3 className="w-full">Preview</h3>
@@ -238,6 +239,7 @@ function Create() {
             senderName={formData.sender}
             customMessage={formData.message}
             theme={formData.design as ThemeKey}
+            redeemPath="#"
             scrollTo={scroll}
           />
         </div>

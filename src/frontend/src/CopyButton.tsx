@@ -3,6 +3,7 @@ import { Gift } from "../../declarations/backend/backend.did";
 import { getTheme, ThemeKey } from "./cardThemes";
 import toast, { Toast } from "react-hot-toast";
 import { shortenErr } from "./utils";
+import { Button } from "./components/ui/button";
 
 interface CopyButtonProps {
   textToCopy: string;
@@ -29,25 +30,19 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
     if (navigator.clipboard && navigator.clipboard.writeText) {
       try {
         await navigator.clipboard.writeText(textToCopy);
+        setIsCopied(true);
         console.log("Copied to clipboard:", textToCopy);
       } catch (error) {
         console.error("Failed to copy:", error);
       }
-    } else {
-      // Fallback method
-      const textArea = document.createElement("textarea");
-      textArea.value = textToCopy;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textArea);
     }
+    setTimeout(() => setIsCopied(false), 1500); // Reset after 1.5 seconds
   };
 
   return (
-    <button onClick={handleCopy} className="button-sm">
+    <Button onClick={handleCopy} variant="outline" size="sm" className="">
       {isCopied ? "Copied!" : label}
-    </button>
+    </Button>
   );
 };
 

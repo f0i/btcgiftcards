@@ -11,7 +11,7 @@ function Debug() {
     queries.giftcards(queryClient, backendActor, principal),
   );
   return (
-    <div className="text-gray-200 text-pre">{stringify(data ?? error)}</div>
+    <div className="text-red-800 text-pre">{stringify(data ?? error)}</div>
   );
 }
 
