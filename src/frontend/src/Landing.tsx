@@ -248,7 +248,7 @@ export const ImageTextCTA = ({
   title: string;
   text: string;
   cta: string;
-  to: string;
+  to?: string;
   img: string;
   imageRight: boolean;
   className?: string;
@@ -276,7 +276,7 @@ export const ImageTextCTA = ({
           <Button
             variant="cta"
             size="lg"
-            onClick={() => login(false).then(() => navigate(to))}
+            onClick={() => login(false).then(() => (to ? navigate(to) : null))}
             className="w-full lg:w-2/3 max-w-md m-auto lg:m-0"
           >
             {cta}

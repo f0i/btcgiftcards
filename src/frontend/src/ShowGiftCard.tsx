@@ -65,7 +65,7 @@ const ShowGiftCard = () => {
       e.preventDefault();
     } catch (e) {}
     await logout();
-    await login();
+    await login(true);
   };
 
   return (
@@ -137,7 +137,7 @@ const ShowGiftCard = () => {
               <br />
               <br />
               <Button
-                onClick={login}
+                onClick={() => login(true)}
                 className="mx-auto bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition duration-200 mb-4"
               >
                 Sign In with Google

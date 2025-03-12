@@ -65,7 +65,7 @@ const TopNav = ({ tab }: { tab: Tab }) => {
             Sign out
           </Link>
         ) : (
-          <Link to="/" onClick={login} className="button">
+          <Link to="/" onClick={() => login(false)} className="button">
             Sign in
           </Link>
         )}

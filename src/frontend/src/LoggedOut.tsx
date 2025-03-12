@@ -4,7 +4,6 @@ import Footer from "./Footer";
 import { ImageTextCTA } from "./Landing";
 
 function LoggedOut() {
-  const { isAuthenticated } = useAuth();
   return (
     <>
       <TopNav tab="new" />
