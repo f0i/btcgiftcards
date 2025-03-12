@@ -47,7 +47,7 @@ export const defaultOptions = {
 
 type AuthProps = {
   isAuthenticated: boolean;
-  login: () => Promise<void>;
+  login: (force: boolean) => Promise<unknown>;
   logout: () => Promise<void>;
   authClient?: AuthClient;
   identity?: Identity;
@@ -83,16 +83,23 @@ export const useAuthClient = (options = defaultOptions): AuthProps => {
     });
   }, []);
 
-  const login = () => {
+  const login = (force: boolean): Promise<unknown> => {
     if (!authClient) {
       console.error("authClient not set");
       return Promise.reject("authClient not set");
     }
-    return authClient.login({
-      ...options.loginOptions,
-      onSuccess: () => {
-        updateClient(authClient);
-      },
+    if (!force && isAuthenticated) {
+      return Promise.resolve();
+    }
+    return new Promise((res, rej) => {
+      authClient.login({
+        ...options.loginOptions,
+        onSuccess: () => {
+          updateClient(authClient);
+          res(authClient);
+        },
+        onError: rej,
+      });
     });
   };
 

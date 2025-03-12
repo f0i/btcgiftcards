@@ -1,7 +1,7 @@
 import { useAuth } from "./use-auth-client";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { formatCurrency, shortenErr } from "./utils";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
 import { ThemeSelect } from "./ThemeSelect";
 import { useState } from "react";
@@ -9,7 +9,7 @@ import { queries, mutations } from "./queryKeys";
 import toast from "react-hot-toast";
 import { confirmDialog } from "./CopyButton";
 import EmailTemplate, { ScrollTarget } from "./email/EmailTemplate";
-import { ThemeKey } from "./cardThemes";
+import { getTheme, ThemeKey } from "./cardThemes";
 import { Button } from "./components/ui/button";
 
 function Create() {
@@ -20,6 +20,9 @@ function Create() {
   const { data } = useQuery(
     queries.giftcards(queryClient, backendActor, principal),
   );
+
+  const hash = useLocation().hash.substring(1);
+  const initTheme = getTheme(hash).name;
 
   const createGiftCardMutation = useMutation({
     ...mutations.createGiftCard(backendActor!),
@@ -40,7 +43,7 @@ function Create() {
     amount: 1000n,
     customAmount: 100n,
     to: "",
-    design: "",
+    design: initTheme ?? "",
     sender: "",
     created: BigInt(Number(new Date())) * 1000000n,
     creator: principal!,
@@ -134,7 +137,7 @@ function Create() {
     <div className="content w-max-center mb-4 grid grid-cols-1 lg:grid-cols-[60%_40%] gap-8 grow">
       <form action="#" onSubmit={handleSubmit} className="w-full">
         <h3 className="w-full">New Gift Card</h3>
-        <ThemeSelect id="design" onChange={handleChange} />
+        <ThemeSelect id="design" onChange={handleChange} initial={initTheme} />
         <label htmlFor="sender">Enter your name: &nbsp;</label>
         <input id="sender" alt="Name" type="text" onChange={handleChange} />
         <label

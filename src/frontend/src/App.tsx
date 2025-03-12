@@ -44,12 +44,6 @@ function App() {
               isAuthenticated ? <LoggedIn tab="account" /> : <LoggedOut />
             }
           />
-          <Route
-            path="/withdraw"
-            element={
-              isAuthenticated ? <LoggedIn tab="withdraw" /> : <LoggedOut />
-            }
-          />
           <Route path="/show/:giftId" element={<ShowGiftCard />} />
           <Route path="/send/:giftId" element={<ShowGiftCard />} />
           <Route path="/colors" element={<ColorTest />} />

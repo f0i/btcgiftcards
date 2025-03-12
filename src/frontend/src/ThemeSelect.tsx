@@ -32,11 +32,14 @@ export const ThemeButton = ({
 export const ThemeSelect = ({
   id,
   onChange,
+  initial,
 }: {
   id: string;
   onChange?: (e: any) => void;
+  initial?: ThemeKey;
 }) => {
-  const [active, setActive] = useState<ThemeKey>(getTheme("").name);
+  const [active, setActive] = useState<ThemeKey>(getTheme(initial ?? "").name);
+  console.log("ThemeSelect", initial);
   const setActiveChange = (theme: ThemeKey) => {
     setActive(theme);
     if (onChange) {

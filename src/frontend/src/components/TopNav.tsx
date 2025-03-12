@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import Logo from "./Logo";
 import { useAuth } from "../use-auth-client";
-import { BsCaretDown } from "react-icons/bs";
 
 export type Tab =
   | "created"

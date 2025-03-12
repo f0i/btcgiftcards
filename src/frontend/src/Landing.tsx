@@ -38,7 +38,7 @@ function Landing() {
             your first gift card.
             <br />
             <Button
-              onClick={login}
+              onClick={() => login(false).then(() => navigate("/create"))}
               size="lg"
               variant="cta"
               className="w-64 mt-8 lg:mt-16"
@@ -56,7 +56,7 @@ function Landing() {
             <br />
             Redeem it here!
             <Button
-              onClick={login}
+              onClick={() => login(false).then(() => navigate("/received"))}
               size="lg"
               variant="cta"
               className="w-64 mt-8 lg:mt-16"
@@ -172,6 +172,7 @@ function Landing() {
         text="Celebrate Easter with a gift that lasts! Send a personalized Bitcoin Gift Card with festive designs and a heartfelt message—perfect for friends and family."
         img="/visuals/easter-paper-orange-green.jpeg"
         cta="Create an Easter Gift Card"
+        to="/create#easter"
         imageRight={false}
       />
 
@@ -180,6 +181,7 @@ function Landing() {
         text="Celebrate love with a gift that lasts forever! Send a BTC Gift Card as a meaningful and timeless wedding present."
         img="/visuals/wedding-paper-orange-green.jpeg"
         cta="Create a Wedding Gift Card"
+        to="/create#wedding"
         imageRight={true}
         className="bg-gray-100"
       />
@@ -189,6 +191,7 @@ function Landing() {
         text="Show your love and appreciation with a heartfelt Bitcoin Gift Card. Add a personal message and make it a meaningful gift for someone special."
         img="/visuals/valentine-paper-orange.jpeg"
         cta="Create a Special Gift"
+        to="/create#valentine"
         imageRight={false}
       />
 
@@ -220,7 +223,7 @@ function Landing() {
           <Button
             variant="cta"
             size="lg"
-            onClick={login}
+            onClick={() => login(false).then(() => navigate("/create"))}
             className="w-full lg:w-2/3 max-w-md m-auto lg:m-0"
           >
             Create Your Gift Card
@@ -237,6 +240,7 @@ export const ImageTextCTA = ({
   title,
   text,
   cta,
+  to,
   img,
   imageRight,
   className,
@@ -244,11 +248,13 @@ export const ImageTextCTA = ({
   title: string;
   text: string;
   cta: string;
+  to: string;
   img: string;
   imageRight: boolean;
   className?: string;
 }) => {
-  const { login, isAuthenticated } = useAuth();
+  const { login } = useAuth();
+
   const navigate = useNavigate();
 
   return (
@@ -270,7 +276,7 @@ export const ImageTextCTA = ({
           <Button
             variant="cta"
             size="lg"
-            onClick={isAuthenticated ? () => navigate("/account") : login}
+            onClick={() => login(false).then(() => navigate(to))}
             className="w-full lg:w-2/3 max-w-md m-auto lg:m-0"
           >
             {cta}
