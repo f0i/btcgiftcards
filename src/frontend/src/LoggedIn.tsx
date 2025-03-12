@@ -12,9 +12,7 @@ import { BsLock, BsUnlock } from "react-icons/bs";
 import { isRefundable, isRevoked, statusText } from "./gift";
 import Account from "./Account";
 import Create from "./Create";
-import Withdraw from "./Withdraw";
 import { PageLoading } from "./PageLoading";
-import Learn from "./Learn";
 
 function LoggedIn({ tab }: { tab: Tab }) {
   const queryClient = useQueryClient();
@@ -77,7 +75,6 @@ function LoggedIn({ tab }: { tab: Tab }) {
           </div>
         )}
         {tab !== "account" ? null : <Account />}
-        {tab !== "withdraw" ? null : <Withdraw />}
       </div>
       <TinyFooter />
     </>

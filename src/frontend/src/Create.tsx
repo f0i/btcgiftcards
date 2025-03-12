@@ -1,14 +1,13 @@
 import { useAuth } from "./use-auth-client";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { formatCurrency, shortenErr } from "./utils";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
 import { ThemeSelect } from "./ThemeSelect";
 import { useState } from "react";
 import { queries, mutations } from "./queryKeys";
 import toast from "react-hot-toast";
 import { confirmDialog } from "./CopyButton";
-import { GiftCard } from "./GiftCard";
 import EmailTemplate, { ScrollTarget } from "./email/EmailTemplate";
 import { ThemeKey } from "./cardThemes";
 import { Button } from "./components/ui/button";
@@ -132,7 +131,7 @@ function Create() {
   };
 
   return (
-    <div className="content w-max-center mb-4 grid grid-cols-1 lg:grid-cols-[60%_40%] gap-8">
+    <div className="content w-max-center mb-4 grid grid-cols-1 lg:grid-cols-[60%_40%] gap-8 grow">
       <form action="#" onSubmit={handleSubmit} className="w-full">
         <h3 className="w-full">New Gift Card</h3>
         <ThemeSelect id="design" onChange={handleChange} />
@@ -217,7 +216,7 @@ function Create() {
             : "Create Gift Card!"}
         </Button>
       </form>
-      <div className="w-full flex flex-col">
+      <div className="w-full flex flex-col hidden lg:flex grow">
         <h3 className="w-full">Preview</h3>
 
         <div className="border border-4 border-gray-200 bg-gray-200 text-right text-gray-400 pr-2 w-full">

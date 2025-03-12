@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { shortenErr } from "./utils";
 import TopNav from "./components/TopNav";
 import { TinyFooter } from "./Footer";
+import { Button } from "./components/ui/button";
 
 const ShowGiftCard = () => {
   const { giftId } = useParams();
@@ -102,54 +103,32 @@ const ShowGiftCard = () => {
             for instructions.
           </div>
         )}
-        <div>
+        <div className="text-center">
           {isAuthenticated ? (
             isEmailVerified ? (
-              isForMe ? (
-                <div>
-                  "The amount has been added to your account. 🎉"
-                  <br />
-                  <br />
-                  <Link
-                    to="/account"
-                    className="w-full button-green block text-center"
-                  >
-                    Go to Your Accout
-                  </Link>
-                </div>
-              ) : (
+              isForMe ? null : (
                 <div>
                   The gift card is assigned to another email address.
                   <br />
                   <br />
-                  <button
+                  <Button
                     onClick={changeAccount}
-                    className="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition duration-200 mb-4"
+                    className="mx-auto bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition duration-200 mb-4"
                   >
                     Change Account
-                  </button>
+                  </Button>
                 </div>
               )
             ) : (
               <div>
-                Your email address has not been verified
+                Your email address could not be verified
                 <br />
-                <br />
-                <form
-                  action="#"
-                  onSubmit={formVerifyEmail}
-                  className="flex flex-row gap-4"
+                <Button
+                  onClick={changeAccount}
+                  className="mx-auto bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition duration-200 mb-4"
                 >
-                  <button type="submit" className="w-2/3">
-                    Verify Email Address
-                  </button>
-                  <button
-                    onClick={changeAccount}
-                    className="w-1/3 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition duration-200"
-                  >
-                    Change Account
-                  </button>
-                </form>
+                  Change Account
+                </Button>
               </div>
             )
           ) : (
@@ -157,12 +136,12 @@ const ShowGiftCard = () => {
               Sign in to redeem.
               <br />
               <br />
-              <button
+              <Button
                 onClick={login}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition duration-200 mb-4"
+                className="mx-auto bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition duration-200 mb-4"
               >
                 Sign In with Google
-              </button>
+              </Button>
             </div>
           )}
         </div>

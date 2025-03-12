@@ -12,6 +12,7 @@ interface EmailTemplateProps {
   theme: ThemeKey;
   redeemPath: string;
   scrollTo?: ScrollTarget;
+  onChange?: (html: string) => void;
 }
 
 const EmailTemplate: React.FC<EmailTemplateProps> = ({
@@ -23,6 +24,7 @@ const EmailTemplate: React.FC<EmailTemplateProps> = ({
   theme,
   redeemPath,
   scrollTo,
+  onChange,
 }) => {
   const messageDivRef = useRef<HTMLDivElement>(null);
   const senderDivRef = useRef<HTMLDivElement>(null);
@@ -54,6 +56,7 @@ const EmailTemplate: React.FC<EmailTemplateProps> = ({
     );
 
     setEmailHtml(updatedHtml);
+    if (onChange) onChange(updatedHtml);
   }, [
     recipientName,
     senderName,
@@ -117,8 +120,8 @@ const template = (
   redeemPath: string,
   scrollTo?: string,
 ) => {
-  const baseUrl = "";
-  //const baseUrl = "https://btc-gift-cards.com";
+  //const baseUrl = "";
+  const baseUrl = "https://btc-gift-cards.com";
 
   const redeemLink = redeemPath.length > 2 ? baseUrl + redeemPath : "#";
 
@@ -566,7 +569,7 @@ const template = (
                               <td class="pad" style="vertical-align: middle; color: #000000; font-family: inherit; font-size: 14px; text-align: center;">
                                 <table class="icons-outer" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; display: inline-table;">
                                   <tr>
-                                    <td style="vertical-align: middle; text-align: center; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px;"><img class="icon" src="${baseUrl}/email/bitcoin.svg" height="auto" width="64" align="center" style="display: block; height: auto; margin: 0 auto; border: 0;"></td>
+                                    <td style="vertical-align: middle; text-align: center; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px;"><img class="icon" src="${baseUrl}/email/bitcoin.png" height="auto" width="64" align="center" style="display: block; height: auto; margin: 0 auto; border: 0;"></td>
                                   </tr>
                                 </table>
                               </td>
@@ -586,7 +589,7 @@ const template = (
                               <td class="pad" style="vertical-align: middle; color: #000000; font-family: inherit; font-size: 14px; text-align: center;">
                                 <table class="icons-outer" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; display: inline-table;">
                                   <tr>
-                                    <td style="vertical-align: middle; text-align: center; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px;"><img class="icon" src="${baseUrl}/email/ckbtc.svg" height="auto" width="64" align="center" style="display: block; height: auto; margin: 0 auto; border: 0;"></td>
+                                    <td style="vertical-align: middle; text-align: center; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px;"><img class="icon" src="${baseUrl}/email/ckbtc.png" height="auto" width="64" align="center" style="display: block; height: auto; margin: 0 auto; border: 0;"></td>
                                   </tr>
                                 </table>
                               </td>
@@ -606,7 +609,7 @@ const template = (
                               <td class="pad" style="vertical-align: middle; color: #000000; font-family: inherit; font-size: 14px; text-align: center;">
                                 <table class="icons-outer" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; display: inline-table;">
                                   <tr>
-                                    <td style="vertical-align: middle; text-align: center; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px;"><img class="icon" src="${baseUrl}/email/icp.svg" height="auto" width="128" align="center" style="display: block; height: auto; margin: 0 auto; border: 0;"></td>
+                                    <td style="vertical-align: middle; text-align: center; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px;"><img class="icon" src="${baseUrl}/email/icp.png" height="auto" width="128" align="center" style="display: block; height: auto; margin: 0 auto; border: 0;"></td>
                                   </tr>
                                 </table>
                               </td>

@@ -7,6 +7,9 @@ import { confirmDialog, CopyFormattedContent } from "./CopyButton";
 import toast from "react-hot-toast";
 import { Principal } from "@dfinity/principal";
 import EmailTemplate from "./email/EmailTemplate";
+import { Button } from "./components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { isRevoked, statusText } from "./gift";
 
 export const GiftCard = ({
   gift,
@@ -25,6 +28,7 @@ export const GiftCard = ({
 }) => {
   let { backendActor } = useAuth();
   let queryClient = useQueryClient();
+  let navigate = useNavigate();
 
   const refund = async () => {
     try {
@@ -33,6 +37,7 @@ export const GiftCard = ({
         sub: "The balance will be transfered back to your main account. Transaction fees will be deducted.",
       });
 
+      // refund amount will be validated in the backend. Passed in to ensure it is as expected, otherwise refund will fail.
       let res = await backendActor!.refund(gift.id, gift.amount - 10n);
       if ("ok" in res) {
         toast.success("Refund successful");
@@ -88,7 +93,7 @@ export const GiftCard = ({
 
   return (
     <>
-      <EmailTemplate
+      {/*<EmailTemplate
         recipientName={gift.to}
         amount={formatCurrency(gift.amount, 10000000, 0)}
         value={formatCurrency(gift.amount, 1000, 2)}
@@ -96,78 +101,89 @@ export const GiftCard = ({
         customMessage={gift.message}
         theme={gift.design as ThemeKey}
         redeemPath={"/show/" + gift.id}
-      />
+      />*/}
       <div
         className={
-          "border border-2 p-4 flex flex-col bg-white rounded-lg " +
+          "border border-2 flex flex-col bg-white rounded-lg " +
           (className ?? "")
         }
       >
         <div className="relative text-gray-500 text-base">
-          <div className="card-date">{formatDateFromNano(gift.created)}</div>
-          <div>To: {gift.to}</div>
+          <div className="card-date absolute w-full text-right p-2">
+            {formatDateFromNano(gift.created)}
+          </div>
         </div>
-        <img
-          className="w-full max-w-full object-cover rounded-lg max-h-[25em] aspect-video"
-          src={theme.cover}
-        />
-        <br />
-        <div>You received a gift from {gift.sender}</div>
-        <br />
-        <div className={revoked ? "line-through" : ""}>
-          Value: <strong>{gift.amount.toString()} ckSat</strong> (={" "}
-          {Number(gift.amount) / 100000000.0} Bitcoin)
+        <div className="p-4 bg-stone-200">
+          <div className="text-[3em] font-cormorant text-center w-full">
+            Bitcoin Gift&nbsp;Card
+          </div>
+          <img
+            className="w-full max-w-full object-cover rounded-lg max-h-[25em] aspect-video"
+            src={theme.cover}
+          />
         </div>
-        <br />
-        Visit the following link to redeem it:
-        <br />
-        {isPreview ? (
-          <span className="link text-blue-900">
-            {document.location.origin}/show/xxxxxxxxxxxxxxxx
-          </span>
-        ) : (
-          <a
-            href={"/show/" + gift.id}
-            target="_blank"
-            className="link text-blue-900"
-          >
-            {document.location.origin}/show/{gift.id}
-          </a>
-        )}
-        <br />
-        <br />
-        <strong>Message from {gift.sender}:</strong>
-        <div className="text-pre grow">{gift.message}</div>
+        <div className="w-full text-center">
+          <div className="pt-16">{gift.sender} send you</div>
+          <br />
+          <div className={revoked ? "line-through" : ""}>
+            <div className="font-cormorant text-4xl">
+              {formatCurrency(gift.amount, 100000000.0, 0)} Bitcoin
+            </div>
+            <br />
+            Valued at about ${formatCurrency(gift.amount, 1000.0, 2)}
+          </div>
+        </div>
+        <div className="text-center grow py-8 font-bold">
+          {gift.message.split("\n").map((line, index) => (
+            <p style={{ margin: 0 }} key={index}>
+              {line.length > 0 ? line : <>&nbsp;</>}
+            </p>
+          ))}
+        </div>
+        <div className="text-center grow py-4">
+          This Gift card is linked to {gift.to}
+          <br />
+          <br />
+          {isPreview ? (
+            <Button>CLAIM YOUR BITCOIN</Button>
+          ) : isRevoked(gift, sendStatus) ? (
+            <Button className="line-through">CLAIM YOUR BITCOIN</Button>
+          ) : (
+            <Button onClick={() => navigate("/show/" + gift.id)}>
+              CLAIM YOUR BITCOIN
+            </Button>
+          )}
+        </div>
         {revoked ? (
           <div className="warning w-full">
             ⚠️ <strong>Warning:</strong> This Card has been revoked.
           </div>
         ) : null}
-        <div className="w-full flex felx-row space-x-2 justify-end mt-8">
+        <div className="w-full flex felx-row space-x-2 justify-end mt-8 p-4">
           {showRefund ? (
-            <button onClick={refund} className="button w-32">
+            <Button variant="destructive" onClick={refund}>
               Refund
-            </button>
+            </Button>
           ) : null}
           {canCancel ? (
-            <button
+            <Button
               onClick={() => {
                 requestSend(false);
               }}
-              className="button"
+              variant="outline"
             >
               Cancel Send Request
-            </button>
+            </Button>
           ) : null}
           {canRequestSend ? (
-            <button
+            <Button
               onClick={() => {
                 requestSend(true);
               }}
-              className="button"
+              variant="outline"
             >
               Request Send by Email
-            </button>
+            </Button>
           ) : null}
           {revoked ? null : (
             <CopyFormattedContent gift={gift} isPreview={isPreview} />

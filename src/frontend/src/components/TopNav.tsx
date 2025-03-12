@@ -34,12 +34,6 @@ const TopNav = ({ tab }: { tab: Tab }) => {
           Account
         </Link>
         <Link
-          to="/withdraw"
-          className={tab === "withdraw" ? "active" : "inactive"}
-        >
-          Withdraw
-        </Link>
-        <Link
           to="/create"
           className={
             "hidden sm:block " + (tab === "new" ? "active" : "inactive")

@@ -2,8 +2,10 @@ import React, { useRef, useState } from "react";
 import { Gift } from "../../declarations/backend/backend.did";
 import { getTheme, ThemeKey } from "./cardThemes";
 import toast, { Toast } from "react-hot-toast";
-import { shortenErr } from "./utils";
+import { formatCurrency, shortenErr } from "./utils";
 import { Button } from "./components/ui/button";
+import EmailTemplate from "./email/EmailTemplate";
+import { Copy } from "lucide-react";
 
 interface CopyButtonProps {
   textToCopy: string;
@@ -15,16 +17,6 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
   label = "Copy",
 }) => {
   const [isCopied, setIsCopied] = useState(false);
-
-  const oldHandleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(textToCopy);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 1500); // Reset after 1.5 seconds
-    } catch (err) {
-      console.error("Failed to copy text:", err);
-    }
-  };
 
   const handleCopy = async () => {
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -41,7 +33,13 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
 
   return (
     <Button onClick={handleCopy} variant="outline" size="sm" className="">
-      {isCopied ? "Copied!" : label}
+      {isCopied ? (
+        "Copied!"
+      ) : label === "copy" ? (
+        <Copy className="h-4 w-4" />
+      ) : (
+        label
+      )}
     </Button>
   );
 };
@@ -53,13 +51,15 @@ export const CopyFormattedContent = ({
   gift: Gift;
   isPreview?: boolean;
 }) => {
+  const [emailHtml, setEmailHtml] = useState("");
+
   const handleCopy = async () => {
     if (isPreview) {
       toast.error("Link to redeem is not available in preview.");
       return;
     }
     try {
-      const htmlContent = hiddenDivRef.current?.innerHTML;
+      const htmlContent = emailHtml;
       const textContent = hiddenDivRef.current?.innerText;
 
       if (!htmlContent || !textContent) {
@@ -82,44 +82,25 @@ export const CopyFormattedContent = ({
   };
 
   const hiddenDivRef = useRef<HTMLDivElement>(null);
-  const theme = getTheme(gift?.design || "");
-  const imageUrl = "https://btc-gift-cards.com" + theme.cover;
-  const linkUrl = "https://btc-gift-cards.com/show/" + gift?.id;
 
   return (
     <div>
-      <button
-        onClick={handleCopy}
-        className={isPreview ? "button-disabled" : "button-green"}
-      >
+      <Button onClick={handleCopy} variant={isPreview ? "ghost" : "outline"}>
         Copy gift card
-      </button>
+      </Button>
       {gift ? (
         // hidden div to generate html content for copy button
         <div ref={hiddenDivRef} style={{ display: "none" }} className="border">
-          You received a gift from {gift.sender}:
-          <p>
-            <img src={imageUrl} alt="Card" style={{ maxWidth: "500px" }} />
-          </p>
-          <p>
-            Value: <strong>{gift.amount.toString()} ckSat</strong> (={" "}
-            {Number(gift.amount) / 100000000.0} Bitcoin)
-          </p>
-          <br />
-          <p>
-            Visit the following link to redeem it:
-            <br />
-            <a href={linkUrl} target="_blank" rel="noopener noreferrer">
-              {linkUrl}
-            </a>
-          </p>
-          <br />
-          <p>
-            <strong>Message from {gift.sender}:</strong>
-          </p>
-          {gift.message.split("\n").map((line, index) => (
-            <p key={index}>{line}</p>
-          ))}
+          <EmailTemplate
+            recipientName={gift.to}
+            amount={formatCurrency(gift.amount, 10000000, 0)}
+            value={formatCurrency(gift.amount, 1000, 2)}
+            senderName={gift.sender}
+            customMessage={gift.message}
+            theme={gift.design as ThemeKey}
+            redeemPath={"/show/" + gift.id}
+            onChange={setEmailHtml}
+          />
         </div>
       ) : null}
     </div>

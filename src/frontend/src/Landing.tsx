@@ -1,13 +1,6 @@
-import React from "react";
 import { useAuth } from "./use-auth-client";
-import Logo from "./components/Logo";
 import TopNav from "./components/TopNav";
-import {
-  BsArrowDownCircle,
-  BsDiscord,
-  BsQuote,
-  BsTwitterX,
-} from "react-icons/bs";
+import { BsArrowDownCircle, BsQuote } from "react-icons/bs";
 import Footer from "./Footer";
 import { useNavigate } from "react-router-dom";
 import { Button } from "./components/ui/button";
@@ -18,7 +11,7 @@ function Landing() {
   const navigate = useNavigate();
 
   if (isAuthenticated) {
-    navigate("/account");
+    navigate("/create");
   }
 
   return (
@@ -164,12 +157,21 @@ function Landing() {
       <div className="w-max-center text-xl py-8 text-center">
         <h2 className="text-center w-full pt-4">Upcoming occations</h2>
       </div>
-
+      {/*
       <ImageTextCTA
         title="New Year Bitcoin Gift Card"
         text="Start the New Year with a unique and valuable gift! Send a personalized BTC Gift Card with festive designs and a custom message."
         img="/visuals/fireworks-paper-orange-green.jpeg"
         cta="Create a New Year Gift Card"
+        imageRight={false}
+      />
+      */}
+
+      <ImageTextCTA
+        title="Easter Bitcoin Gift Card"
+        text="Celebrate Easter with a gift that lasts! Send a personalized Bitcoin Gift Card with festive designs and a heartfelt message—perfect for friends and family."
+        img="/visuals/easter-paper-orange-green.jpeg"
+        cta="Create an Easter Gift Card"
         imageRight={false}
       />
 

@@ -29,7 +29,9 @@ export const statusText = (
   gift: Gift,
   sendStatus: SendStatusEntry[],
 ): string => {
-  return statusKey(gift, sendStatus);
+  const s = statusKey(gift, sendStatus);
+  if (s === "init") return "created";
+  return s;
 };
 
 export const isRevoked = (

@@ -59,8 +59,8 @@ actor class Main() = this {
   stable var emailQueue : Map<Text, SendStatus> = Map.new();
   emailQueue := Map.new(); // TODO: remove after next deployment
 
-  let testUser = Principal.fromText("3ozfr-64z5x-ibat6-k3e3u-afjmp-7yutb-xw2xb-olugq-ztyd3-qbxrc-4ae");
-  Map.set(verified, phash, testUser, "asdf@localhost");
+  let testUser = Principal.fromText("5jz2b-l4l3e-xmvdh-hk6v6-u6u3m-guhcy-zzjdt-3bane-x3diu-7jm7e-vqe");
+  Map.set(verified, phash, testUser, "asdf@localhost.local");
 
   public shared ({ caller }) func createGiftCard(email : Text, amount : Nat, fee : Nat, sender : Text, message : Text, design : Text) : async Result<Gift> {
     let ?senderEmail = Map.get(verified, phash, caller) else return #err("Email address not verified");
