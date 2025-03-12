@@ -50,6 +50,8 @@ function App() {
           <Route path="/signin" element={<LoggedOut />} />
           <Route path="/learn" element={<Learn />} />
           <Route path="/learn/:topic" element={<Learn />} />
+          <Route path="/about" element={<Learn />} />
+          <Route path="/faq" element={<Learn />} />
           <Route path="/debug" element={<Debug />} />
         </Routes>
       </Router>
