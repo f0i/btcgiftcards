@@ -47,9 +47,15 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
 export const CopyFormattedContent = ({
   gift,
   isPreview,
+  variant,
+  size,
+  label,
 }: {
   gift: Gift;
   isPreview?: boolean;
+  variant?: "default" | "outline";
+  size?: "default" | "sm" | "lg";
+  label?: string;
 }) => {
   const [emailHtml, setEmailHtml] = useState("");
 
@@ -85,8 +91,12 @@ export const CopyFormattedContent = ({
 
   return (
     <div>
-      <Button onClick={handleCopy} variant={isPreview ? "ghost" : "outline"}>
-        Copy gift card
+      <Button
+        onClick={handleCopy}
+        variant={variant ? variant : isPreview ? "ghost" : "outline"}
+        size={size}
+      >
+        {label ? label : "Copy gift card"}
       </Button>
       {gift ? (
         // hidden div to generate html content for copy button

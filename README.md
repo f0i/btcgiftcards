@@ -73,6 +73,10 @@ To get some funds for testing, call the transfer function on the ledger and spec
 dfx canister call ckbtc_ledger icrc1_transfer
 ```
 
+## Architecture
+
+![C4 Diagrams](./architecture.drawio.png)
+
 ## Roadmap
 
 The following outlines the next features that are considered for implementation.

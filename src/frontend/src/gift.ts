@@ -1,3 +1,4 @@
+import { Principal } from "@dfinity/principal";
 import {
   Gift,
   SendStatus,
@@ -38,17 +39,84 @@ export const isRevoked = (
   gift: Gift,
   sendStatus: SendStatusEntry[],
 ): boolean => {
-  let s: SendStatusKey = statusKey(gift, sendStatus);
-
-  const key = Object.keys(s)[0] as keyof SendStatus;
+  let key: SendStatusKey = statusKey(gift, sendStatus);
+  console.log("isRevoked", key, gift, sendStatus);
 
   switch (key) {
     case "revoked":
     case "revoking":
       return true;
     case "init":
-    case "send":
     case "sendCanceled":
+    case "sendRequested":
+    case "send":
+    case "claimed":
+      return false;
+  }
+
+  return false;
+};
+
+export const isClaimed = (
+  gift: Gift,
+  sendStatus: SendStatusEntry[],
+): boolean => {
+  let key: SendStatusKey = statusKey(gift, sendStatus);
+
+  switch (key) {
+    case "revoked":
+    case "revoking":
+    case "init":
+    case "sendCanceled":
+    case "sendRequested":
+    case "send":
+      return false;
+    case "claimed":
+      return true;
+  }
+
+  return false;
+};
+
+export const canRequestSend = (
+  principal: Principal,
+  gift: Gift,
+  sendStatus: SendStatusEntry[],
+): boolean => {
+  if (principal.toString() !== gift.creator.toString()) return false;
+  let key: SendStatusKey = statusKey(gift, sendStatus);
+
+  switch (key) {
+    case "init":
+    case "sendCanceled":
+      return true;
+    case "revoked":
+    case "revoking":
+    case "sendRequested":
+    case "send":
+    case "claimed":
+      return false;
+  }
+
+  return false;
+};
+
+export const canCancelSend = (
+  principal: Principal,
+  gift: Gift,
+  sendStatus: SendStatusEntry[],
+): boolean => {
+  if (principal.toString() !== gift.creator.toString()) return false;
+  let key: SendStatusKey = statusKey(gift, sendStatus);
+
+  switch (key) {
+    case "sendRequested":
+      return true;
+    case "revoked":
+    case "revoking":
+    case "init":
+    case "sendCanceled":
+    case "send":
     case "claimed":
       return false;
   }

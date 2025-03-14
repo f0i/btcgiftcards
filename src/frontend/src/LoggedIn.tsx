@@ -1,7 +1,7 @@
 import { useAuth } from "./use-auth-client";
 import { Gift, SendStatusEntry } from "../../declarations/backend/backend.did";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { formatDateTimeFromNano } from "./utils";
+import { formatDateTimeFromNano, shortenErr } from "./utils";
 import { GiftCard } from "./GiftCard";
 import { queries } from "./queryKeys";
 import { Principal } from "@dfinity/principal";
@@ -13,6 +13,10 @@ import { isRefundable, isRevoked, statusText } from "./gift";
 import Account from "./Account";
 import Create from "./Create";
 import { PageLoading } from "./PageLoading";
+import { confirmDialog, CopyButton } from "./CopyButton";
+import toast from "react-hot-toast";
+import { CopyFormattedContent } from "./CopyButton";
+import { Button } from "./components/ui/button";
 
 function LoggedIn({ tab }: { tab: Tab }) {
   const queryClient = useQueryClient();
@@ -22,6 +26,26 @@ function LoggedIn({ tab }: { tab: Tab }) {
   const { data, isLoading, isError, error, failureCount } = useQuery(
     queries.giftcards(queryClient, backendActor, principal),
   );
+
+  const refund = async (gift: Gift) => {
+    try {
+      await confirmDialog({
+        msg: "Do you really want to refund this gift card?",
+        sub: "The balance will be transfered back to your main account. Transaction fees will be deducted.",
+      });
+
+      // refund amount will be validated in the backend. Passed in to ensure it is as expected, otherwise refund will fail.
+      let res = await backendActor!.refund(gift.id, gift.amount - 10n);
+      if ("ok" in res) {
+        toast.success("Refund successful");
+        queryClient.invalidateQueries();
+      } else {
+        throw res.err;
+      }
+    } catch (e: any) {
+      toast.error("Refund failed:\n" + shortenErr(e));
+    }
+  };
 
   return (
     <>
@@ -37,7 +61,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
                   gifts={data.ok.received}
                   refundable={[]}
                   empty="No gift cards received yet."
-                  sendStatus={[]}
+                  sendStatus={data.ok.sendStatus}
                   principal={principal!}
                 />
               ) : (
@@ -62,6 +86,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
                   empty="No gift cards created yet."
                   sendStatus={data.ok.sendStatus}
                   principal={principal!}
+                  onRefund={refund}
                 />
               ) : (
                 <PageLoading
@@ -87,12 +112,14 @@ function GiftcardTable({
   empty,
   sendStatus,
   principal,
+  onRefund,
 }: {
   gifts: Gift[];
   refundable: string[];
   empty: string;
   sendStatus: SendStatusEntry[];
   principal: Principal;
+  onRefund: (gift: Gift) => void;
 }) {
   if (gifts.length === 0) return <div className="warning mt-2">{empty}</div>;
 
@@ -120,6 +147,7 @@ function GiftcardTable({
               key={gift.data.id}
               refundable={refundable}
               sendStatus={sendStatus}
+              hideRevoked={true}
               principal={principal}
             />
           </div>
@@ -174,12 +202,20 @@ function GiftcardTable({
             name: "Actions",
             width: "200px",
             cell: (gift) => (
-              <>
+              <div className="flex flex-row gap-2">
                 {isRefundable(gift, refundable) ? (
-                  <button className="button-sm">Refund</button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onRefund(gift)}
+                  >
+                    Refund
+                  </Button>
                 ) : null}
-                <button className="button-sm">Copy</button>
-              </>
+                {isRevoked(gift, sendStatus) ? null : (
+                  <CopyFormattedContent gift={gift} size="sm" label="Copy" />
+                )}
+              </div>
             ),
           },
         ]}
@@ -205,7 +241,7 @@ function GiftcardList({
   if (gifts.length === 0) return <div className="warning mt-2">{empty}</div>;
 
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {gifts
         .map((gift) => (
           <GiftCard
@@ -214,6 +250,7 @@ function GiftcardList({
             key={gift.id}
             refundable={refundable}
             sendStatus={sendStatus}
+            hideRevoked={true}
             principal={principal}
           />
         ))

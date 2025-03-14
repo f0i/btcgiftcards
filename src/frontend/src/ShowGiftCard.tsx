@@ -85,6 +85,7 @@ const ShowGiftCard = () => {
             sendStatus={
               data ? [{ id: data.gift.id, status: data.sendStatus }] : []
             }
+            hideRevoked={false}
             principal={principal}
             className="max-w-2xl m-auto mt-8"
           />

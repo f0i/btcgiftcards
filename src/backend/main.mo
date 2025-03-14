@@ -51,7 +51,7 @@ actor class Main() = this {
   stable var verified : Map<Principal, Text> = Map.new();
   // Lookup table from gift ID to Gift
   stable var lookup : Map<Text, Gift> = Map.new();
-  // List of emails that signed in and can't be refunded with first time of email verification
+  // List of gift IDs that are claimed and can't be refunded
   stable var locked : Map<Text, Time> = Map.new();
   // List of gift IDs that have been revoked with time of revocation and completion status
   stable var revoked : Map<Text, (Time, Bool, Gift)> = Map.new();
@@ -382,6 +382,7 @@ actor class Main() = this {
           // set status to claimed
           case (_) {
             Map.set(emailQueue, thash, id, #claimed(now));
+            Map.set(locked, thash, id, now);
             count += 1;
           };
         };
@@ -398,6 +399,7 @@ actor class Main() = this {
         // set status to claimed
         case (_) {
           Map.set(emailQueue, thash, id, #claimed(now));
+          Map.set(locked, thash, id, now);
           return #ok("gift card claimed");
         };
       };

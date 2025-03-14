@@ -8,12 +8,20 @@ import toast from "react-hot-toast";
 import { Principal } from "@dfinity/principal";
 import { Button } from "./components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { isRevoked } from "./gift";
+import {
+  canCancelSend,
+  canRequestSend,
+  isClaimed,
+  isRevoked,
+  statusText,
+} from "./gift";
+import { Check } from "lucide-react";
 
 export const GiftCard = ({
   gift,
   refundable,
   sendStatus,
+  hideRevoked,
   principal,
   className,
   isPreview,
@@ -21,6 +29,7 @@ export const GiftCard = ({
   gift: Gift;
   refundable: string[];
   sendStatus: SendStatusEntry[];
+  hideRevoked: boolean;
   principal?: Principal;
   className?: string;
   isPreview?: boolean;
@@ -57,7 +66,7 @@ export const GiftCard = ({
             "The gift card will be manually reviewd and send to " +
             gift.to +
             "?",
-          sub: "This can take several hours or days! You can also copy the card and send it your self.",
+          sub: "This can take several hours! You can also copy the card and send it your self.",
         });
       }
 
@@ -73,22 +82,31 @@ export const GiftCard = ({
     }
   };
 
+  const claim = async () => {
+    try {
+      let res = await backendActor!.claim(gift.id);
+      if ("ok" in res) {
+        toast.success("Gift Card successfully claimed!");
+        queryClient.invalidateQueries();
+      } else {
+        throw res.err;
+      }
+    } catch (e: any) {
+      toast.error("Could not claim:\n" + shortenErr(e));
+    }
+  };
+
   const theme = getTheme(gift.design);
   const showRefund = refundable.indexOf(gift.id) >= 0;
   const status = sendStatus.find((stat) => stat.id === gift.id) ?? {
     id: gift.id,
     status: "unknown",
   };
-  const canRequestSend =
-    gift.creator.toString() === principal?.toString() &&
-    (status.status === "init" || status.status === "sendCancel");
-  const canCancel =
-    gift.creator.toString() === principal?.toString() &&
-    status?.status === "sendRequest";
-  const revoked =
-    status.status === "cardRevoked" || status.status === "cardRevoking";
+  const canRequest = principal && canRequestSend(principal, gift, sendStatus);
+  const canCancel = principal && canCancelSend(principal, gift, sendStatus);
+  const revoked = isRevoked(gift, sendStatus);
   console.log("status", status, canRequestSend);
-  if (revoked) return null;
+  if (revoked && hideRevoked) return null;
 
   return (
     <div
@@ -113,7 +131,7 @@ export const GiftCard = ({
       <div className="w-full text-center">
         <div className="pt-16">{gift.sender} send you</div>
         <br />
-        <div className={revoked ? "line-through" : ""}>
+        <div className={isRevoked(gift, sendStatus) ? "line-through" : ""}>
           <div className="font-cormorant text-4xl">
             {formatCurrency(gift.amount, 100000000.0, 0)} Bitcoin
           </div>
@@ -135,16 +153,20 @@ export const GiftCard = ({
         {isPreview ? (
           <Button>CLAIM YOUR BITCOIN</Button>
         ) : isRevoked(gift, sendStatus) ? (
-          <Button className="line-through">CLAIM YOUR BITCOIN</Button>
-        ) : (
-          <Button onClick={() => navigate("/show/" + gift.id)}>
-            CLAIM YOUR BITCOIN
+          <Button className="line-through" variant="outline">
+            Refunded to sender
           </Button>
+        ) : isClaimed(gift, sendStatus) ? (
+          <Button>
+            Claimed <Check />
+          </Button>
+        ) : (
+          <Button onClick={() => claim()}>CLAIM YOUR BITCOIN</Button>
         )}
       </div>
       {revoked ? (
-        <div className="warning w-full">
-          ⚠️ <strong>Warning:</strong> This Card has been revoked.
+        <div className="warning m-8">
+          ⚠️ <strong>Warning:</strong> This Bitcoin Gift Card has been revoked.
         </div>
       ) : null}
       <div className="w-full flex felx-row space-x-2 justify-end mt-8 p-4">
@@ -163,7 +185,7 @@ export const GiftCard = ({
             Cancel Send Request
           </Button>
         ) : null}
-        {canRequestSend ? (
+        {canRequest ? (
           <Button
             onClick={() => {
               requestSend(true);
