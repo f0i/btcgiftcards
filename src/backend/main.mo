@@ -19,12 +19,10 @@ import { phash; thash } "mo:map/Map";
 import Vec "mo:vector";
 import ICLogin "canister:iclogin";
 import Sha256 "mo:sha2/Sha256";
-import TwoWayMap "TwoWayMap";
 
 actor class Main() = this {
   type Result<T> = Result.Result<T, Text>;
   type Map<K, V> = Map.Map<K, V>;
-  type TwoWayMap<K, V> = TwoWayMap.TwoWayMap<K, V>;
   type Set<T> = Set.Set<T>;
   type Vec<V> = Vec.Vector<V>;
   type Time = Time.Time;
