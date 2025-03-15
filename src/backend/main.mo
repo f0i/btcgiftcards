@@ -227,10 +227,17 @@ actor class Main() = this {
   };
 
   private func isRefundable(gift : Gift) : Bool {
+    // to account locked
     switch (Map.get(locked, thash, gift.to)) {
       case (?_time) return false;
       case (null) {};
     };
+    // gift ID locked
+    switch (Map.get(locked, thash, gift.id)) {
+      case (?_time) return false;
+      case (null) {};
+    };
+    // gift ID revoked (already refunded or refund in progress)
     switch (Map.get(revoked, thash, gift.id)) {
       case (?(_, true, _)) return false;
       case (?(_, false, _)) return false;
