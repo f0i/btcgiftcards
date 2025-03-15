@@ -2,6 +2,8 @@
 
 Create gift cards on [btc-gift-cards.com](https://btc-gift-cards.com)!
 
+![Banner](src/frontend/public/email/valentine.jpeg)
+
 ### 🎁 A Simple Way to Gift Bitcoin
 
 BTC Gift Cards is a project designed to make gifting Bitcoin easy and accessible, serving as an introduction to **ckBTC on the Internet Computer** and the broader ICP ecosystem. Whether it’s for Christmas, a birthday, or any special occasion, this project provides a seamless way to share Bitcoin with others.
