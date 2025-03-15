@@ -126,7 +126,6 @@ function Create() {
   ) => {
     const { id, value } = e.target;
     setScroll(id === "design" ? "theme" : "message");
-    console.log("asdfasdfasd", id, value, formData);
     setFormData((prevData) => ({
       ...prevData,
       [id]: value,

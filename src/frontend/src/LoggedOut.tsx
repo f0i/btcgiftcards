@@ -1,4 +1,3 @@
-import { useAuth } from "./use-auth-client";
 import TopNav from "./components/TopNav";
 import Footer from "./Footer";
 import { ImageTextCTA } from "./Landing";

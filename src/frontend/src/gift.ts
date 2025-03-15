@@ -40,7 +40,6 @@ export const isRevoked = (
   sendStatus: SendStatusEntry[],
 ): boolean => {
   let key: SendStatusKey = statusKey(gift, sendStatus);
-  console.log("isRevoked", key, gift, sendStatus);
 
   switch (key) {
     case "revoked":

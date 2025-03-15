@@ -23,7 +23,6 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       try {
         await navigator.clipboard.writeText(textToCopy);
         setIsCopied(true);
-        console.log("Copied to clipboard:", textToCopy);
       } catch (error) {
         console.error("Failed to copy:", error);
       }
@@ -53,11 +52,11 @@ export const CopyFormattedContent = ({
 }: {
   gift: Gift;
   isPreview?: boolean;
-  variant?: "default" | "outline";
+  variant?: "default" | "outline" | "ghost";
   size?: "default" | "sm" | "lg";
   label?: string;
 }) => {
-  const [emailHtml, setEmailHtml] = useState("");
+  const [emailHtml, setEmailHtml] = useState("asdf");
 
   const handleCopy = async () => {
     if (isPreview) {
@@ -66,9 +65,14 @@ export const CopyFormattedContent = ({
     }
     try {
       const htmlContent = emailHtml;
-      const textContent = hiddenDivRef.current?.innerText;
+      const textContent = hiddenDivRef.current?.innerText || "-";
 
       if (!htmlContent || !textContent) {
+        console.log(
+          "Content missing for CopyFormattedContent",
+          htmlContent,
+          textContent,
+        );
         throw new Error("No content to copy");
       }
 

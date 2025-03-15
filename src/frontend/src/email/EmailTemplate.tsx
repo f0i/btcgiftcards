@@ -71,7 +71,6 @@ const EmailTemplate: React.FC<EmailTemplateProps> = ({
   useEffect(() => {
     requestAnimationFrame(() => {
       if (!iframeRef.current?.contentWindow) {
-        console.log("asdfqwer");
         return;
       }
       const iframeDoc = iframeRef.current.contentWindow.document;
