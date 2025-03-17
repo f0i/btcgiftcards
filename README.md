@@ -42,14 +42,13 @@ BTC Gift Cards is a project designed to make gifting Bitcoin easy and accessible
 
 ## Local setup
 
-Init toolchain
+Init toolchain:
 
 ```bash
 mops toolchain init
 ```
 
 Create and deploy canisters:
-
 
 ```bash
 # create all canisters
@@ -73,6 +72,12 @@ To get some funds for testing, call the transfer function on the ledger and spec
 ```bash
 # when prompted, input principal and subaccount as show inside the app
 dfx canister call ckbtc_ledger icrc1_transfer
+```
+
+Run the following command to execute all tests:
+
+```bash
+npm run test
 ```
 
 ## Architecture
