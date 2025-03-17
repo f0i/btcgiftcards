@@ -9,12 +9,12 @@ export type ThemeKey =
   | "wedding"
   | "easter";
 const themes: { [key: string]: Theme } = {
-  xmas: { name: "xmas", cover: "/themes/xmas-gift.jpg" },
+  xmas: { name: "xmas", cover: "/email/xmas.jpeg" },
   xmasThankYou: {
     name: "xmasThankYou",
     cover: "/themes/xmas-thankyou.jpg",
   },
-  btcFuture: { name: "btcFuture", cover: "/themes/btc-future.jpeg" },
+  btcFuture: { name: "btcFuture", cover: "/email/future.jpeg" },
   btcPlan: { name: "btcPlan", cover: "/themes/btc-plan.jpg" },
   birthday: { name: "birthday", cover: "/email/birthday.jpeg" },
   valentine: { name: "valentine", cover: "/email/valentine.jpeg" },
