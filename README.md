@@ -102,6 +102,7 @@ During the Encode Culb Hackathon, BTC Gift Cards received a developer grant whic
 
 - Automate sending emails (most likeley needed at some point, currently still manual)
 - Add redeem by code (without email verification)
+- Lightning integration to deposit/withdraw ckBTC
 
 ### Obsolete
 

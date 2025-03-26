@@ -14,7 +14,7 @@ const themes: { [key: string]: Theme } = {
     name: "xmasThankYou",
     cover: "/themes/xmas-thankyou.jpg",
   },
-  btcFuture: { name: "btcFuture", cover: "/email/future.jpeg" },
+  btcFuture: { name: "btcFuture", cover: "/email/champagne.jpeg" },
   btcPlan: { name: "btcPlan", cover: "/themes/btc-plan.jpg" },
   birthday: { name: "birthday", cover: "/email/birthday.jpeg" },
   valentine: { name: "valentine", cover: "/email/valentine.jpeg" },
