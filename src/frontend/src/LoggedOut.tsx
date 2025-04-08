@@ -1,11 +1,11 @@
-import TopNav from "./components/TopNav";
+import TopNav, { Tab } from "./components/TopNav";
 import Footer from "./Footer";
 import { ImageTextCTA } from "./Landing";
 
-function LoggedOut() {
+function LoggedOut({ tab }: { tab: Tab }) {
   return (
     <>
-      <TopNav tab="new" />
+      <TopNav tab={tab} />
 
       <ImageTextCTA
         title="Sign in"

@@ -24,30 +24,44 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route
             path="/create"
-            element={isAuthenticated ? <LoggedIn tab="new" /> : <LoggedOut />}
+            element={
+              isAuthenticated ? <LoggedIn tab="new" /> : <LoggedOut tab="new" />
+            }
           />
           <Route
             path="/created"
             element={
-              isAuthenticated ? <LoggedIn tab="created" /> : <LoggedOut />
+              isAuthenticated ? (
+                <LoggedIn tab="created" />
+              ) : (
+                <LoggedOut tab="created" />
+              )
             }
           />
           <Route
             path="/received"
             element={
-              isAuthenticated ? <LoggedIn tab="received" /> : <LoggedOut />
+              isAuthenticated ? (
+                <LoggedIn tab="received" />
+              ) : (
+                <LoggedOut tab="received" />
+              )
             }
           />
           <Route
             path="/account"
             element={
-              isAuthenticated ? <LoggedIn tab="account" /> : <LoggedOut />
+              isAuthenticated ? (
+                <LoggedIn tab="account" />
+              ) : (
+                <LoggedOut tab="account" />
+              )
             }
           />
           <Route path="/show/:giftId" element={<ShowGiftCard />} />
           <Route path="/send/:giftId" element={<ShowGiftCard />} />
           <Route path="/colors" element={<ColorTest />} />
-          <Route path="/signin" element={<LoggedOut />} />
+          <Route path="/signin" element={<LoggedOut tab="new" />} />
           <Route path="/learn" element={<Learn />} />
           <Route path="/learn/:topic" element={<Learn />} />
           <Route path="/about" element={<Learn />} />
