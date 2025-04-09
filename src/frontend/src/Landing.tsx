@@ -231,6 +231,26 @@ function Landing() {
         </div>
       </div>
 
+      {process.env.DFX_NETWORK === "demo" ? (
+        <ImageTextCTA
+          title="You are currently using the demo app!"
+          text="Go to btc-gift-cards.com to send or receive real Bitcon."
+          img="/visuals/playground-paper-orange.jpeg"
+          cta="Start the main app"
+          to="https://btc-gift-cards.com" // "https://y4leg-vyaaa-aaaah-aq3ra-cai.icp0.io"
+          imageRight={false}
+        />
+      ) : (
+        <ImageTextCTA
+          title="Not ready? Try the demo app."
+          text="Try out Bitcoin Gift Cards with Testnet Bitcoin."
+          img="/visuals/playground-paper-orange.jpeg"
+          cta="Goto the Demo application"
+          to="https://mdh4j-syaaa-aaaah-arcfq-cai.icp0.io"
+          imageRight={false}
+        />
+      )}
+
       <Footer />
     </>
   );
@@ -276,7 +296,11 @@ export const ImageTextCTA = ({
           <Button
             variant="cta"
             size="lg"
-            onClick={() => login(false).then(() => (to ? navigate(to) : null))}
+            onClick={() =>
+              to?.startsWith("https://")
+                ? (window.location.href = to)
+                : login(false).then(() => (to ? navigate(to) : null))
+            }
             className="w-full lg:w-2/3 max-w-md m-auto lg:m-0"
           >
             {cta}

@@ -14,7 +14,7 @@ export type Tab =
 
 const TopNav = ({ tab }: { tab: Tab }) => {
   const { login, logout, isAuthenticated } = useAuth();
-  const isTestnet = process.env.DFX_NETWORK === "demo" || true;
+  const isTestnet = process.env.DFX_NETWORK === "demo";
 
   const NavItems = () => (
     <>
