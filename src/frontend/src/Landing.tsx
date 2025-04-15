@@ -4,9 +4,11 @@ import { BsArrowDownCircle, BsQuote } from "react-icons/bs";
 import Footer from "./Footer";
 import { useNavigate } from "react-router-dom";
 import { Button } from "./components/ui/button";
+import { useEnv } from "./use-env";
 
 function Landing() {
   const { login, isAuthenticated } = useAuth();
+  const { isDemo } = useEnv();
 
   const navigate = useNavigate();
 
@@ -231,7 +233,7 @@ function Landing() {
         </div>
       </div>
 
-      {process.env.DFX_NETWORK === "demo" ? (
+      {isDemo ? (
         <ImageTextCTA
           title="You are currently using the demo app!"
           text="Go to btc-gift-cards.com to send or receive real Bitcon."
@@ -245,7 +247,7 @@ function Landing() {
           title="Not ready? Try the demo app."
           text="Try out Bitcoin Gift Cards with Testnet Bitcoin."
           img="/visuals/playground-paper-orange.jpeg"
-          cta="Goto the Demo application"
+          cta="Go to the Demo application"
           to="https://mdh4j-syaaa-aaaah-arcfq-cai.icp0.io"
           imageRight={false}
         />

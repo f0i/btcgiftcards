@@ -6,6 +6,7 @@ import { formatCurrency, shortenErr } from "./utils";
 import { Button } from "./components/ui/button";
 import EmailTemplate from "./email/EmailTemplate";
 import { Copy } from "lucide-react";
+import { useEnv } from "./use-env";
 
 interface CopyButtonProps {
   textToCopy: string;
@@ -108,7 +109,7 @@ export const CopyFormattedContent = ({
           <EmailTemplate
             recipientName={gift.to}
             amount={formatCurrency(gift.amount, 10000000, 0)}
-            value={formatCurrency(gift.amount, 1000, 2)}
+            value={formatCurrency(gift.amount, useEnv().satPerUSD, 2)}
             senderName={gift.sender}
             customMessage={gift.message}
             theme={gift.design as ThemeKey}

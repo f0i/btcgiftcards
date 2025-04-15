@@ -1,11 +1,14 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BackendActor,
   LedgerActor,
   MinterActor,
   useAuth,
 } from "./use-auth-client";
-import { GiftInfo } from "../../declarations/backend/backend.did";
+import {
+  Account as ckBTCAccount,
+  GiftInfo,
+} from "../../declarations/backend/backend.did";
 import { ckbtc_ledger } from "../../declarations/ckbtc_ledger";
 import { confirmDialog, CopyButton } from "./CopyButton";
 import {
@@ -22,6 +25,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { Button } from "./components/ui/button";
 import { useState } from "react";
 import { Input } from "./components/ui/input";
+import { useEnv } from "./use-env";
+import { QRCodeSVG } from "qrcode.react";
+import { ckbtc_minter } from "../../declarations/ckbtc_minter";
 
 function Account() {
   const { backendActor, minterActor, principal } = useAuth();
@@ -56,6 +62,7 @@ export default Account;
 function UserInfo({
   info,
   ledger,
+  minter,
   backend,
 }: {
   info: GiftInfo;
@@ -69,6 +76,8 @@ function UserInfo({
   const { isLoading, isError, data, error } = useQuery(
     queries.balance(ledger, info.account),
   );
+
+  const { isDemo } = useEnv();
 
   // User info
   const email = info.email;
@@ -160,12 +169,23 @@ function UserInfo({
 
       <Card>
         <CardHeader>
-          <CardTitle>Deposit ckBTC</CardTitle>
+          <CardTitle>
+            {isDemo ? "Deposit TESTNET ckBTC" : "Deposit ckBTC"}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
+            {isDemo ? (
+              <div className="mb-4 rounded-lg border border-yellow-500 bg-yellow-100 p-4 text-sm text-yellow-900">
+                <strong>Warning:</strong> This is a{" "}
+                <strong>demo version</strong> of the app. Please deposit{" "}
+                <strong>only TESTNET ckBTC</strong>. Sending real ckBTC may
+                result in permanent loss.
+                <DepositAddressBTC info={info} minter={minter} />
+              </div>
+            ) : null}
             <p className="text-sm font-medium text-gray-600">
-              ckBTC deposit account:
+              {isDemo ? "TESTNET" : null} ckBTC deposit account:
             </p>
             <div className="flex items-center justify-between bg-gray-100 p-2 rounded-lg">
               <span className="font-mono text-sm text-gray-800 break-all">
@@ -187,7 +207,9 @@ function UserInfo({
 
       <Card>
         <CardHeader>
-          <CardTitle>Withdraw ckBTC</CardTitle>
+          <CardTitle>
+            {isDemo ? "Withdraw TESTNET ckBTC" : "Withdraw ckBTC"}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -232,3 +254,88 @@ function UserInfo({
     </div>
   );
 }
+
+function DepositAddressBTC(props: { info: GiftInfo; minter: MinterActor }) {
+  const account = props.info.account;
+  const { isLoading, isError, data } = useQuery({
+    queryKey: ["deposit-address-btc", props.info.account.subaccount.toString()],
+    queryFn: () => {
+      return props.minter.get_btc_address({
+        owner: [account.owner],
+        subaccount: account.subaccount,
+      });
+    },
+  });
+
+  // TODO: remove dummy address
+  //return <BTCQRCode btcAddress="bc1qyawapemf4nsv6lc4z9tcltgfymsl2wklnecqlw" />;
+  if (isLoading) return <div>Loading BTC deposit address...</div>;
+  // TODO: log error
+  if (isError) return <div>Error getting BTC deposit address.</div>;
+  if (!data) return <div>No Data received</div>;
+  return (
+    <BTCQRCode btcAddress={data} account={account} minter={props.minter} />
+  );
+}
+
+const BTCQRCode = ({
+  btcAddress,
+  account,
+  minter,
+}: {
+  btcAddress: string;
+  account: ckBTCAccount;
+  minter: MinterActor;
+}) => {
+  const btcUri = `bitcoin:${btcAddress}`;
+  const { isDemo } = useEnv();
+
+  const updateBalance = useMutation({
+    mutationFn: () =>
+      minter.update_balance({
+        owner: [account.owner],
+        subaccount: account.subaccount,
+      }),
+  });
+
+  return (
+    <div className="">
+      {isDemo ? "TESTNET" : null} BTC deposit account:{" "}
+      <CopyButton
+        label={
+          isDemo
+            ? "Copy TESTNET BTC Deposit Address"
+            : "Copy BTC Deposit Address"
+        }
+        textToCopy={btcAddress}
+      />
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          updateBalance.isPending ? null : updateBalance.mutate();
+        }}
+      >
+        {updateBalance.isPending
+          ? "updating..."
+          : updateBalance.isSuccess
+            ? "Balance updated"
+            : "Update balance"}
+      </Button>
+      <br />
+      <div className="info-address min-height-200 flex-row">
+        <span className="max-w-600 flex-grow">{btcAddress}</span>
+        <QRCodeSVG
+          width={150}
+          className="float-right w-300"
+          value={btcUri}
+          size={150} // in pixels
+          fgColor="#000000"
+          bgColor="transparent"
+          level="H" // Error correction: L, M, Q, H
+          marginSize={1}
+        />
+      </div>
+    </div>
+  );
+};

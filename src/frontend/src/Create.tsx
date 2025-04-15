@@ -11,6 +11,7 @@ import { confirmDialog } from "./CopyButton";
 import EmailTemplate, { ScrollTarget } from "./email/EmailTemplate";
 import { getTheme, ThemeKey } from "./cardThemes";
 import { Button } from "./components/ui/button";
+import { useEnv } from "./use-env";
 
 function Create() {
   const queryClient = useQueryClient();
@@ -132,6 +133,9 @@ function Create() {
     }));
   };
 
+  const value = (sats: bigint): string =>
+    formatCurrency(sats, useEnv().satPerUSD, 2);
+
   return (
     <div className="content w-max-center mb-4 grid grid-cols-1 lg:grid-cols-[60%_40%] gap-8 grow">
       <form action="#" onSubmit={handleSubmit} className="w-full">
@@ -179,13 +183,12 @@ function Create() {
             handleChange(e as any);
           }}
         >
-          {/* TODO: get current exchange rate */}
-          <option value="1000">1000 ckSat (~1$)</option>
+          <option value="1000">1000 ckSat (~${value(1000n)})</option>
           <option value="2222">2222 ckSat (🦆🦆🦆🦆)</option>
-          <option value="5000">5000 ckSat (~5$)</option>
-          <option value="10000">10000 ckSat (~10$)</option>
-          <option value="21000">21000 ckSat (~21$)</option>
-          <option value="50000">50000 ckSat (~50$)</option>
+          <option value="5000">5000 ckSat (~${value(5000n)})</option>
+          <option value="10000">10000 ckSat (~${value(10000n)})</option>
+          <option value="21000">21000 ckSat (~${value(21000n)})</option>
+          <option value="50000">50000 ckSat (~${value(50000n)})</option>
           <option value="0">Custom Amount...</option>
         </select>
         <div className="w-full" hidden={!useCustomAmount}>
@@ -234,7 +237,7 @@ function Create() {
             )}
             value={formatCurrency(
               useCustomAmount ? formData.customAmount : formData.amount,
-              1000,
+              useEnv().satPerUSD,
               2,
             )}
             senderName={formData.sender}

@@ -3,6 +3,7 @@ import Logo from "./Logo";
 import { useAuth } from "../use-auth-client";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useEnv } from "@/use-env";
 
 export type Tab =
   | "created"
@@ -14,7 +15,7 @@ export type Tab =
 
 const TopNav = ({ tab }: { tab: Tab }) => {
   const { login, logout, isAuthenticated } = useAuth();
-  const isTestnet = process.env.DFX_NETWORK === "demo";
+  const { isDemo } = useEnv();
 
   const NavItems = () => (
     <>
@@ -114,7 +115,7 @@ const TopNav = ({ tab }: { tab: Tab }) => {
         </Sheet>
 
         <div className="grow font-bold text-red-600 text-center flex items-center justify-center">
-          {isTestnet && (
+          {isDemo && (
             <>
               <span className="md:hidden">Demo mode - No real Bitcoin</span>
               <span className="hidden md:inline">

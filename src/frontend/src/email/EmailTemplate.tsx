@@ -102,7 +102,11 @@ const EmailTemplate: React.FC<EmailTemplateProps> = ({
           </p>
         ))}
       </div>
-      <iframe className="w-full h-full" ref={iframeRef} />
+      <iframe
+        className="w-full h-full"
+        ref={iframeRef}
+        srcDoc={`<!DOCTYPE html><html><head> <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'; img-src 'self' data: https:;"> </head><body></body></html>`}
+      />
     </div>
   );
 };
@@ -120,7 +124,8 @@ const template = (
   scrollTo?: string,
 ) => {
   //const baseUrl = "";
-  const baseUrl = "https://btc-gift-cards.com";
+  //const baseUrl = "https://btc-gift-cards.com";
+  const baseUrl = document.location.origin;
 
   const redeemLink = redeemPath.length > 2 ? baseUrl + redeemPath : "#";
 
@@ -132,6 +137,7 @@ const template = (
   <title></title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"><!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch><o:AllowPNG/></o:OfficeDocumentSettings></xml><![endif]--><!--[if !mso]><!-->
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'; img-src 'self' https: data:;">
   <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Cormorant+Garamond" rel="stylesheet" type="text/css"><!--<![endif]-->
   <style>

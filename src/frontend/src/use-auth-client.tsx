@@ -13,6 +13,7 @@ import {
   createActor as createLedgerActor,
   canisterId as canisterIdLedger,
 } from "../../declarations/ckbtc_ledger";
+import { useEnv } from "./use-env";
 
 export type BackendActor = typeof backend;
 export type MinterActor = typeof ckbtc_minter;
@@ -20,7 +21,8 @@ export type LedgerActor = typeof ckbtc_ledger;
 const AuthContext = createContext({} as AuthProps);
 
 export const getIdentityProvider = () => {
-  if (process.env.DFX_NETWORK === "local") {
+  const { isLocal } = useEnv();
+  if (isLocal) {
     const ii = process.env.CANISTER_ID_INTERNET_IDENTITY;
     return "http://" + ii + ".localhost:4943/";
   }

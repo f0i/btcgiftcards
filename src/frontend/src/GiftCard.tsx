@@ -16,6 +16,7 @@ import {
   statusText,
 } from "./gift";
 import { Check } from "lucide-react";
+import { useEnv } from "./use-env";
 
 export const GiftCard = ({
   gift,
@@ -136,7 +137,7 @@ export const GiftCard = ({
             {formatCurrency(gift.amount, 100000000.0, 0)} Bitcoin
           </div>
           <br />
-          Valued at about ${formatCurrency(gift.amount, 1000.0, 2)}
+          Valued at about ${formatCurrency(gift.amount, useEnv().satPerUSD, 2)}
         </div>
       </div>
       <div className="text-center grow py-8 font-bold">
