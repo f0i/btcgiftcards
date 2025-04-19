@@ -152,7 +152,7 @@ function Landing() {
           </div>
         </div>
         <p className="w-max-center text-center text-sm text-gray-600">
-          Join the first customers who trust BTC Gift Cards
+          Join the first customers who trust Bitcoin Gift Cards
         </p>
       </div>
 
@@ -162,7 +162,7 @@ function Landing() {
       {/*
       <ImageTextCTA
         title="New Year Bitcoin Gift Card"
-        text="Start the New Year with a unique and valuable gift! Send a personalized BTC Gift Card with festive designs and a custom message."
+        text="Start the New Year with a unique and valuable gift! Send a personalized Bitcoin Gift Card with festive designs and a custom message."
         img="/visuals/fireworks-paper-orange-green.jpeg"
         cta="Create a New Year Gift Card"
         imageRight={false}
@@ -180,7 +180,7 @@ function Landing() {
 
       <ImageTextCTA
         title="Wedding Bitcoin Gift Card"
-        text="Celebrate love with a gift that lasts forever! Send a BTC Gift Card as a meaningful and timeless wedding present."
+        text="Celebrate love with a gift that lasts forever! Send a Bitcoin Gift Card as a meaningful and timeless wedding present."
         img="/visuals/wedding-paper-orange-green.jpeg"
         cta="Create a Wedding Gift Card"
         to="/create#wedding"

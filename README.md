@@ -89,12 +89,12 @@ npm run test
 The following outlines the next features that are considered for implementation.
 All of those are subject to change based on user feedback, or changes in development resources.
 
-### March 2025
+### March 2025 (completed)
 
-During the Encode Culb Hackathon, BTC Gift Cards received a developer grant which will cover development of the following features.
+During the Encode Culb Hackathon, BTC Gift Cards received a developer grant which also covered development of the following features.
 
 - Implement new design
-- Forward Gift Cards
+- Simplify account management
 - Automated testing
 - Documentation
 
