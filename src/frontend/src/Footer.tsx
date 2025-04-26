@@ -30,7 +30,7 @@ const Footer = () => {
           links={[
             ["New Year", "/create#new-year"],
             ["Valentine's Day", "/create#valentine"],
-            ["Easter", "/create#easter"],
+            ["Mothers Day", "/create#mothersday"],
             ["Birthday", "/create#birthday"],
             ["New Baby", "/create#baby"],
             ["Wedding", "/create#wedding"],

@@ -7,16 +7,9 @@ import { confirmDialog, CopyFormattedContent } from "./CopyButton";
 import toast from "react-hot-toast";
 import { Principal } from "@dfinity/principal";
 import { Button } from "./components/ui/button";
-import { useNavigate } from "react-router-dom";
-import {
-  canCancelSend,
-  canRequestSend,
-  isClaimed,
-  isRevoked,
-  statusText,
-} from "./gift";
 import { Check } from "lucide-react";
 import { useEnv } from "./use-env";
+import { canCancelSend, canRequestSend, isClaimed, isRevoked } from "./gift";
 
 export const GiftCard = ({
   gift,
@@ -26,6 +19,7 @@ export const GiftCard = ({
   principal,
   className,
   isPreview,
+  isForMe,
 }: {
   gift: Gift;
   refundable: string[];
@@ -34,10 +28,10 @@ export const GiftCard = ({
   principal?: Principal;
   className?: string;
   isPreview?: boolean;
+  isForMe?: boolean | null;
 }) => {
-  let { backendActor } = useAuth();
+  let { backendActor, isAuthenticated, login } = useAuth();
   let queryClient = useQueryClient();
-  let navigate = useNavigate();
 
   const refund = async () => {
     try {
@@ -140,7 +134,7 @@ export const GiftCard = ({
           Valued at about ${formatCurrency(gift.amount, useEnv().satPerUSD, 2)}
         </div>
       </div>
-      <div className="text-center grow py-8 font-bold">
+      <div className="text-center grow py-8 font-bold px-4">
         {gift.message.split("\n").map((line, index) => (
           <p style={{ margin: 0 }} key={index}>
             {line.length > 0 ? line : <>&nbsp;</>}
@@ -161,6 +155,10 @@ export const GiftCard = ({
           <Button>
             Claimed <Check />
           </Button>
+        ) : !isAuthenticated ? (
+          <Button onClick={() => login(false)}>Sign in to Claim</Button>
+        ) : isForMe === false ? (
+          <Button>Change Account to Claim</Button>
         ) : (
           <Button onClick={() => claim()}>CLAIM YOUR BITCOIN</Button>
         )}

@@ -7,7 +7,8 @@ export type ThemeKey =
   | "birthday"
   | "valentine"
   | "wedding"
-  | "easter";
+  | "easter"
+  | "mothersday";
 const themes: { [key: string]: Theme } = {
   xmas: { name: "xmas", cover: "/email/xmas.jpeg" },
   xmasThankYou: {
@@ -20,6 +21,7 @@ const themes: { [key: string]: Theme } = {
   valentine: { name: "valentine", cover: "/email/valentine.jpeg" },
   wedding: { name: "wedding", cover: "/email/wedding.jpeg" },
   easter: { name: "easter", cover: "/email/easter.jpeg" },
+  mothersday: { name: "mothersday", cover: "/email/mothersday.jpeg" },
 };
 
 export const getTheme = (name: ThemeKey | string): Theme => {

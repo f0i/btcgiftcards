@@ -167,7 +167,6 @@ function Landing() {
         cta="Create a New Year Gift Card"
         imageRight={false}
       />
-      */}
 
       <ImageTextCTA
         title="Easter Bitcoin Gift Card"
@@ -175,6 +174,16 @@ function Landing() {
         img="/visuals/easter-paper-orange-green.jpeg"
         cta="Create an Easter Gift Card"
         to="/create#easter"
+        imageRight={false}
+      />
+      */}
+
+      <ImageTextCTA
+        title="Mother's Day Bitcoin Gift Card"
+        text="Show your love with a timeless gift! Send a personalized Bitcoin Gift Card this Mother's Day—with elegant designs and a heartfelt message she'll always remember."
+        img="/visuals/mothers-day-paper-orange.jpeg"
+        cta="Create a Mother's Day Gift Card"
+        to="/create#mothersday"
         imageRight={false}
       />
 

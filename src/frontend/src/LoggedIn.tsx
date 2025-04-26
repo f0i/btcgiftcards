@@ -87,6 +87,7 @@ function LoggedIn({ tab }: { tab: Tab }) {
                   sendStatus={data.ok.sendStatus}
                   principal={principal!}
                   onRefund={refund}
+                  myEmail={data.ok.email}
                 />
               ) : (
                 <PageLoading
@@ -113,6 +114,7 @@ function GiftcardTable({
   sendStatus,
   principal,
   onRefund,
+  myEmail,
 }: {
   gifts: Gift[];
   refundable: string[];
@@ -120,6 +122,7 @@ function GiftcardTable({
   sendStatus: SendStatusEntry[];
   principal: Principal;
   onRefund: (gift: Gift) => void;
+  myEmail: string;
 }) {
   if (gifts.length === 0) return <div className="warning mt-2">{empty}</div>;
 
@@ -149,6 +152,7 @@ function GiftcardTable({
               sendStatus={sendStatus}
               hideRevoked={true}
               principal={principal}
+              isForMe={myEmail === gift.data.to}
             />
           </div>
         )}

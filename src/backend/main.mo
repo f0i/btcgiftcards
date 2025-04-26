@@ -198,11 +198,12 @@ actor class Main() = this {
     let sendArr = Vec.toArray<Gift>(send);
     let refundable = Array.map(Array.filter(sendArr, isRefundable), func(g : Gift) : Text = g.id);
     let sendStatus = Array.map(sendArr, getSendStatusEntry);
+    let sendStatusOwn = Array.map(Vec.toArray(own), getSendStatusEntry);
 
     return #ok({
       created = sendArr;
       refundable;
-      sendStatus;
+      sendStatus = Array.flatten([sendStatus, sendStatusOwn]);
       received = Vec.toArray<Gift>(own);
       email;
       account;
@@ -367,14 +368,12 @@ actor class Main() = this {
   };
 
   public shared ({ caller }) func claim(id : Text) : async Result<Text> {
+    if (Principal.isAnonymous(caller)) return #err("Not signed in");
     let claimAll = id == "*";
     let now = Time.now();
 
-    let email = Map.get(verified, phash, caller);
-    let own : Vec<Gift> = switch (email) {
-      case (null) Vec.new<Gift>();
-      case (?gmail) Option.get<Vec<Gift>>(Map.get(received, thash, gmail), Vec.new());
-    };
+    let ?email = Map.get(verified, phash, caller) else return #err("Email not verified.");
+    let own : Vec<Gift> = Option.get<Vec<Gift>>(Map.get(received, thash, email), Vec.new());
 
     if (claimAll) {
       var count = 0;
@@ -395,6 +394,7 @@ actor class Main() = this {
       #ok(if (count == 1) "1 gift card claimed" else (Nat.toText(count) # " gift cards claimed"));
     } else {
       let ?gift = Map.get(lookup, thash, id) else return #err("Invalid gift ID");
+      if (gift.to != email) return #err("Not your gift");
 
       switch (getSendStatus(gift)) {
         // ignore claimed and revoked

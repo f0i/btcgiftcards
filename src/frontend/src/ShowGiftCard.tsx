@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { queries, queryKeys } from "./queryKeys";
 import { useAuth } from "./use-auth-client";
 import { GiftCard } from "./GiftCard";
@@ -88,6 +88,7 @@ const ShowGiftCard = () => {
             hideRevoked={false}
             principal={principal}
             className="max-w-2xl m-auto mt-8"
+            isForMe={isForMe}
           />
         )}
         <br />

@@ -69,6 +69,7 @@ const TopNav = ({ tab }: { tab: Tab }) => {
       >
         Learn
       </Link>
+      <div className="grow" />
       {isAuthenticated ? (
         <Link to="/" onClick={logout} className="button-hover-danger">
           Sign out
