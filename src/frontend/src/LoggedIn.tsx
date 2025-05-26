@@ -171,9 +171,9 @@ function GiftcardTable({
           },
           {
             name: "To",
-            selector: (gift) => gift.to,
             width: "300px",
             sortable: true,
+            cell: (gift) => <span className="hideable-email">{gift.to}</span>,
           },
           {
             name: "Message",
@@ -185,6 +185,7 @@ function GiftcardTable({
             selector: (gift) => statusText(gift, sendStatus),
             width: "100px",
             style: { margin: "auto" },
+            sortable: true,
           },
           {
             name: "Refundable",

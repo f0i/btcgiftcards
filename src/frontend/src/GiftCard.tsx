@@ -142,7 +142,8 @@ export const GiftCard = ({
         ))}
       </div>
       <div className="text-center grow py-4">
-        This Gift card is linked to {gift.to}
+        This Gift card is linked to{" "}
+        <span className="hideable-email">{gift.to}</span>
         <br />
         <br />
         {isPreview ? (

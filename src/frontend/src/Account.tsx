@@ -142,7 +142,9 @@ function UserInfo({
         <CardContent>
           <p>
             Your email address:{" "}
-            <span className="font-mono text-gray-800">{email}</span>
+            <span className="font-mono text-gray-800 hideable-email">
+              {email}
+            </span>
           </p>
         </CardContent>
       </Card>

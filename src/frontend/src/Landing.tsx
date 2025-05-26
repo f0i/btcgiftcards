@@ -176,7 +176,6 @@ function Landing() {
         to="/create#easter"
         imageRight={false}
       />
-      */}
 
       <ImageTextCTA
         title="Mother's Day Bitcoin Gift Card"
@@ -184,6 +183,16 @@ function Landing() {
         img="/visuals/mothers-day-paper-orange.jpeg"
         cta="Create a Mother's Day Gift Card"
         to="/create#mothersday"
+        imageRight={false}
+      />
+      */}
+
+      <ImageTextCTA
+        title="WCS 2025 Bitcoin Gift Card"
+        text="Remember the World Computer Summit 2025 with a special edition Bitcoin Gift Card! For a limited time, you can create a unique gift card with the WCS 2025 design, perfect for celebrating this historic event."
+        img="/visuals/mountain-2025-paper-orange.jpeg"
+        cta="Create a WCS 2025 Gift Card"
+        to="/create#wcs25"
         imageRight={false}
       />
 
