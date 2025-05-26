@@ -57,7 +57,7 @@ export const ThemeSelect = ({
         />
         <ThemeButton
           setActive={setActiveChange}
-          design="mothersday"
+          design="wcs25"
           active={active}
         />
         <ThemeButton
